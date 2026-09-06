@@ -4,7 +4,6 @@ import {
   ArrowRight,
   ClipboardCheck,
   HeartPulse,
-  Home,
   ShieldCheck,
   Stethoscope,
   Users,
@@ -25,25 +24,25 @@ const categories: ResourceCategory[] = [
   {
     name: "CHAMPVA",
     href: "/resources/champva",
-    body: "Provider access, questions to ask, telehealth, participation barriers, and what information to verify before relying on a care pathway.",
+    body: "Provider access, telehealth, participation questions, patient responsibility, and information to confirm before relying on a care pathway.",
     Icon: HeartPulse,
   },
   {
     name: "VA Community Care",
     href: "/resources/va-community-care",
-    body: "Referrals, authorization, provider pathways, records to keep, and the moving parts veterans often have to track themselves.",
+    body: "Referrals, authorization, provider pathways, records to keep, and questions to ask when the process stalls.",
     Icon: ShieldCheck,
   },
   {
     name: "Clinical Documentation",
     href: "/resources/documentation",
-    body: "Ethical treatment records, functional impact, documentation boundaries, and why responsible records grow out of real care.",
+    body: "Treatment records, functional impact, documentation boundaries, and the role clinical documentation can play across care systems.",
     Icon: ClipboardCheck,
   },
   {
     name: "Veteran Mental Health",
     href: "/resources/veteran-mental-health",
-    body: "Therapy access, PTSD-related concerns, family strain, transition stress, telehealth, and deciding what kind of help to look for next.",
+    body: "Therapy access, PTSD-related concerns, family strain, transition stress, telehealth, and deciding what kind of help to seek next.",
     Icon: Stethoscope,
   },
   {
@@ -74,8 +73,8 @@ export default function Resources() {
   return (
     <Layout>
       <SEO
-        title="Veteran & Family Resources | ValorWell"
-        description="Explore practical ValorWell resources on CHAMPVA, VA Community Care, veteran mental health, clinical documentation, and family systems."
+        title="Veteran & Family Mental Health Resources | ValorWell"
+        description="Browse ValorWell resources on CHAMPVA, VA Community Care, veteran mental health, clinical documentation, and family systems."
         canonical="/resources"
       />
       <BreadcrumbSchema
@@ -108,10 +107,10 @@ export default function Resources() {
             <div className="lg:col-span-8">
               <Eyebrow>ValorWell Resources</Eyebrow>
               <h1 className="mt-6 max-w-5xl text-4xl font-bold leading-[1.03] sm:text-5xl md:text-6xl lg:text-7xl">
-                Start with the question you are actually trying to answer.
+                Practical guidance for navigating care, coverage, documentation, and family systems.
               </h1>
               <p className="mt-7 max-w-3xl text-lg leading-8 text-[#111814]/68 md:text-xl">
-                These resources are built to make complicated care, documentation, and family-system questions easier to navigate. The library is intentionally small while the material is developed and verified.
+                Choose the topic closest to the question in front of you. Resource pages explain terminology, common process steps, questions to ask, and when current information should be confirmed with the responsible program or provider.
               </p>
             </div>
 
@@ -121,7 +120,7 @@ export default function Resources() {
                 onClick={() => trackHomeEvent("resources_hero_care", { page: "resources" })}
                 className="inline-flex min-h-12 items-center gap-2 rounded-md bg-[#3B5147] px-6 py-3 text-sm font-bold text-white"
               >
-                Need Care Instead?
+                Find Care
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
@@ -131,13 +130,10 @@ export default function Resources() {
         <section className="border-b border-[#3B5147]/15 bg-white">
           <div className="container-wide py-20 md:py-28">
             <div className="max-w-3xl">
-              <Eyebrow>Choose a Resource Path</Eyebrow>
+              <Eyebrow>Resource Categories</Eyebrow>
               <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                Five categories. No empty article archive.
+                Browse by topic.
               </h2>
-              <p className="mt-5 text-lg leading-8 text-[#111814]/64">
-                Each category explains what it is useful for, what information can change, and where to go next. New articles should appear only when there is something substantive enough to publish.
-              </p>
             </div>
 
             <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -172,19 +168,19 @@ export default function Resources() {
         <section className="border-b border-white/10 bg-[#111814] text-white">
           <div className="container-wide grid gap-12 py-20 md:py-28 lg:grid-cols-12 lg:items-start">
             <div className="lg:col-span-5">
-              <Eyebrow light>What This Hub Is For</Eyebrow>
+              <Eyebrow light>Using the Library</Eyebrow>
               <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                Better questions. Clearer next steps. Fewer invented answers.
+                Use educational guidance for orientation, then confirm details that can change.
               </h2>
             </div>
 
             <div className="lg:col-span-7">
               <div className="space-y-5">
                 {[
-                  "Use the resources to understand terminology, common friction points, and the questions worth asking next.",
-                  "Verify current benefits, authorization, provider participation, and administrative requirements when those details can change.",
-                  "Treat mental-health information as education, not an individual diagnosis or treatment plan.",
-                  "Use Find Care when the problem is not understanding the system but actually locating a current ValorWell care pathway.",
+                  "Use resource pages to understand terminology, common process steps, and questions worth asking next.",
+                  "Confirm current eligibility, authorization, provider participation, and administrative requirements with the responsible program when those details affect care or payment.",
+                  "Treat mental health information as general education rather than an individual diagnosis or treatment plan.",
+                  "If you are already looking for a ValorWell care pathway, use Find Care instead of starting with the resource library.",
                 ].map((item) => (
                   <div key={item} className="flex gap-4 border-b border-white/10 pb-5 last:border-b-0">
                     <ShieldCheck className="mt-1 h-5 w-5 shrink-0 text-[#D7A92E]" aria-hidden="true" />
@@ -199,13 +195,10 @@ export default function Resources() {
         <section className="bg-[#F4F1E8]">
           <div className="container-wide grid gap-8 py-16 md:py-20 lg:grid-cols-12 lg:items-center">
             <div className="lg:col-span-8">
-              <Home className="h-7 w-7 text-[#3B5147]" aria-hidden="true" />
-              <h2 className="mt-5 text-3xl font-bold leading-tight md:text-4xl">
-                Resources should help you move—not keep you reading forever.
+              <Eyebrow>Need Something Else?</Eyebrow>
+              <h2 className="mt-4 text-3xl font-bold leading-tight md:text-4xl">
+                Go directly to care or contact ValorWell with a specific question.
               </h2>
-              <p className="mt-4 max-w-3xl leading-7 text-[#111814]/64">
-                If you already know you are looking for mental health care, go directly to the care pathway. If you are trying to understand a system first, choose the category closest to the question in front of you.
-              </p>
             </div>
             <div className="flex flex-wrap gap-3 lg:col-span-4 lg:justify-end">
               <Link

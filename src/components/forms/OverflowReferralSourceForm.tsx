@@ -109,8 +109,8 @@ export function OverflowReferralSourceForm() {
 
   return (
     <div className="border border-[color:var(--cl-evergreen)]/25 bg-white/45 shadow-sm">
-      <div className="grid gap-8 p-7 md:p-10 lg:grid-cols-[1fr_auto] lg:items-center">
-        <div>
+      <div className="grid min-w-0 gap-8 p-7 md:p-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+        <div className="min-w-0">
           <div className="flex items-center gap-3">
             <Building2
               className="h-6 w-6 text-[color:var(--cl-ember)]"
@@ -137,7 +137,7 @@ export function OverflowReferralSourceForm() {
           <Button
             type="button"
             onClick={() => setIsOpen(true)}
-            className="min-h-12 rounded-none bg-[color:var(--cl-evergreen)] px-7 text-sm font-bold uppercase tracking-wide text-[color:var(--cl-canvas)] hover:bg-[color:var(--cl-ink)]"
+            className="min-h-12 w-full whitespace-normal rounded-none bg-[color:var(--cl-evergreen)] px-7 py-3 text-center text-sm font-bold uppercase leading-snug tracking-wide text-[color:var(--cl-canvas)] hover:bg-[color:var(--cl-ink)] sm:w-auto"
           >
             Join the Overflow Referral Network
             <ChevronDown className="ml-2 h-4 w-4" aria-hidden="true" />
@@ -181,7 +181,7 @@ export function OverflowReferralSourceForm() {
             <button
               type="button"
               onClick={closeForm}
-              className="inline-flex h-10 w-10 shrink-0 items-center justify-center border border-[color:var(--cl-canvas)]/25 text-[color:var(--cl-canvas)]/75 hover:bg-[color:var(--cl-canvas)]/10"
+              className="inline-flex h-11 w-11 shrink-0 items-center justify-center border border-[color:var(--cl-canvas)]/25 text-[color:var(--cl-canvas)]/75 hover:bg-[color:var(--cl-canvas)]/10"
               aria-label="Close overflow referral form"
             >
               <X className="h-5 w-5" aria-hidden="true" />

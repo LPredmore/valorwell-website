@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { CheckCircle2, Loader2, Mail, ShieldCheck } from "lucide-react";
 import GetCare from "./GetCare";
@@ -49,6 +49,7 @@ export default function GetCareWithSignup() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const lastTriggerRef = useRef<HTMLElement | null>(null);
   const submissionId = useMemo(() => createWebsiteSubmissionKey(), [open]);
 
   // Direct entry point (/get-care?signup=1) so Google Ads' guided conversion
@@ -76,6 +77,7 @@ export default function GetCareWithSignup() {
         const destination = new URL(anchor.href, window.location.href);
         if (!CLIENT_PORTAL_HOSTS.has(destination.hostname)) return;
         event.preventDefault();
+        lastTriggerRef.current = anchor;
         setError(null);
         setOpen(true);
       } catch {
@@ -165,7 +167,10 @@ export default function GetCareWithSignup() {
 
       <Button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={(event) => {
+          lastTriggerRef.current = event.currentTarget;
+          setOpen(true);
+        }}
         className="fixed bottom-5 left-4 right-4 z-40 min-h-12 justify-center rounded-full px-6 font-bold shadow-2xl sm:left-auto sm:right-5"
       >
         Start CHAMPVA Intake
@@ -182,6 +187,13 @@ export default function GetCareWithSignup() {
           }}
           onInteractOutside={(event) => {
             if (submitting) event.preventDefault();
+          }}
+          onCloseAutoFocus={(event) => {
+            const trigger = lastTriggerRef.current;
+            if (!trigger) return;
+            event.preventDefault();
+            trigger.focus();
+            lastTriggerRef.current = null;
           }}
         >
           {submitted ? (

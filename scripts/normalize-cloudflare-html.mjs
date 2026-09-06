@@ -18,13 +18,11 @@ const routes = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)]
     }
     return url.pathname || "/";
   })
-  .filter((route) => route !== "/")
-  .sort((a, b) => b.split("/").length - a.split("/").length);
+  .filter((route) => route !== "/");
 
 for (const route of routes) {
   const relativeRoute = route.replace(/^\//, "");
-  const sourceDirectory = path.join(DIST_DIR, relativeRoute);
-  const sourcePath = path.join(sourceDirectory, "index.html");
+  const sourcePath = path.join(DIST_DIR, relativeRoute, "index.html");
   const destinationPath = path.join(DIST_DIR, `${relativeRoute}.html`);
 
   if (!fs.existsSync(sourcePath)) {
@@ -33,7 +31,8 @@ for (const route of routes) {
 
   fs.mkdirSync(path.dirname(destinationPath), { recursive: true });
   fs.copyFileSync(sourcePath, destinationPath);
-  fs.rmSync(sourceDirectory, { recursive: true, force: true });
 }
 
-console.log(`Normalized ${routes.length} prerendered routes for Cloudflare Pages extensionless HTML serving.`);
+console.log(
+  `Preserved directory-index HTML and added extensionless-compatible HTML for ${routes.length} prerendered routes.`,
+);

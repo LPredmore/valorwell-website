@@ -2,14 +2,12 @@ import type { MouseEvent, ReactNode } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
-  BriefcaseMedical,
   CalendarClock,
-  FileHeart,
-  HeartHandshake,
-  Scale,
+  CheckCircle2,
+  FileText,
   Settings2,
-  ShieldCheck,
   Stethoscope,
+  WalletCards,
   Workflow,
 } from "lucide-react";
 import { Layout } from "@/components/layout";
@@ -30,62 +28,42 @@ const Eyebrow = ({ children }: { children: ReactNode }) => (
   </div>
 );
 
-const principles = [
+const roleFacts = [
+  ["Current pay", "$75 per completed session"],
+  ["Pay cadence", "Weekly"],
+  ["Schedule", "You set your availability"],
+  ["Structure", "1099 · Telehealth-first"],
+  ["Billing", "Handled by ValorWell"],
+] as const;
+
+const roleFeatures = [
   {
-    title: "Your schedule remains yours",
-    body: "Set sustainable availability without pressure to continually expand it.",
+    title: "Set your availability",
+    body: "Choose the hours you can sustainably offer. Caseload volume is not guaranteed.",
     icon: CalendarClock,
   },
   {
-    title: "Your license still means something",
-    body: "Clinical decisions remain with the independently licensed clinician.",
-    icon: Scale,
-  },
-  {
-    title: "The infrastructure works around care",
-    body: "Billing, scheduling, documentation, and telehealth are built to reduce friction.",
-    icon: Workflow,
-  },
-] as const;
-
-const practiceQuestions = [
-  {
-    question: "Do you want autonomy without building an entire private practice?",
-    icon: BriefcaseMedical,
-  },
-  {
-    question:
-      "Do you want to choose the populations, concerns, and hours you accept?",
-    icon: Settings2,
-  },
-  {
-    question:
-      "Do you want your clinical judgment treated as professional judgment?",
+    title: "Make clinical decisions",
+    body: "Assessment, treatment planning, and clinical judgment remain with the independently licensed clinician.",
     icon: Stethoscope,
   },
   {
-    question:
-      "Do you want technology to reduce documentation work instead of creating more?",
-    icon: FileHeart,
-  },
-  {
-    question:
-      "Do you want sustainable boundaries treated as responsible practice?",
-    icon: ShieldCheck,
-  },
-  {
-    question: "Do you want broken workflows improved instead of normalized?",
+    title: "Use shared infrastructure",
+    body: "ValorWell provides the telehealth, scheduling, documentation, and billing environment around the clinical work.",
     icon: Workflow,
+  },
+  {
+    title: "Get paid weekly",
+    body: "Current direct-clinician compensation is $75 for each completed session, paid on a weekly cadence.",
+    icon: WalletCards,
   },
 ] as const;
 
-const clinicianIdentity = [
-  "They value autonomy and accountability.",
-  "They protect their capacity so they can remain effective.",
-  "They want systems that support care rather than obstruct it.",
-  "They believe documentation should serve clinical work.",
-  "They want to serve veterans and families without exploiting their claims.",
-  "They would rather improve a system than continually complain about it.",
+const onboardingSteps = [
+  ["1", "Submit interest", "Share your contact information and basic professional details."],
+  ["2", "Review the clinician environment", "Learn about the role, technology, documentation expectations, compensation, and populations served."],
+  ["3", "Complete qualification steps", "ValorWell reviews licensing and the additional information required for the clinical role."],
+  ["4", "Set up access and availability", "Approved clinicians complete onboarding, configure availability, and begin using the clinical platform."],
 ] as const;
 
 export default function Clinicians() {
@@ -94,7 +72,7 @@ export default function Clinicians() {
       <Layout>
         <SEO
           title="Mental Health Clinician Opportunities — $75 per session"
-          description="Explore ValorWell's telehealth clinician environment: $75 per completed session, weekly pay, flexible availability, billing support, clinical autonomy, and a veteran-focused mission."
+          description="Join ValorWell's telehealth clinician network: $75 per completed session, weekly pay, flexible availability, billing support, and independent clinical judgment."
           canonical="/clinicians"
         />
         <JobPostingSchema />
@@ -106,25 +84,19 @@ export default function Clinicians() {
         />
 
         <section className="relative overflow-hidden border-b border-[color:var(--cl-evergreen)]/20">
-          <div
-            className="pointer-events-none absolute inset-0"
-            aria-hidden="true"
-          >
+          <div className="pointer-events-none absolute inset-0" aria-hidden="true">
             <div className="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-[color:var(--cl-ember)]/10 blur-3xl" />
             <div className="absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-[color:var(--cl-evergreen)]/10 blur-3xl" />
           </div>
 
           <div className="container-wide relative grid gap-12 py-16 md:py-24 lg:grid-cols-12 lg:items-center">
             <div className="lg:col-span-7">
-              <Eyebrow>Now Recruiting Licensed Mental-Health Clinicians</Eyebrow>
+              <Eyebrow>Licensed Mental Health Clinicians</Eyebrow>
               <h1 className="mt-6 max-w-5xl text-4xl font-bold leading-[1.03] tracking-tight md:text-6xl lg:text-7xl">
-                Help build the clinic clinicians keep saying should exist.
+                Provide telehealth care with a schedule you control.
               </h1>
-              <p className="mt-7 max-w-3xl text-lg leading-relaxed text-[color:var(--cl-ink)]/85 md:text-xl">
-                Clear pay. Flexible availability. Billing support. Clinical
-                judgment that still belongs to the clinician. And a
-                veteran-focused mission you can help shape while the operating
-                model is still being built.
+              <p className="mt-7 max-w-3xl text-lg leading-relaxed text-[color:var(--cl-ink)]/80 md:text-xl">
+                ValorWell contracts with independently licensed mental health clinicians to serve veterans and military families through a telehealth-first clinical environment.
               </p>
 
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">
@@ -133,41 +105,30 @@ export default function Clinicians() {
                   onClick={scrollToInterest}
                   className="inline-flex items-center justify-center gap-2 bg-[color:var(--cl-evergreen)] px-7 py-4 text-sm font-bold uppercase tracking-wide text-[color:var(--cl-canvas)] transition-colors hover:bg-[color:var(--cl-ink)]"
                 >
-                  Start My Onboarding
+                  Start Clinician Onboarding
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </a>
                 <Link
-                  to="/mission"
+                  to="/about"
                   className="inline-flex items-center justify-center border border-[color:var(--cl-evergreen)] px-7 py-4 text-sm font-bold uppercase tracking-wide text-[color:var(--cl-evergreen)] transition-colors hover:bg-[color:var(--cl-evergreen)] hover:text-[color:var(--cl-canvas)]"
                 >
-                  See the ValorWell Mission
+                  About ValorWell
                 </Link>
               </div>
 
               <p className="mt-5 max-w-2xl text-sm leading-relaxed text-[color:var(--cl-ink)]/65">
-                Independently licensed clinicians only. Current direct-clinician
-                structure is telehealth-first 1099 contract work. Caseload volume
-                is not guaranteed.
+                Independently licensed clinicians only. Current direct-clinician structure is telehealth-first 1099 contract work. Caseload volume is not guaranteed.
               </p>
             </div>
 
             <aside className="lg:col-span-5">
               <div className="border border-[color:var(--cl-evergreen)]/25 bg-[color:var(--cl-ink)] p-7 text-[color:var(--cl-canvas)] shadow-xl md:p-9">
                 <div className="text-xs font-bold uppercase tracking-[0.22em] text-[color:var(--cl-ember)]">
-                  The Actual Deal
+                  Role Summary
                 </div>
                 <dl className="mt-6 divide-y divide-[color:var(--cl-canvas)]/15 border-y border-[color:var(--cl-canvas)]/15">
-                  {[
-                    ["Current pay", "$75 per completed session"],
-                    ["Pay cadence", "Weekly"],
-                    ["Schedule", "You set availability"],
-                    ["Structure", "1099 · Telehealth-first"],
-                    ["Billing", "Handled by ValorWell"],
-                  ].map(([label, value]) => (
-                    <div
-                      key={label}
-                      className="grid grid-cols-[1fr_auto] gap-5 py-5"
-                    >
+                  {roleFacts.map(([label, value]) => (
+                    <div key={label} className="grid grid-cols-[1fr_auto] gap-5 py-5">
                       <dt className="text-sm font-semibold text-[color:var(--cl-canvas)]/65">
                         {label}
                       </dt>
@@ -177,69 +138,28 @@ export default function Clinicians() {
                     </div>
                   ))}
                 </dl>
-                <p className="mt-6 text-sm leading-relaxed text-[color:var(--cl-canvas)]/72">
-                  You focus on care and timely documentation. ValorWell builds the
-                  operational support around the work.
-                </p>
               </div>
             </aside>
           </div>
         </section>
 
         <section className="border-b border-[color:var(--cl-evergreen)]/20 bg-[color:var(--cl-evergreen)] text-[color:var(--cl-canvas)]">
-          <div className="container-wide grid md:grid-cols-3">
-            {principles.map((principle, index) => {
-              const Icon = principle.icon;
-              return (
-                <article
-                  key={principle.title}
-                  className={`py-9 md:px-8 md:py-11 ${
-                    index > 0
-                      ? "border-t border-[color:var(--cl-canvas)]/15 md:border-l md:border-t-0"
-                      : ""
-                  }`}
-                >
-                  <Icon
-                    className="h-6 w-6 text-[color:var(--cl-ember)]"
-                    aria-hidden="true"
-                  />
-                  <h2 className="mt-5 text-xl font-bold leading-tight md:text-2xl">
-                    {principle.title}
-                  </h2>
-                  <p className="mt-3 leading-relaxed text-[color:var(--cl-canvas)]/72">
-                    {principle.body}
-                  </p>
-                </article>
-              );
-            })}
-          </div>
-        </section>
+          <div className="container-wide py-16 md:py-20">
+            <div className="max-w-3xl">
+              <Eyebrow>What the Role Includes</Eyebrow>
+              <h2 className="mt-5 text-3xl font-bold leading-tight md:text-5xl">
+                Clinical work supported by shared operations.
+              </h2>
+            </div>
 
-        <section className="border-b border-[color:var(--cl-evergreen)]/20">
-          <div className="container-wide py-20 md:py-28">
-            <Eyebrow>A Simple Gut Check</Eyebrow>
-            <h2 className="mt-6 max-w-4xl text-3xl font-bold leading-tight md:text-5xl">
-              Is this how you want to practice?
-            </h2>
-            <p className="mt-5 text-lg font-semibold text-[color:var(--cl-evergreen)]">
-              Ask yourself:
-            </p>
-
-            <div className="mt-12 grid gap-px border border-[color:var(--cl-evergreen)]/20 bg-[color:var(--cl-evergreen)]/20 md:grid-cols-2 lg:grid-cols-3">
-              {practiceQuestions.map((item) => {
-                const Icon = item.icon;
+            <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+              {roleFeatures.map((feature) => {
+                const Icon = feature.icon;
                 return (
-                  <article
-                    key={item.question}
-                    className="bg-[color:var(--cl-canvas)] p-7 md:min-h-64 md:p-9"
-                  >
-                    <Icon
-                      className="h-7 w-7 text-[color:var(--cl-ember)]"
-                      aria-hidden="true"
-                    />
-                    <h3 className="mt-8 text-xl font-bold leading-snug md:text-2xl">
-                      {item.question}
-                    </h3>
+                  <article key={feature.title} className="border border-[color:var(--cl-canvas)]/15 bg-[color:var(--cl-canvas)]/[0.06] p-7">
+                    <Icon className="h-6 w-6 text-[color:var(--cl-ember)]" aria-hidden="true" />
+                    <h3 className="mt-5 text-xl font-bold leading-tight">{feature.title}</h3>
+                    <p className="mt-3 leading-relaxed text-[color:var(--cl-canvas)]/72">{feature.body}</p>
                   </article>
                 );
               })}
@@ -247,48 +167,60 @@ export default function Clinicians() {
           </div>
         </section>
 
-        <section className="border-b border-[color:var(--cl-evergreen)]/20 bg-[color:var(--cl-ink)] text-[color:var(--cl-canvas)]">
-          <div className="container-wide py-20 md:py-28">
-            <div className="grid gap-12 lg:grid-cols-12 lg:items-start">
-              <div className="lg:col-span-7">
-                <Eyebrow>The Clinicians Finding Their Way Here</Eyebrow>
-                <h2 className="mt-6 max-w-5xl text-3xl font-bold leading-tight md:text-5xl">
-                  The clinicians drawn to ValorWell are not looking for less
-                  meaningful work. They are looking for a better environment in
-                  which to do it.
-                </h2>
-                <p className="mt-7 max-w-3xl text-lg leading-relaxed text-[color:var(--cl-canvas)]/75 md:text-xl">
-                  They still care deeply about the person in front of them. They
-                  also understand that good clinical work becomes difficult to
-                  sustain when administrative burden, rigid systems, and pressure
-                  to overextend are treated as normal.
-                </p>
-              </div>
-
-              <div className="lg:col-span-5">
-                <div className="border-y border-[color:var(--cl-canvas)]/20">
-                  {clinicianIdentity.map((statement) => (
-                    <div
-                      key={statement}
-                      className="flex gap-4 border-b border-[color:var(--cl-canvas)]/15 py-5 last:border-b-0"
-                    >
-                      <HeartHandshake
-                        className="mt-0.5 h-5 w-5 shrink-0 text-[color:var(--cl-ember)]"
-                        aria-hidden="true"
-                      />
-                      <p className="text-base font-semibold leading-relaxed md:text-lg">
-                        {statement}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
+        <section className="border-b border-[color:var(--cl-evergreen)]/20 bg-[color:var(--cl-canvas)]">
+          <div className="container-wide grid gap-12 py-20 md:py-28 lg:grid-cols-12 lg:items-start">
+            <div className="lg:col-span-5">
+              <Eyebrow>Professional Expectations</Eyebrow>
+              <h2 className="mt-6 text-3xl font-bold leading-tight md:text-5xl">
+                The clinician owns the clinical work.
+              </h2>
+              <p className="mt-6 text-lg leading-relaxed text-[color:var(--cl-ink)]/72">
+                ValorWell supports the surrounding workflow, but clinicians remain responsible for assessment, treatment decisions, timely documentation, professional boundaries, and practicing within their license and scope.
+              </p>
             </div>
 
-            <p className="mt-14 max-w-4xl border-l-4 border-[color:var(--cl-ember)] pl-6 text-2xl font-bold leading-snug md:text-3xl">
-              Clinicians who have been looking for this kind of environment tend
-              to recognize it quickly.
-            </p>
+            <div className="lg:col-span-7">
+              <div className="divide-y divide-[color:var(--cl-evergreen)]/15 border-y border-[color:var(--cl-evergreen)]/15">
+                {[
+                  [CheckCircle2, "Independent clinical judgment", "Clinical decisions are made by the treating clinician based on the client's needs and the clinician's professional judgment."],
+                  [Settings2, "Availability you set", "Clinicians determine the availability they offer rather than accepting a required fixed caseload."],
+                  [FileText, "Timely documentation", "Documentation is part of the role and must be completed in the clinical system according to the applicable requirements."],
+                  [Workflow, "Shared operations", "ValorWell handles the surrounding platform, scheduling, and billing workflows used by the practice."],
+                ].map(([Icon, title, body]) => {
+                  const RowIcon = Icon as typeof CheckCircle2;
+                  return (
+                    <div key={title as string} className="grid gap-3 py-7 sm:grid-cols-[42px_1fr]">
+                      <RowIcon className="mt-1 h-6 w-6 text-[color:var(--cl-evergreen)]" aria-hidden="true" />
+                      <div>
+                        <h3 className="text-xl font-bold">{title as string}</h3>
+                        <p className="mt-2 leading-7 text-[color:var(--cl-ink)]/64">{body as string}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-b border-[color:var(--cl-evergreen)]/20 bg-[color:var(--cl-ink)] text-[color:var(--cl-canvas)]">
+          <div className="container-wide py-20 md:py-28">
+            <div className="max-w-3xl">
+              <Eyebrow>Onboarding</Eyebrow>
+              <h2 className="mt-6 text-3xl font-bold leading-tight md:text-5xl">
+                Start with interest, then complete the qualification process.
+              </h2>
+            </div>
+
+            <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              {onboardingSteps.map(([number, title, body]) => (
+                <article key={number} className="border border-[color:var(--cl-canvas)]/15 bg-[color:var(--cl-canvas)]/[0.05] p-7">
+                  <p className="text-sm font-bold text-[color:var(--cl-ember)]">{number}</p>
+                  <h3 className="mt-5 text-xl font-bold">{title}</h3>
+                  <p className="mt-3 leading-7 text-[color:var(--cl-canvas)]/65">{body}</p>
+                </article>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -300,28 +232,17 @@ export default function Clinicians() {
             <div className="grid gap-12 lg:grid-cols-12 lg:items-start">
               <div className="lg:col-span-5">
                 <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-[color:var(--cl-ember)] md:text-xs">
-                  Start With Interest
+                  Clinician Interest
                 </div>
                 <h2 className="mt-6 text-3xl font-bold leading-tight md:text-5xl">
-                  Interested in joining the clinicians building this with us?
+                  Interested in joining ValorWell's clinician network?
                 </h2>
                 <p className="mt-7 text-lg leading-relaxed text-[color:var(--cl-canvas)]/78">
-                  Share your contact information and we will create your onboarding
-                  access. You can learn more about the clinical environment,
-                  technology, mission, expectations, and application process before
-                  deciding whether to continue.
+                  Share your contact information to begin. This first step creates a path into the clinician onboarding process so you can review the environment and complete the required qualification steps.
                 </p>
-                <div className="mt-9 flex items-start gap-4 border-t border-[color:var(--cl-canvas)]/20 pt-7">
-                  <ShieldCheck
-                    className="h-6 w-6 shrink-0 text-[color:var(--cl-ember)]"
-                    aria-hidden="true"
-                  />
-                  <p className="text-sm leading-relaxed text-[color:var(--cl-canvas)]/68">
-                    This is an initial expression of interest, not the full clinical
-                    application or a promise of acceptance. The deeper qualification
-                    process comes next.
-                  </p>
-                </div>
+                <p className="mt-7 border-t border-[color:var(--cl-canvas)]/20 pt-7 text-sm leading-relaxed text-[color:var(--cl-canvas)]/68">
+                  Submitting interest is not the full clinical application and does not guarantee acceptance or caseload volume.
+                </p>
               </div>
 
               <div className="lg:col-span-7">

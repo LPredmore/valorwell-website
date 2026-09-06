@@ -12,13 +12,9 @@ import { Layout } from "@/components/layout/Layout";
 import { SEO, BreadcrumbSchema } from "@/components/SEO";
 import { trackHomeEvent } from "@/lib/tracking";
 
-function Eyebrow({
-  children,
-  light = false,
-}: {
-  children: ReactNode;
-  light?: boolean;
-}) {
+const SNAPSHOT_DATE = "September 5, 2026";
+
+function Eyebrow({ children, light = false }: { children: ReactNode; light?: boolean }) {
   return (
     <p
       className={`text-xs font-bold uppercase tracking-[0.2em] ${
@@ -61,7 +57,7 @@ export default function Support() {
     <Layout>
       <SEO
         title="Support ValorWell | Help Fund Therapy for Veterans"
-        description="Support the ValorWell Foundation and help fund direct therapy for veterans who sought VA care but were denied Community Care."
+        description="Support the ValorWell Foundation and help fund direct therapy for veterans who sought mental health care but still could not reach a therapist."
         canonical="/support"
       />
       <BreadcrumbSchema
@@ -95,10 +91,10 @@ export default function Support() {
             <div className="lg:col-span-7">
               <Eyebrow light>Support the ValorWell Foundation</Eyebrow>
               <h1 className="mt-6 max-w-5xl text-4xl font-bold leading-[1.03] sm:text-5xl md:text-6xl lg:text-7xl">
-                Help fund the next hour of therapy.
+                Help fund therapy for veterans who still cannot reach care.
               </h1>
               <p className="mt-7 max-w-3xl text-lg leading-8 text-white/72 md:text-xl">
-                Veterans have come to ValorWell after seeking care through the VA and being denied Community Care. Foundation supporters give us the ability to pay therapists so those veterans still have somewhere to turn.
+                Donor funding allows ValorWell to pay therapists for veterans who sought mental health care through the VA but still did not have an available treatment path.
               </p>
 
               <div className="mt-9 flex flex-wrap gap-3">
@@ -115,7 +111,7 @@ export default function Support() {
                   event="support_hero_impact"
                   className="inline-flex min-h-12 items-center gap-2 rounded-md border border-white/30 px-6 py-3 text-sm font-bold text-white transition hover:bg-white/10"
                 >
-                  See the Full Impact
+                  View Impact Details
                 </TrackedLink>
               </div>
             </div>
@@ -124,11 +120,12 @@ export default function Support() {
               <div className="rounded-3xl border border-white/12 bg-white/[0.06] p-8 shadow-2xl backdrop-blur-sm">
                 <HeartHandshake className="h-9 w-9 text-[#D7A92E]" aria-hidden="true" />
                 <p className="mt-7 text-xs font-bold uppercase tracking-[0.18em] text-[#D7A92E]">
-                  2026 so far
+                  2026 impact snapshot
                 </p>
                 <p className="mt-4 text-3xl font-bold leading-snug">
-                  540+ hours of direct therapy funded for 45+ veterans across 11 states.
+                  540+ hours of direct therapy for 45+ veterans across 11 states.
                 </p>
+                <p className="mt-4 text-sm text-white/55">As of {SNAPSHOT_DATE}</p>
               </div>
             </div>
           </div>
@@ -137,12 +134,12 @@ export default function Support() {
         <section className="border-b border-[#3B5147]/15 bg-white">
           <div className="container-wide py-20 md:py-28">
             <div className="max-w-3xl">
-              <Eyebrow>What Support Has Made Possible</Eyebrow>
+              <Eyebrow>2026 Donor-Funded Care</Eyebrow>
               <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                This is care that already happened.
+                What donor funding has paid for so far.
               </h2>
               <p className="mt-5 text-lg leading-8 text-[#111814]/65">
-                These are 2026 results from the donor-funded therapy program—not projections or fundraising goals.
+                These figures count the donor-funded therapy program through {SNAPSHOT_DATE}. They do not represent every clinical service provided by ValorWell.
               </p>
             </div>
 
@@ -156,13 +153,13 @@ export default function Support() {
               <article className="rounded-3xl bg-[#111814] p-8 text-white">
                 <Users className="h-8 w-8 text-[#D7A92E]" aria-hidden="true" />
                 <p className="mt-6 text-5xl font-bold text-[#D7A92E]">45+</p>
-                <h3 className="mt-4 text-xl font-bold">unique veterans reached</h3>
+                <h3 className="mt-4 text-xl font-bold">veterans who received care</h3>
               </article>
 
               <article className="rounded-3xl border border-[#D7A92E]/35 bg-[#F8F3E4] p-8">
                 <MapPinned className="h-8 w-8 text-[#8A6814]" aria-hidden="true" />
                 <p className="mt-6 text-5xl font-bold text-[#8A6814]">11</p>
-                <h3 className="mt-4 text-xl font-bold">states served</h3>
+                <h3 className="mt-4 text-xl font-bold">states represented</h3>
               </article>
             </div>
           </div>
@@ -171,9 +168,9 @@ export default function Support() {
         <section className="border-b border-white/10 bg-[#3B5147] text-white">
           <div className="container-wide grid gap-12 py-20 md:py-28 lg:grid-cols-12 lg:items-start">
             <div className="lg:col-span-5">
-              <Eyebrow light>Where the Money Goes</Eyebrow>
+              <Eyebrow light>How Donations Are Used</Eyebrow>
               <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                100%* of Foundation funds go to pay therapists for therapy sessions.
+                Foundation funds are used to pay therapists for therapy sessions.
               </h2>
             </div>
 
@@ -183,63 +180,69 @@ export default function Support() {
               </p>
               <div className="mt-8 rounded-3xl border border-white/15 bg-white/[0.06] p-8">
                 <ShieldCheck className="h-8 w-8 text-[#D7A92E]" aria-hidden="true" />
-                <p className="mt-6 text-2xl font-bold leading-snug">
-                  You are not paying for our office. You are not paying for advertising. You are helping pay a therapist to be there for a veteran who needs someone there.
-                </p>
+                <h3 className="mt-6 text-2xl font-bold">Donation flow</h3>
+                <div className="mt-5 space-y-3 text-white/72">
+                  <p>1. A supporter donates to the ValorWell Foundation.</p>
+                  <p>2. Foundation funds are allocated to eligible donor-funded therapy sessions.</p>
+                  <p>3. ValorWell pays the therapist for the completed session.</p>
+                </div>
               </div>
               <p className="mt-6 text-sm leading-6 text-white/50">
-                *Excludes unavoidable third-party payment-processing fees deducted before funds are received by the Foundation. ValorWell and the ValorWell Foundation do not retain or redirect donated funds for administrative or other operating costs.
+                Third-party payment-processing fees may be deducted before funds are received by the Foundation. ValorWell and the ValorWell Foundation do not retain or redirect donated funds for administrative or other operating costs.
               </p>
             </div>
           </div>
         </section>
 
-        <section className="border-b border-[#3B5147]/15 bg-white">
-          <div className="container-wide grid gap-12 py-20 md:py-28 lg:grid-cols-12 lg:items-center">
-            <div className="lg:col-span-7">
-              <Eyebrow>You Do Not Have to Give a Lot to Matter</Eyebrow>
+        <section className="border-b border-[#3B5147]/15 bg-[#F4F1E8]">
+          <div className="container-wide grid gap-12 py-20 md:py-28 lg:grid-cols-12 lg:items-start">
+            <div className="lg:col-span-5">
+              <Eyebrow>Why the Program Exists</Eyebrow>
               <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                Most supporters are building this one manageable monthly gift at a time.
+                Some veterans ask for care and still do not reach a therapist.
               </h2>
-              <p className="mt-6 max-w-3xl text-lg leading-8 text-[#111814]/68">
-                Some supporters give what they might otherwise spend on a few coffees. Others give up one meal out. No one donor has to carry the program alone.
-              </p>
             </div>
-
-            <div className="grid gap-5 sm:grid-cols-2 lg:col-span-5 lg:grid-cols-1">
-              <article className="rounded-3xl border border-[#3B5147]/15 bg-[#F4F1E8] p-7">
-                <p className="text-5xl font-bold text-[#3B5147]">72%</p>
-                <h3 className="mt-4 text-xl font-bold">of 2026 donors give monthly</h3>
-              </article>
-              <article className="rounded-3xl border border-[#D7A92E]/35 bg-[#F8F3E4] p-7">
-                <p className="text-5xl font-bold text-[#8A6814]">$25</p>
-                <h3 className="mt-4 text-xl font-bold">is the most common monthly gift</h3>
-              </article>
+            <div className="lg:col-span-7 space-y-5 text-lg leading-8 text-[#111814]/68">
+              <p>
+                VA Community Care can provide treatment outside the VA when eligibility, authorization, and provider availability align. In practice, veterans can still reach the end of that process without an available therapist.
+              </p>
+              <p>
+                The donor-funded program gives ValorWell another way to pay for treatment when a veteran has already sought care but the existing pathway did not produce an appointment.
+              </p>
+              <TrackedLink
+                to="/impact"
+                event="support_impact_detail"
+                className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#3B5147]"
+              >
+                Read the Impact Methodology
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </TrackedLink>
             </div>
           </div>
         </section>
 
         <section className="border-b border-white/10 bg-[#111814] text-white">
-          <div className="container-wide grid gap-12 py-20 md:py-28 lg:grid-cols-12 lg:items-center">
-            <div className="lg:col-span-7">
-              <Eyebrow light>Why This Care Matters</Eyebrow>
-              <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                They asked for help. They were denied Community Care. Supporters gave us another answer.
-              </h2>
-              <p className="mt-6 text-lg leading-8 text-white/72">
-                The veterans represented in these numbers came to ValorWell after trying to get seen through the VA and being denied Community Care. Donor funding allowed ValorWell to pay therapists and provide another path into treatment—potentially preventing veterans from becoming another statistic.
-              </p>
-            </div>
-
-            <div className="lg:col-span-5">
-              <TrackedLink
-                to="/impact"
-                event="support_impact_detail"
-                className="inline-flex min-h-12 items-center gap-2 rounded-md border border-white/30 px-6 py-3 text-sm font-bold text-white transition hover:bg-white/10"
-              >
-                Read Veteran Stories and Full Impact
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </TrackedLink>
+          <div className="container-wide py-20 md:py-28">
+            <div className="grid gap-12 lg:grid-cols-12 lg:items-center">
+              <div className="lg:col-span-7">
+                <Eyebrow light>Recurring Support</Eyebrow>
+                <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
+                  Monthly donors make up most of the current supporter base.
+                </h2>
+                <p className="mt-6 text-lg leading-8 text-white/70">
+                  In 2026, 72% of donors give monthly, and $25 is the most common monthly gift. Recurring support helps make future therapy funding more predictable.
+                </p>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2 lg:col-span-5">
+                <article className="rounded-3xl border border-white/12 bg-white/[0.05] p-7">
+                  <p className="text-5xl font-bold text-[#D7A92E]">72%</p>
+                  <h3 className="mt-4 text-xl font-bold">of 2026 donors give monthly</h3>
+                </article>
+                <article className="rounded-3xl border border-white/12 bg-white/[0.05] p-7">
+                  <p className="text-5xl font-bold text-[#D7A92E]">$25</p>
+                  <h3 className="mt-4 text-xl font-bold">most common monthly gift</h3>
+                </article>
+              </div>
             </div>
           </div>
         </section>
@@ -247,21 +250,27 @@ export default function Support() {
         <section className="bg-[#3B5147] text-white">
           <div className="container-wide py-20 text-center md:py-24">
             <HeartHandshake className="mx-auto h-10 w-10 text-[#D7A92E]" aria-hidden="true" />
-            <Eyebrow light>Fund the Next Hour</Eyebrow>
+            <Eyebrow light>Support Care</Eyebrow>
             <h2 className="mx-auto mt-5 max-w-4xl text-3xl font-bold leading-tight md:text-5xl">
-              The next veteran who is told to wait should still have somewhere to turn.
+              Help fund additional therapy for veterans who cannot reach care through the pathway available to them.
             </h2>
-            <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-white/70">
-              Join the supporters paying therapists so ValorWell can keep opening another door to care.
-            </p>
-            <TrackedLink
-              to="/donate?vw_entry_source=support-final&vw_entry_medium=site&vw_entry_campaign=support-valorwell&vw_entry_content=final"
-              event="support_final_donate"
-              className="mt-8 inline-flex min-h-12 items-center gap-2 rounded-md bg-white px-6 py-3 text-sm font-bold text-[#3B5147] hover:bg-[#F4F1E8]"
-            >
-              Donate to the ValorWell Foundation
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </TrackedLink>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <TrackedLink
+                to="/donate?vw_entry_source=support-final&vw_entry_medium=site&vw_entry_campaign=support-valorwell&vw_entry_content=final"
+                event="support_final_donate"
+                className="inline-flex min-h-12 items-center gap-2 rounded-md bg-white px-6 py-3 text-sm font-bold text-[#3B5147] hover:bg-[#F4F1E8]"
+              >
+                Donate to the ValorWell Foundation
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </TrackedLink>
+              <TrackedLink
+                to="/impact"
+                event="support_final_impact"
+                className="inline-flex min-h-12 items-center rounded-md border border-white/30 px-6 py-3 text-sm font-bold text-white"
+              >
+                View Impact
+              </TrackedLink>
+            </div>
           </div>
         </section>
       </div>

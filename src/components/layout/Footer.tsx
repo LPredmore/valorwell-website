@@ -50,7 +50,7 @@ export function Footer() {
           <div className="md:col-span-3 lg:col-span-1">
             <Link
               to="/"
-              className="flex items-center gap-2 text-lg font-bold tracking-tight text-foreground"
+              className="inline-flex min-h-11 items-center gap-2 text-lg font-bold tracking-tight text-foreground"
               aria-label="ValorWell home"
             >
               <img
@@ -69,12 +69,12 @@ export function Footer() {
               <h3 className="text-xs font-semibold uppercase tracking-wider text-foreground">
                 {group.title}
               </h3>
-              <ul className="mt-4 space-y-2">
+              <ul className="mt-3">
                 {group.links.map((link) => (
                   <li key={`${group.title}-${link.name}`}>
                     <Link
                       to={link.href}
-                      className="text-sm text-muted-foreground hover:text-foreground"
+                      className="inline-flex min-h-11 items-center py-2 text-sm text-muted-foreground hover:text-foreground"
                     >
                       {link.name}
                     </Link>

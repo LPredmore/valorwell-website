@@ -2,6 +2,7 @@ import { useEffect, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
+  BookOpen,
   HeartHandshake,
   Network,
   Stethoscope,
@@ -9,7 +10,6 @@ import {
 import { Layout } from "@/components/layout/Layout";
 import { SEO } from "@/components/SEO";
 import { trackHomeEvent } from "@/lib/tracking";
-import missionCoverAsset from "@/assets/mission-cover-new.png.asset.json";
 
 function Eyebrow({ children, light = false }: { children: ReactNode; light?: boolean }) {
   return (
@@ -54,7 +54,7 @@ export default function MissionPage() {
     <Layout>
       <SEO
         title="ValorWell Mission | Make Mental Health Support Easier to Reach"
-        description="ValorWell works to make mental health care and support easier to reach for veterans and military families while connecting communities around useful action."
+        description="ValorWell works to make mental health care and support easier to reach for veterans and military families through care, donor-funded therapy, resources, and community work."
         canonical="/mission"
       />
 
@@ -106,16 +106,41 @@ export default function MissionPage() {
               </div>
             </div>
 
-            <div className="lg:col-span-5">
-              <div className="overflow-hidden rounded-3xl border border-[#3B5147]/15 bg-white shadow-xl">
-                <img
-                  src={missionCoverAsset.url}
-                  alt="ValorWell mission"
-                  className="aspect-[4/5] h-full w-full object-cover lg:aspect-[5/6]"
-                  loading="eager"
-                />
+            <aside className="lg:col-span-5">
+              <div className="rounded-3xl bg-[#111814] p-8 text-white shadow-xl md:p-9">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D7A92E]">Current work</p>
+                <div className="mt-6 divide-y divide-white/12 border-y border-white/12">
+                  <div className="flex gap-4 py-5">
+                    <Stethoscope className="mt-0.5 h-6 w-6 shrink-0 text-[#D7A92E]" aria-hidden="true" />
+                    <div>
+                      <p className="font-bold">Telehealth mental health care</p>
+                      <p className="mt-1 text-sm leading-6 text-white/60">Care pathways for veterans and military families where coverage, licensure, capacity, and fit align.</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-4 py-5">
+                    <HeartHandshake className="mt-0.5 h-6 w-6 shrink-0 text-[#D7A92E]" aria-hidden="true" />
+                    <div>
+                      <p className="font-bold">Donor-funded therapy</p>
+                      <p className="mt-1 text-sm leading-6 text-white/60">540+ completed direct-therapy hours for 45+ veterans through September 5, 2026.</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-4 py-5">
+                    <Network className="mt-0.5 h-6 w-6 shrink-0 text-[#D7A92E]" aria-hidden="true" />
+                    <div>
+                      <p className="font-bold">Beyond The Yellow</p>
+                      <p className="mt-1 text-sm leading-6 text-white/60">Published conversations and organization pages featuring community work visitors can explore directly.</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-4 py-5">
+                    <BookOpen className="mt-0.5 h-6 w-6 shrink-0 text-[#D7A92E]" aria-hidden="true" />
+                    <div>
+                      <p className="font-bold">Public resources</p>
+                      <p className="mt-1 text-sm leading-6 text-white/60">Guidance on CHAMPVA, VA Community Care, veteran mental health, family systems, and related topics.</p>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
+            </aside>
           </div>
         </section>
 
@@ -135,7 +160,7 @@ export default function MissionPage() {
                 When one part of that chain breaks, the practical result can be the same as having no service at all: the person still does not receive care.
               </p>
               <p>
-                ValorWell is built around reducing those gaps wherever we can—through treatment, clearer pathways, clinician infrastructure, donor-funded care, and community relationships.
+                ValorWell addresses those gaps through treatment, clearer pathways, clinician infrastructure, donor-funded care, public resources, and community relationships.
               </p>
             </div>
           </div>
@@ -145,12 +170,8 @@ export default function MissionPage() {
           <div className="container-wide py-20 md:py-28">
             <div className="max-w-3xl">
               <Eyebrow>How the Mission Works</Eyebrow>
-              <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                Care. Impact. Community.
-              </h2>
-              <p className="mt-5 text-lg leading-8 text-[#111814]/65">
-                Each area addresses a different part of access and support.
-              </p>
+              <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">Care. Impact. Community.</h2>
+              <p className="mt-5 text-lg leading-8 text-[#111814]/65">Each area addresses a different part of access and support.</p>
             </div>
 
             <div className="mt-12 grid gap-6 lg:grid-cols-3">
@@ -169,7 +190,7 @@ export default function MissionPage() {
                 <HeartHandshake className="h-8 w-8 text-[#D7A92E]" aria-hidden="true" />
                 <h3 className="mt-6 text-2xl font-bold">Impact</h3>
                 <p className="mt-4 leading-7 text-white/64">
-                  Use donor funding to pay for therapy when veterans have sought help through existing systems but still cannot reach a clinician.
+                  Support donor-funded therapy when veterans have sought help through existing systems but still cannot reach an available clinician.
                 </p>
                 <TrackedLink to="/impact" event="mission_impact" className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-white">
                   See Impact <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -203,7 +224,7 @@ export default function MissionPage() {
                 Veterans may need care shaped by military service, transition, trauma, disability, VA access, and the systems around those experiences.
               </p>
               <p>
-                Military family members face their own mental health needs, pressures, and coverage questions. Their care is not treated as secondary to the veteran's care.
+                Military family members face their own mental health needs, pressures, and coverage questions. Their care is not treated as secondary to the veteran&apos;s care.
               </p>
               <p>
                 Beyond The Yellow extends the mission into the wider community by highlighting organizations that turn support into programs, services, opportunities, and direct help.
@@ -217,17 +238,17 @@ export default function MissionPage() {
             <div className="max-w-3xl">
               <Eyebrow light>What We Measure</Eyebrow>
               <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                The mission has to produce outcomes people can see.
+                Public impact should be defined well enough to check.
               </h2>
               <p className="mt-6 text-lg leading-8 text-white/70">
-                ValorWell tracks donor-funded therapy separately from broader organizational activity so supporters can see what their funding produced. As of September 5, 2026, donor funding had paid for 540+ hours of direct therapy for 45+ veterans.
+                ValorWell reports donor-funded therapy separately from broader organizational activity. As of September 5, 2026, the program reported 540+ hours of completed direct therapy for 45+ veterans, with definitions and exclusions published on the Impact page.
               </p>
               <TrackedLink
                 to="/impact"
                 event="mission_measure_impact"
                 className="mt-8 inline-flex min-h-12 items-center gap-2 rounded-md bg-white px-6 py-3 text-sm font-bold text-[#3B5147]"
               >
-                View Impact Details
+                View Impact Methodology
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </TrackedLink>
             </div>
@@ -239,7 +260,7 @@ export default function MissionPage() {
             <div className="lg:col-span-8">
               <Eyebrow light>Next Step</Eyebrow>
               <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                Start with care, learn more about the organization, or see where support is going.
+                Start with care, learn about the organization, or review the work already underway.
               </h2>
             </div>
             <div className="flex flex-wrap gap-3 lg:col-span-4 lg:justify-end">

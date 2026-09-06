@@ -1,18 +1,6 @@
 import { useEffect, type ReactNode } from "react";
 import { Link } from "react-router-dom";
-import {
-  ArrowRight,
-  ExternalLink,
-  HeartHandshake,
-  Network,
-  Play,
-  PlayCircle,
-  Radio,
-  ShieldCheck,
-  Users,
-  Wrench,
-  type LucideIcon,
-} from "lucide-react";
+import { ExternalLink, Play, PlayCircle } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { SEO } from "@/components/SEO";
 import { trackHomeEvent } from "@/lib/tracking";
@@ -101,44 +89,11 @@ const btyVideos: VideoCard[] = [
   },
 ];
 
-const contentPaths: {
-  title: string;
-  copy: string;
-  Icon: LucideIcon;
-  destination: string;
-  external?: boolean;
-  event: string;
-}[] = [
-  {
-    title: "Veteran systems & practical help",
-    copy: "Clear explanations, direct opinions, and useful information about care access, CHAMPVA, VA Community Care, disability-system issues, and veteran-family realities.",
-    Icon: ShieldCheck,
-    destination: "https://www.youtube.com/@ValorWell",
-    external: true,
-    event: "watch_path_practical",
-  },
-  {
-    title: "Beyond The Yellow",
-    copy: "Long-form conversations with people and organizations doing real work instead of stopping at symbolic support.",
-    Icon: HeartHandshake,
-    destination: "/beyond-the-yellow",
-    event: "watch_path_bty",
-  },
-  {
-    title: "Building ValorWell",
-    copy: "Founder-led explanations of what ValorWell is building, what is changing, where the friction is, and what the mission looks like in practice.",
-    Icon: Wrench,
-    destination: "https://www.youtube.com/@ValorWell",
-    external: true,
-    event: "watch_path_build",
-  },
-];
-
-function Eyebrow({ children, yellow = false }: { children: ReactNode; yellow?: boolean }) {
+function Eyebrow({ children, light = false }: { children: ReactNode; light?: boolean }) {
   return (
     <p
       className={`text-xs font-bold uppercase tracking-[0.2em] ${
-        yellow ? "text-[#D7A92E]" : "text-[#3B5147]"
+        light ? "text-[#D7A92E]" : "text-[#3B5147]"
       }`}
     >
       {children}
@@ -197,8 +152,8 @@ export default function WatchPage() {
   return (
     <Layout>
       <SEO
-        title="Watch ValorWell | Stories, Practical Help & Real Action"
-        description="Watch ValorWell videos about veteran and family systems, mental well-being, practical help, Beyond The Yellow conversations, and the work behind the mission."
+        title="Watch ValorWell | Veteran, Family & Beyond The Yellow Videos"
+        description="Watch ValorWell videos about veteran systems, CHAMPVA, VA Community Care, mental health, military families, and Beyond The Yellow conversations."
         canonical="/watch"
       />
 
@@ -209,8 +164,7 @@ export default function WatchPage() {
           }
           .watch-theme h1,
           .watch-theme h2,
-          .watch-theme h3,
-          .watch-theme h4 {
+          .watch-theme h3 {
             font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
             letter-spacing: -0.025em;
           }
@@ -224,12 +178,12 @@ export default function WatchPage() {
 
           <div className="container-wide relative grid gap-12 py-16 md:py-24 lg:grid-cols-12 lg:items-center lg:py-28">
             <div className="lg:col-span-6">
-              <Eyebrow yellow>Watch ValorWell</Eyebrow>
+              <Eyebrow light>Watch ValorWell</Eyebrow>
               <h1 className="mt-6 text-4xl font-bold leading-[1.03] sm:text-5xl md:text-6xl lg:text-7xl">
-                Watch the ideas, stories, and work behind ValorWell.
+                Videos for veterans, families, and people following the work.
               </h1>
               <p className="mt-7 max-w-2xl text-lg leading-8 text-white/70 md:text-xl">
-                Practical veteran and family information. Direct conversations about broken systems. Beyond The Yellow interviews. Founder-led work shown in public.
+                Recent videos cover care access, CHAMPVA, VA Community Care, mental health, disability-system issues, and Beyond The Yellow conversations with featured organizations.
               </p>
               <div className="mt-9 flex flex-wrap gap-3">
                 <a
@@ -284,13 +238,10 @@ export default function WatchPage() {
           <div className="container-wide py-20 md:py-28">
             <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
               <div className="lg:col-span-8">
-                <Eyebrow>Latest From ValorWell</Eyebrow>
+                <Eyebrow>Latest Videos</Eyebrow>
                 <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                  Useful now, not buried in an archive.
+                  Recent videos from ValorWell.
                 </h2>
-                <p className="mt-5 max-w-3xl text-lg leading-8 text-[#111814]/65">
-                  Current videos are surfaced here so Watch functions as a real media destination. The full and continuously updated catalog lives on ValorWell&apos;s YouTube channel.
-                </p>
               </div>
               <div className="lg:col-span-4 lg:text-right">
                 <a
@@ -315,199 +266,49 @@ export default function WatchPage() {
 
         <section className="border-b border-[#3B5147]/15 bg-[#F4F1E8]">
           <div className="container-wide py-20 md:py-28">
-            <div className="max-w-3xl">
-              <Eyebrow>Choose What You Need</Eyebrow>
-              <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                Three media jobs. No artificial program lanes.
-              </h2>
-              <p className="mt-5 text-lg leading-8 text-[#111814]/65">
-                Watch is organized around what the content does for the viewer: explain, spotlight, or show the build.
-              </p>
-            </div>
-
-            <div className="mt-12 grid gap-5 lg:grid-cols-3">
-              {contentPaths.map(({ title, copy, Icon, destination, external, event }) => {
-                const className =
-                  "group rounded-3xl border border-[#3B5147]/15 bg-white p-8 shadow-sm transition hover:-translate-y-0.5 hover:border-[#3B5147]/30 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2 motion-reduce:transform-none motion-reduce:transition-none";
-                const body = (
-                  <>
-                    <Icon className="h-8 w-8 text-[#3B5147]" aria-hidden="true" />
-                    <h3 className="mt-6 text-2xl font-bold">{title}</h3>
-                    <p className="mt-4 leading-7 text-[#111814]/62">{copy}</p>
-                    <span className="mt-7 inline-flex items-center gap-2 text-sm font-bold text-[#3B5147]">
-                      Explore
-                      {external ? (
-                        <ExternalLink className="h-4 w-4" aria-hidden="true" />
-                      ) : (
-                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 motion-reduce:transform-none" aria-hidden="true" />
-                      )}
-                    </span>
-                  </>
-                );
-
-                return external ? (
-                  <a
-                    key={title}
-                    href={destination}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => trackHomeEvent(event, { page: "watch" })}
-                    className={className}
-                  >
-                    {body}
-                  </a>
-                ) : (
-                  <Link
-                    key={title}
-                    to={destination}
-                    onClick={() => trackHomeEvent(event, { page: "watch" })}
-                    className={className}
-                  >
-                    {body}
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        <section className="border-b border-white/10 bg-[#111814] text-white">
-          <div className="container-wide py-20 md:py-28">
-            <div className="grid gap-10 lg:grid-cols-12 lg:items-end">
+            <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
               <div className="lg:col-span-8">
-                <Eyebrow yellow>Beyond The Yellow Conversations</Eyebrow>
+                <Eyebrow>Beyond The Yellow</Eyebrow>
                 <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                  Long conversations with people doing the work.
+                  Conversations with featured organizations and community leaders.
                 </h2>
-                <p className="mt-5 max-w-3xl text-lg leading-8 text-white/65">
-                  Beyond The Yellow gives people and organizations taking real action room to explain the problem they saw, what they actually do, and how others can help.
-                </p>
               </div>
               <div className="lg:col-span-4 lg:text-right">
                 <Link
-                  to="/network"
-                  onClick={() => trackHomeEvent("watch_bty_network", { page: "watch" })}
-                  className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#D7A92E]"
+                  to="/beyond-the-yellow"
+                  className="inline-flex min-h-11 items-center text-sm font-bold text-[#3B5147]"
                 >
-                  Find featured organizations <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  Explore Beyond The Yellow
                 </Link>
               </div>
             </div>
 
             <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
               {btyVideos.map((video) => (
-                <a
-                  key={video.id}
-                  href={youtubeUrl(video.id)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => trackHomeEvent("watch_bty_video", { video_id: video.id, page: "watch" })}
-                  className="group overflow-hidden rounded-2xl border border-white/12 bg-white/[0.06] transition hover:bg-white/[0.09] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D7A92E]"
-                >
-                  <div className="relative aspect-video overflow-hidden bg-black">
-                    <img
-                      src={video.thumbnail}
-                      alt=""
-                      loading="lazy"
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transform-none motion-reduce:transition-none"
-                    />
-                    <div className="absolute inset-0 bg-black/10" aria-hidden="true" />
-                    <div className="absolute bottom-3 left-3 flex h-9 w-9 items-center justify-center rounded-full bg-white text-[#111814]">
-                      <Play className="ml-0.5 h-4 w-4 fill-current" aria-hidden="true" />
-                    </div>
-                  </div>
-                  <div className="p-5">
-                    <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#D7A92E]">Beyond The Yellow</p>
-                    <h3 className="mt-3 text-lg font-bold leading-snug text-white">{video.title}</h3>
-                    <p className="mt-4 text-xs text-white/45">{video.published}</p>
-                  </div>
-                </a>
+                <VideoTile key={video.id} video={video} event="watch_bty_video" />
               ))}
-            </div>
-
-            <div className="mt-9 flex flex-wrap gap-3">
-              <Link
-                to="/beyond-the-yellow"
-                onClick={() => trackHomeEvent("watch_bty_explore", { page: "watch" })}
-                className="inline-flex min-h-11 items-center gap-2 rounded-md bg-[#D7A92E] px-5 py-3 text-sm font-bold text-[#111814]"
-              >
-                Explore Beyond The Yellow
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
-              <Link
-                to="/network"
-                onClick={() => trackHomeEvent("watch_network", { page: "watch" })}
-                className="inline-flex min-h-11 items-center gap-2 rounded-md border border-white/30 px-5 py-3 text-sm font-bold text-white hover:bg-white/10"
-              >
-                <Network className="h-4 w-4" aria-hidden="true" />
-                Explore the Network
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        <section className="border-b border-[#3B5147]/15 bg-white">
-          <div className="container-wide grid gap-12 py-20 md:py-28 lg:grid-cols-12 lg:items-start">
-            <div className="lg:col-span-5">
-              <Eyebrow>What Watch Is For</Eyebrow>
-              <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                Media should move people somewhere useful.
-              </h2>
-            </div>
-            <div className="lg:col-span-7">
-              <div className="divide-y divide-[#3B5147]/12 border-y border-[#3B5147]/12">
-                {[
-                  [Radio, "Understand the issue", "Use video to make complicated systems, mental-health realities, and practical choices easier to understand."],
-                  [Users, "Meet people doing the work", "Use long-form conversations to introduce viewers to credible organizations and people taking real action."],
-                  [Wrench, "See how ValorWell thinks", "Founder-led content makes the organization less opaque by showing decisions, friction, disagreement, and progress in public."],
-                ].map(([Icon, title, copy]) => {
-                  const RowIcon = Icon as LucideIcon;
-                  return (
-                    <div key={title as string} className="grid gap-4 py-7 sm:grid-cols-[48px_1fr]">
-                      <RowIcon className="mt-1 h-6 w-6 text-[#3B5147]" aria-hidden="true" />
-                      <div>
-                        <h3 className="text-xl font-bold">{title as string}</h3>
-                        <p className="mt-2 leading-7 text-[#111814]/62">{copy as string}</p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
             </div>
           </div>
         </section>
 
         <section className="bg-[#3B5147] text-white">
-          <div className="container-wide py-20 text-center md:py-24">
-            <PlayCircle className="mx-auto h-10 w-10 text-[#D7A92E]" aria-hidden="true" />
-            <h2 className="mx-auto mt-5 max-w-4xl text-3xl font-bold leading-tight md:text-5xl">
-              Watch the work. Then choose what you want to do with it.
-            </h2>
-            <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-white/68">
-              Follow ValorWell for the current media stream, or move from watching into care, organizations, impact, or participation.
-            </p>
-            <div className="mt-8 flex flex-wrap justify-center gap-3">
-              <a
-                href="https://www.youtube.com/@ValorWell"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => trackHomeEvent("watch_final_youtube", { page: "watch" })}
-                className="inline-flex min-h-11 items-center gap-2 rounded-md bg-white px-5 py-3 text-sm font-bold text-[#3B5147]"
-              >
-                Follow on YouTube
-                <ExternalLink className="h-4 w-4" aria-hidden="true" />
-              </a>
+          <div className="container-wide grid gap-8 py-16 md:py-20 lg:grid-cols-12 lg:items-center">
+            <div className="lg:col-span-8">
+              <Eyebrow light>Looking for Written Guidance?</Eyebrow>
+              <h2 className="mt-4 text-3xl font-bold leading-tight md:text-4xl">
+                Use the resource library for care, coverage, documentation, and family-system topics.
+              </h2>
+            </div>
+            <div className="flex flex-wrap gap-3 lg:col-span-4 lg:justify-end">
               <Link
-                to="/impact"
-                onClick={() => trackHomeEvent("watch_final_impact", { page: "watch" })}
-                className="inline-flex min-h-11 items-center gap-2 rounded-md border border-white/30 px-5 py-3 text-sm font-bold text-white hover:bg-white/10"
+                to="/resources"
+                className="inline-flex min-h-12 items-center rounded-md bg-white px-6 py-3 text-sm font-bold text-[#3B5147]"
               >
-                See Impact
+                Browse Resources
               </Link>
               <Link
                 to="/get-care"
-                onClick={() => trackHomeEvent("watch_final_care", { page: "watch" })}
-                className="inline-flex min-h-11 items-center gap-2 rounded-md border border-white/30 px-5 py-3 text-sm font-bold text-white hover:bg-white/10"
+                className="inline-flex min-h-12 items-center rounded-md border border-white/30 px-6 py-3 text-sm font-bold text-white"
               >
                 Find Care
               </Link>

@@ -33,7 +33,7 @@ describe("About ValorWell page", () => {
     expect(
       screen.getByRole("heading", {
         level: 1,
-        name: /ValorWell is building better systems around mental well-being, care, and community action/i,
+        name: /ValorWell works at the intersection of mental health care, veteran and family support, and community action/i,
       }),
     ).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /^Care$/i })).toBeInTheDocument();
@@ -41,12 +41,12 @@ describe("About ValorWell page", () => {
     expect(screen.getByRole("heading", { name: /^Community$/i })).toBeInTheDocument();
   });
 
-  it("publishes only the already established founder role", () => {
+  it("publishes the established founder and host role", () => {
     renderAbout();
 
     expect(
       screen.getByRole("heading", {
-        name: /Luke — Founder, ValorWell · Host, Beyond The Yellow/i,
+        name: /Luke Predmore — Founder, ValorWell · Host, Beyond The Yellow/i,
       }),
     ).toBeInTheDocument();
   });
@@ -54,11 +54,11 @@ describe("About ValorWell page", () => {
   it("routes visitors into the current public architecture", () => {
     renderAbout();
 
-    expect(screen.getAllByRole("link", { name: /Why ValorWell Exists/i })[0]).toHaveAttribute(
+    expect(screen.getAllByRole("link", { name: /Read the Mission/i })[0]).toHaveAttribute(
       "href",
       "/mission",
     );
-    expect(screen.getAllByRole("link", { name: /See Impact/i })[0]).toHaveAttribute(
+    expect(screen.getAllByRole("link", { name: /Impact Details/i })[0]).toHaveAttribute(
       "href",
       "/impact",
     );
@@ -70,7 +70,7 @@ describe("About ValorWell page", () => {
       "href",
       "/support",
     );
-    expect(screen.getAllByRole("link", { name: /Explore Beyond The Yellow/i })[0]).toHaveAttribute(
+    expect(screen.getAllByRole("link", { name: /Beyond The Yellow/i })[0]).toHaveAttribute(
       "href",
       "/beyond-the-yellow",
     );

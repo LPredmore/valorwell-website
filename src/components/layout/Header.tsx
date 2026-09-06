@@ -4,17 +4,17 @@ import { ChevronDown, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const primary = [
-  { name: "Mission", href: "/mission" },
+  { name: "About", href: "/about" },
   { name: "Impact", href: "/impact" },
   { name: "Beyond The Yellow", href: "/beyond-the-yellow" },
-  { name: "Watch", href: "/watch" },
+  { name: "Resources", href: "/resources" },
 ];
 
 const getInvolved = [
   { name: "Clinicians", href: "/clinicians" },
   { name: "Partner With ValorWell", href: "/partner" },
   { name: "Support ValorWell", href: "/support" },
-  { name: "Share a Beyond The Yellow Story", href: "/beyond-the-yellow" },
+  { name: "Watch", href: "/watch" },
   { name: "Contact", href: "/contact" },
 ];
 
@@ -64,6 +64,10 @@ export function Header() {
     };
   }, []);
 
+  const isActive = (href: string) =>
+    location.pathname === href ||
+    (href === "/resources" && location.pathname.startsWith("/resources/"));
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <nav
@@ -90,9 +94,7 @@ export function Header() {
               to={item.href}
               className={cn(
                 "whitespace-nowrap text-sm font-medium transition-colors hover:text-foreground",
-                location.pathname === item.href
-                  ? "text-foreground"
-                  : "text-muted-foreground",
+                isActive(item.href) ? "text-foreground" : "text-muted-foreground",
               )}
             >
               {item.name}
@@ -130,7 +132,7 @@ export function Header() {
 
           <Link
             to="/get-care"
-            className="ml-2 inline-flex items-center rounded-md border border-primary/30 bg-transparent px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+            className="ml-2 inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             Find Care
           </Link>
@@ -222,7 +224,7 @@ export function Header() {
 
             <Link
               to="/get-care"
-              className="mt-3 block rounded-md border border-primary/30 px-3 py-3 text-center text-base font-semibold text-primary hover:bg-primary hover:text-primary-foreground"
+              className="mt-3 block rounded-md bg-primary px-3 py-3 text-center text-base font-semibold text-primary-foreground hover:bg-primary/90"
             >
               Find Care
             </Link>

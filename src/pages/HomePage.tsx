@@ -13,9 +13,17 @@ import {
 import { Layout } from "@/components/layout/Layout";
 import { SEO, OrganizationSchema } from "@/components/SEO";
 import { trackHomeEvent } from "@/lib/tracking";
-import homepageHero from "@/assets/homepage-hero.png.asset.json";
-import btyHomepage from "@/assets/bty-homepage.png.asset.json";
-import valorwellClinic from "@/assets/valorwell-clinic.png.asset.json";
+
+const LATEST_BTY_VIDEO_URL = "https://www.youtube.com/watch?v=A4CUe3c8rJE";
+const LATEST_BTY_THUMBNAIL = "https://i.ytimg.com/vi/A4CUe3c8rJE/maxresdefault.jpg";
+
+const featuredOrganizations = [
+  ["Veterans Breakfast Club", "/veteransbreakfastclub"],
+  ["GallantFew", "/gallantfew"],
+  ["VETS2INDUSTRY", "/vets2industry"],
+  ["Veterans Outreach of Wisconsin", "/VOW"],
+  ["Military Missions in Action", "/mmia"],
+] as const;
 
 function Eyebrow({ children, light = false }: { children: ReactNode; light?: boolean }) {
   return (
@@ -56,7 +64,7 @@ export default function HomePage() {
     <Layout>
       <SEO
         title="ValorWell | Mental Health Care for Veterans & Military Families"
-        description="ValorWell provides telehealth mental health care pathways for veterans and military families, funds therapy when access breaks down, and connects people through Beyond The Yellow."
+        description="ValorWell provides telehealth mental health care pathways for veterans and military families, donor-funded therapy for veterans, and Beyond The Yellow community conversations."
         canonical="/"
       />
       <OrganizationSchema />
@@ -88,7 +96,7 @@ export default function HomePage() {
                 Mental health care and support for veterans and military families.
               </h1>
               <p className="mt-7 max-w-2xl text-lg leading-8 text-[#111814]/70 md:text-xl">
-                ValorWell operates telehealth care pathways, helps fund therapy when veterans cannot reach care through the systems already available to them, and connects people with organizations doing useful work through Beyond The Yellow.
+                ValorWell operates telehealth care pathways, supports donor-funded therapy for veterans who still cannot reach care, and publishes Beyond The Yellow conversations with organizations doing useful work.
               </p>
 
               <div className="mt-9 flex flex-wrap items-center gap-3">
@@ -110,16 +118,34 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="lg:col-span-5">
-              <div className="overflow-hidden rounded-3xl border border-[#3B5147]/15 bg-white shadow-xl">
-                <img
-                  src={homepageHero.url}
-                  alt="ValorWell"
-                  className="aspect-[4/5] h-full w-full object-cover lg:aspect-[5/6]"
-                  loading="eager"
-                />
+            <aside className="lg:col-span-5">
+              <div className="rounded-3xl bg-[#111814] p-8 text-white shadow-xl md:p-9">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D7A92E]">
+                  2026 completed-care snapshot
+                </p>
+                <div className="mt-7 grid gap-6 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                  <div>
+                    <p className="text-5xl font-bold text-[#D7A92E]">540+</p>
+                    <p className="mt-2 text-sm leading-6 text-white/65">hours of direct donor-funded therapy</p>
+                  </div>
+                  <div className="border-t border-white/12 pt-6 sm:border-l sm:border-t-0 sm:pl-6 sm:pt-0 lg:border-l-0 lg:border-t lg:pl-0 lg:pt-6 xl:border-l xl:border-t-0 xl:pl-6 xl:pt-0">
+                    <p className="text-5xl font-bold">45+</p>
+                    <p className="mt-2 text-sm leading-6 text-white/65">unique veterans who received donor-funded care</p>
+                  </div>
+                </div>
+                <p className="mt-7 border-t border-white/12 pt-5 text-sm leading-6 text-white/55">
+                  Snapshot through September 5, 2026. Counts completed direct therapy; see the Impact page for definitions and scope.
+                </p>
+                <TrackedLink
+                  to="/impact"
+                  event="homepage_hero_impact_methodology"
+                  className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-white"
+                >
+                  Review Impact Methodology
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </TrackedLink>
               </div>
-            </div>
+            </aside>
           </div>
         </section>
 
@@ -177,11 +203,7 @@ export default function HomePage() {
                 <p className="mt-4 leading-7 text-[#111814]/65">
                   Telehealth treatment, clinician infrastructure, coverage pathways, and the operational systems that support care.
                 </p>
-                <TrackedLink
-                  to="/get-care"
-                  event="homepage_model_care"
-                  className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#3B5147]"
-                >
+                <TrackedLink to="/get-care" event="homepage_model_care" className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#3B5147]">
                   Find Care <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </TrackedLink>
               </article>
@@ -189,15 +211,11 @@ export default function HomePage() {
               <article className="rounded-3xl bg-[#111814] p-8 text-white">
                 <HeartHandshake className="h-8 w-8 text-[#D7A92E]" aria-hidden="true" />
                 <p className="mt-7 text-xs font-bold uppercase tracking-[0.18em] text-[#D7A92E]">Impact</p>
-                <h3 className="mt-3 text-2xl font-bold">Donations are funding therapy now.</h3>
+                <h3 className="mt-3 text-2xl font-bold">Completed donor-funded therapy.</h3>
                 <p className="mt-4 leading-7 text-white/65">
-                  As of September 5, 2026, donor funding has paid for 540+ hours of direct therapy for 45+ veterans.
+                  As of September 5, 2026, the donor-funded program reports 540+ hours of completed direct therapy for 45+ veterans.
                 </p>
-                <TrackedLink
-                  to="/impact"
-                  event="homepage_model_impact"
-                  className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-white"
-                >
+                <TrackedLink to="/impact" event="homepage_model_impact" className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-white">
                   See the Impact <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </TrackedLink>
               </article>
@@ -205,15 +223,11 @@ export default function HomePage() {
               <article className="rounded-3xl border border-[#D7A92E]/35 bg-[#F8F3E4] p-8">
                 <Network className="h-8 w-8 text-[#8A6814]" aria-hidden="true" />
                 <p className="mt-7 text-xs font-bold uppercase tracking-[0.18em] text-[#8A6814]">Community</p>
-                <h3 className="mt-3 text-2xl font-bold">Find people and organizations taking action.</h3>
+                <h3 className="mt-3 text-2xl font-bold">Published conversations and featured organizations.</h3>
                 <p className="mt-4 leading-7 text-[#111814]/65">
-                  Beyond The Yellow features organizations and leaders whose work creates a measurable difference for the people they serve.
+                  Beyond The Yellow gives visitors actual conversations and organization pages to watch, evaluate, and explore.
                 </p>
-                <TrackedLink
-                  to="/beyond-the-yellow"
-                  event="homepage_model_bty"
-                  className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#3B5147]"
-                >
+                <TrackedLink to="/beyond-the-yellow" event="homepage_model_bty" className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#3B5147]">
                   Explore Beyond The Yellow <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </TrackedLink>
               </article>
@@ -230,7 +244,7 @@ export default function HomePage() {
                   540+ hours of therapy for 45+ veterans.
                 </h2>
                 <p className="mt-6 max-w-3xl text-lg leading-8 text-white/68">
-                  These figures count donor-funded time spent directly between veterans and therapists. Administrative work and other operating activity are not included.
+                  These figures count completed donor-funded time spent directly between veterans and therapists. Administrative work and other operating activity are not included as therapy hours.
                 </p>
               </div>
               <div className="lg:col-span-5 lg:text-right">
@@ -244,40 +258,56 @@ export default function HomePage() {
                 </TrackedLink>
               </div>
             </div>
-
-            <div className="mt-12 grid gap-4 md:grid-cols-2">
-              <article className="rounded-3xl border border-white/12 bg-white/[0.05] p-7">
-                <p className="text-5xl font-bold text-[#D7A92E]">540+</p>
-                <h3 className="mt-4 text-xl font-bold">hours of direct therapy</h3>
-              </article>
-              <article className="rounded-3xl border border-white/12 bg-white/[0.05] p-7">
-                <p className="text-5xl font-bold text-[#D7A92E]">45+</p>
-                <h3 className="mt-4 text-xl font-bold">veterans who received donor-funded care</h3>
-              </article>
-            </div>
           </div>
         </section>
 
         <section className="border-b border-[#3B5147]/15 bg-[#F4F1E8]">
           <div className="container-wide grid items-center gap-14 py-20 md:py-28 lg:grid-cols-12">
             <div className="lg:col-span-6">
-              <div className="overflow-hidden rounded-3xl border border-[#D7A92E]/30 bg-white shadow-lg">
-                <img
-                  src={btyHomepage.url}
-                  alt="Beyond The Yellow"
-                  className="h-auto w-full"
-                  loading="lazy"
-                />
-              </div>
+              <a
+                href={LATEST_BTY_VIDEO_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackHomeEvent("homepage_bty_latest_video")}
+                className="group block overflow-hidden rounded-3xl border border-[#D7A92E]/30 bg-[#111814] shadow-lg"
+              >
+                <div className="relative aspect-video overflow-hidden">
+                  <img
+                    src={LATEST_BTY_THUMBNAIL}
+                    alt="Veterans Breakfast Club Beyond The Yellow conversation"
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transform-none motion-reduce:transition-none"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" aria-hidden="true" />
+                  <PlayCircle className="absolute left-5 top-5 h-10 w-10 text-white drop-shadow" aria-hidden="true" />
+                  <div className="absolute bottom-5 left-5 right-5 text-white">
+                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#D7A92E]">Latest conversation</p>
+                    <p className="mt-2 text-2xl font-bold">Veterans Breakfast Club</p>
+                  </div>
+                </div>
+              </a>
             </div>
+
             <div className="lg:col-span-6">
               <Eyebrow>Beyond The Yellow</Eyebrow>
               <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                Stories about people and organizations turning support into action.
+                Explore the work through published conversations and organization pages.
               </h2>
               <p className="mt-6 text-lg leading-8 text-[#111814]/68">
                 Beyond The Yellow features organizations, founders, volunteers, and community leaders whose work gives people something concrete to participate in, support, or learn from.
               </p>
+
+              <div className="mt-7 border-y border-[#3B5147]/15 py-5">
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3B5147]">Featured organizations</p>
+                <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold text-[#111814]/70">
+                  {featuredOrganizations.map(([name, route]) => (
+                    <Link key={name} to={route} className="min-h-11 py-3 hover:text-[#3B5147]">
+                      {name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
               <div className="mt-8 flex flex-wrap gap-3">
                 <TrackedLink
                   to="/beyond-the-yellow"
@@ -339,7 +369,7 @@ export default function HomePage() {
                 <Users className="h-8 w-8 text-[#3B5147]" aria-hidden="true" />
                 <h3 className="mt-6 text-2xl font-bold">Clinicians</h3>
                 <p className="mt-4 leading-7 text-[#111814]/64">
-                  Join ValorWell's telehealth clinician network and provide care to veterans and military families.
+                  Join ValorWell&apos;s telehealth clinician network and provide care to veterans and military families.
                 </p>
                 <TrackedLink to="/clinicians" event="homepage_clinicians" className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#3B5147]">
                   Clinician Opportunities <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -380,18 +410,10 @@ export default function HomePage() {
               </h2>
             </div>
             <div className="flex flex-wrap gap-3 lg:col-span-4 lg:justify-end">
-              <TrackedLink
-                to="/get-care"
-                event="homepage_final_care"
-                className="inline-flex min-h-12 items-center gap-2 rounded-md bg-white px-6 py-3 text-sm font-bold text-[#111814]"
-              >
+              <TrackedLink to="/get-care" event="homepage_final_care" className="inline-flex min-h-12 items-center gap-2 rounded-md bg-white px-6 py-3 text-sm font-bold text-[#111814]">
                 Find Care
               </TrackedLink>
-              <TrackedLink
-                to="/about"
-                event="homepage_final_about"
-                className="inline-flex min-h-12 items-center gap-2 rounded-md border border-white/30 px-6 py-3 text-sm font-bold text-white"
-              >
+              <TrackedLink to="/about" event="homepage_final_about" className="inline-flex min-h-12 items-center gap-2 rounded-md border border-white/30 px-6 py-3 text-sm font-bold text-white">
                 About ValorWell
               </TrackedLink>
             </div>

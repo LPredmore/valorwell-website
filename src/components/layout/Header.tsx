@@ -68,6 +68,9 @@ export function Header() {
     location.pathname === href ||
     (href === "/resources" && location.pathname.startsWith("/resources/"));
 
+  const focusClass =
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <nav
@@ -76,7 +79,10 @@ export function Header() {
       >
         <Link
           to="/"
-          className="flex items-center gap-2 text-lg font-bold tracking-tight text-foreground"
+          className={cn(
+            "inline-flex min-h-11 items-center gap-2 text-lg font-bold tracking-tight text-foreground",
+            focusClass,
+          )}
           aria-label="ValorWell home"
         >
           <img
@@ -87,14 +93,15 @@ export function Header() {
           <span>VALORWELL</span>
         </Link>
 
-        <div className="hidden lg:flex lg:items-center lg:gap-6">
+        <div className="hidden lg:flex lg:items-center lg:gap-4">
           {primary.map((item) => (
             <Link
               key={item.name}
               to={item.href}
               className={cn(
-                "whitespace-nowrap text-sm font-medium transition-colors hover:text-foreground",
+                "inline-flex min-h-11 items-center whitespace-nowrap px-1 text-sm font-medium transition-colors hover:text-foreground",
                 isActive(item.href) ? "text-foreground" : "text-muted-foreground",
+                focusClass,
               )}
             >
               {item.name}
@@ -107,7 +114,10 @@ export function Header() {
               onClick={() => setMenuOpen((value) => !value)}
               aria-haspopup="menu"
               aria-expanded={menuOpen}
-              className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground"
+              className={cn(
+                "inline-flex min-h-11 items-center gap-1 px-1 text-sm font-medium text-muted-foreground hover:text-foreground",
+                focusClass,
+              )}
             >
               Get Involved <ChevronDown className="h-4 w-4" aria-hidden />
             </button>
@@ -121,7 +131,7 @@ export function Header() {
                     key={item.name}
                     to={item.href}
                     role="menuitem"
-                    className="block rounded px-3 py-2 text-sm text-foreground hover:bg-muted focus:bg-muted focus:outline-none"
+                    className="flex min-h-11 items-center rounded px-3 py-2 text-sm text-foreground hover:bg-muted focus:bg-muted focus:outline-none"
                   >
                     {item.name}
                   </Link>
@@ -132,7 +142,7 @@ export function Header() {
 
           <Link
             to="/get-care"
-            className="ml-2 inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="ml-1 inline-flex min-h-11 items-center rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             Find Care
           </Link>
@@ -143,7 +153,10 @@ export function Header() {
               onClick={() => setLoginOpen((value) => !value)}
               aria-haspopup="menu"
               aria-expanded={loginOpen}
-              className="inline-flex items-center gap-1 px-2 py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+              className={cn(
+                "inline-flex min-h-11 items-center gap-1 px-2 text-sm font-medium text-muted-foreground hover:text-foreground",
+                focusClass,
+              )}
             >
               Login <ChevronDown className="h-4 w-4" aria-hidden />
             </button>
@@ -157,7 +170,7 @@ export function Header() {
                     key={item.name}
                     href={item.href}
                     role="menuitem"
-                    className="block rounded px-3 py-2 text-sm text-foreground hover:bg-muted focus:bg-muted focus:outline-none"
+                    className="flex min-h-11 items-center rounded px-3 py-2 text-sm text-foreground hover:bg-muted focus:bg-muted focus:outline-none"
                   >
                     {item.name}
                   </a>
@@ -169,7 +182,7 @@ export function Header() {
 
         <button
           type="button"
-          className="-m-2 rounded-md p-2 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:hidden"
+          className="-mr-1 inline-flex min-h-11 min-w-11 items-center justify-center rounded-md text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:hidden"
           onClick={() => setOpen((value) => !value)}
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
@@ -186,7 +199,10 @@ export function Header() {
               <Link
                 key={item.name}
                 to={item.href}
-                className="block rounded-md px-3 py-3 text-base font-medium text-foreground hover:bg-muted"
+                className={cn(
+                  "flex min-h-11 items-center rounded-md px-3 py-3 text-base font-medium text-foreground hover:bg-muted",
+                  focusClass,
+                )}
               >
                 {item.name}
               </Link>
@@ -196,7 +212,10 @@ export function Header() {
               type="button"
               onClick={() => setMobileGI((value) => !value)}
               aria-expanded={mobileGI}
-              className="flex w-full items-center justify-between rounded-md px-3 py-3 text-base font-medium text-foreground hover:bg-muted"
+              className={cn(
+                "flex min-h-11 w-full items-center justify-between rounded-md px-3 py-3 text-base font-medium text-foreground hover:bg-muted",
+                focusClass,
+              )}
             >
               Get Involved
               <ChevronDown
@@ -214,7 +233,10 @@ export function Header() {
                   <Link
                     key={item.name}
                     to={item.href}
-                    className="block rounded-md px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
+                    className={cn(
+                      "flex min-h-11 items-center rounded-md px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground",
+                      focusClass,
+                    )}
                   >
                     {item.name}
                   </Link>
@@ -224,7 +246,7 @@ export function Header() {
 
             <Link
               to="/get-care"
-              className="mt-3 block rounded-md bg-primary px-3 py-3 text-center text-base font-semibold text-primary-foreground hover:bg-primary/90"
+              className="mt-3 flex min-h-11 items-center justify-center rounded-md bg-primary px-3 py-3 text-center text-base font-semibold text-primary-foreground hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               Find Care
             </Link>
@@ -233,7 +255,10 @@ export function Header() {
               type="button"
               onClick={() => setMobileLogin((value) => !value)}
               aria-expanded={mobileLogin}
-              className="mt-1 flex w-full items-center justify-between rounded-md px-3 py-3 text-base font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+              className={cn(
+                "mt-1 flex min-h-11 w-full items-center justify-between rounded-md px-3 py-3 text-base font-medium text-muted-foreground hover:bg-muted hover:text-foreground",
+                focusClass,
+              )}
             >
               Login
               <ChevronDown
@@ -251,7 +276,10 @@ export function Header() {
                   <a
                     key={item.name}
                     href={item.href}
-                    className="block rounded-md px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
+                    className={cn(
+                      "flex min-h-11 items-center rounded-md px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground",
+                      focusClass,
+                    )}
                   >
                     {item.name}
                   </a>

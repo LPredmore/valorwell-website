@@ -4,11 +4,10 @@ const groups: { title: string; links: { name: string; href: string }[] }[] = [
   {
     title: "ValorWell",
     links: [
-      { name: "Mission", href: "/mission" },
       { name: "About", href: "/about" },
+      { name: "Mission", href: "/mission" },
       { name: "Impact", href: "/impact" },
-      { name: "Beyond The Yellow", href: "/beyond-the-yellow" },
-      { name: "Watch", href: "/watch" },
+      { name: "Resources", href: "/resources" },
     ],
   },
   {
@@ -16,14 +15,15 @@ const groups: { title: string; links: { name: string; href: string }[] }[] = [
     links: [
       { name: "Find Care", href: "/get-care" },
       { name: "Clinicians", href: "/clinicians" },
-      { name: "Resources", href: "/resources" },
+      { name: "CHAMPVA Resources", href: "/resources/champva" },
+      { name: "VA Community Care Resources", href: "/resources/va-community-care" },
     ],
   },
   {
-    title: "Community",
+    title: "Beyond The Yellow",
     links: [
       { name: "Beyond The Yellow", href: "/beyond-the-yellow" },
-      { name: "Network", href: "/network" },
+      { name: "Featured Organizations", href: "/network" },
       { name: "Watch", href: "/watch" },
     ],
   },
@@ -32,7 +32,7 @@ const groups: { title: string; links: { name: string; href: string }[] }[] = [
     links: [
       { name: "Partner With ValorWell", href: "/partner" },
       { name: "Support ValorWell", href: "/support" },
-      { name: "Share a Beyond The Yellow Story", href: "/beyond-the-yellow" },
+      { name: "Share a Story", href: "/beyond-the-yellow" },
       { name: "Contact", href: "/contact" },
     ],
   },
@@ -60,9 +60,8 @@ export function Footer() {
               />
               <span className="sr-only">ValorWell</span>
             </Link>
-            <p className="mt-3 max-w-xs text-sm text-muted-foreground">
-              Building better systems around veteran and family support, mental
-              well-being, ethical care, and real community action.
+            <p className="mt-3 max-w-xs text-sm leading-6 text-muted-foreground">
+              Mental health care and support for veterans and military families, donor-funded therapy, and Beyond The Yellow.
             </p>
           </div>
           {groups.map((group) => (
@@ -88,9 +87,7 @@ export function Footer() {
         <div className="mt-10 flex flex-col gap-3 border-t border-border/60 pt-6 text-xs text-muted-foreground md:flex-row md:items-center md:justify-between">
           <p>© {new Date().getFullYear()} ValorWell. All rights reserved.</p>
           <p className="max-w-3xl">
-            ValorWell does not guarantee VA Community Care authorization,
-            referrals, Nexus Letters, disability ratings, service connection,
-            claim approval, or any VA outcome.
+            Care and coverage pathways are subject to eligibility or authorization, clinician licensure, availability, capacity, and clinical fit. ValorWell does not control VA authorization or disability outcomes.
           </p>
         </div>
       </div>

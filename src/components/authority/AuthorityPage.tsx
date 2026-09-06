@@ -179,7 +179,7 @@ export function AuthorityPage(p: AuthorityPageProps) {
         )}
 
         {(p.finalCTAs || p.finalNote) && (
-          <section className="bg-white py-14 md:py-18">
+          <section className="bg-white py-14 md:py-20">
             <div className="container-narrow">
               {p.finalCTAs && (
                 <div className="mb-5 flex flex-wrap gap-3">

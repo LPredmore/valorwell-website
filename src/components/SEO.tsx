@@ -11,11 +11,16 @@ interface SEOProps {
 
 const SITE_NAME = "ValorWell";
 const DEFAULT_TITLE =
-  "ValorWell - Mental Health Care for Veterans and Families";
+  "ValorWell | Mental Health Care for Veterans & Military Families";
 const DEFAULT_DESCRIPTION =
-  "Online mental health care for veterans and families—therapy, support sessions, and groups built around access. CHAMPVA accepted.";
+  "ValorWell provides telehealth mental health care pathways for veterans and military families, funds therapy when access breaks down, and connects communities through Beyond The Yellow.";
 const SITE_URL = "https://www.valorwell.org";
 const DEFAULT_IMAGE = `${SITE_URL}/og-image.png`;
+
+function buildPageTitle(title?: string) {
+  if (!title) return DEFAULT_TITLE;
+  return /\bValorWell\b/i.test(title) ? title : `${title} | ${SITE_NAME}`;
+}
 
 export function SEO({
   title,
@@ -25,7 +30,7 @@ export function SEO({
   image = DEFAULT_IMAGE,
   noIndex = false,
 }: SEOProps) {
-  const fullTitle = title ? `${title} | ${SITE_NAME}` : DEFAULT_TITLE;
+  const fullTitle = buildPageTitle(title);
   const canonicalUrl = canonical ? `${SITE_URL}${canonical}` : undefined;
 
   return (
@@ -63,7 +68,7 @@ export function OrganizationSchema() {
     url: "https://www.valorwell.org",
     logo: "https://www.valorwell.org/brand/valorwell-logo.png",
     description:
-      "ValorWell is building better systems around veteran and family support, mental well-being, ethical care, and real community action through Operation Claims Success, Beyond The Yellow, and a real clinical operating engine.",
+      "ValorWell provides telehealth mental health care pathways for veterans and military families, supports donor-funded therapy through the ValorWell Foundation, and connects communities through Beyond The Yellow.",
     sameAs: ["https://www.youtube.com/@ValorWell"],
     contactPoint: {
       "@type": "ContactPoint",
@@ -92,20 +97,14 @@ export function MedicalOrganizationSchema() {
     url: SITE_URL,
     logo: `${SITE_URL}/brand/valorwell-logo.png`,
     description:
-      "Mental health care provider specializing in therapy and support services for veterans, service members, and their families.",
-    medicalSpecialty: ["Psychiatry", "Mental Health"],
+      "Telehealth mental health care for veterans and military families, subject to coverage or authorization, clinician licensure, availability, capacity, and clinical fit.",
+    medicalSpecialty: "Mental Health",
     availableService: [
       {
         "@type": "MedicalTherapy",
-        name: "Therapy",
+        name: "Telehealth Mental Health Therapy",
         description:
-          "Professional, licensed counseling covered by CHAMPVA for veterans and families.",
-      },
-      {
-        "@type": "MedicalTherapy",
-        name: "Support Sessions",
-        description:
-          "Guidance and skills-based coaching for everyday challenges.",
+          "Outpatient telehealth mental health therapy provided where coverage or authorization, state licensure, clinician availability, capacity, and clinical fit align.",
       },
     ],
     areaServed: {
@@ -114,7 +113,7 @@ export function MedicalOrganizationSchema() {
     },
     audience: {
       "@type": "PeopleAudience",
-      audienceType: "Veterans, Service Members, Military Families",
+      audienceType: "Veterans and Military Families",
     },
   };
 
@@ -174,7 +173,7 @@ export function ServiceSchema({ name, description, url }: ServiceSchemaProps) {
     },
     audience: {
       "@type": "PeopleAudience",
-      audienceType: "Veterans, Service Members, Military Families",
+      audienceType: "Veterans and Military Families",
     },
   };
 
@@ -245,38 +244,27 @@ export function JobPostingSchema() {
   );
 }
 
-// NonprofitOrganizationSchema for donor discovery
+// Structured data for the separate ValorWell Foundation nonprofit entity.
 export function NonprofitOrganizationSchema() {
   const schema = {
     "@context": "https://schema.org",
     "@type": "NGO",
-    "@id": `${SITE_URL}/#organization`,
-    name: "ValorWell",
-    alternateName: "ValorWell Mental Health",
-    url: SITE_URL,
+    "@id": `${SITE_URL}/support#foundation`,
+    name: "ValorWell Foundation",
+    url: `${SITE_URL}/support`,
     logo: `${SITE_URL}/brand/valorwell-logo.png`,
     description:
-      "501(c)(3) nonprofit providing free and low-cost mental health care to veterans and military families who can't access VA services.",
-    nonprofitStatus: "Nonprofit501c3",
-    foundingDate: "2023",
+      "The ValorWell Foundation supports donor-funded mental health therapy for veterans who sought care but still could not reach an available treatment path.",
+    foundingDate: "2024-05-13",
     areaServed: {
       "@type": "Country",
       name: "United States",
     },
     knowsAbout: [
       "Veteran mental health",
-      "PTSD treatment",
-      "Military family therapy",
-      "CHAMPVA counseling",
-      "Trauma-informed care",
+      "Mental health care access",
+      "Donor-funded therapy",
     ],
-    slogan: "Mental health care for those who served",
-    contactPoint: {
-      "@type": "ContactPoint",
-      email: "support@valorwell.org",
-      contactType: "donor support",
-      availableLanguage: "English",
-    },
   };
 
   return (
@@ -291,24 +279,23 @@ export function DonateActionSchema() {
   const schema = {
     "@context": "https://schema.org",
     "@type": "DonateAction",
-    name: "Donate to Support Veterans Mental Health",
+    name: "Support Donor-Funded Mental Health Therapy for Veterans",
     description:
-      "Your donation funds free mental health care for veterans who can't access VA services. Over 120 veterans served through our bridge program.",
+      "Donations to the ValorWell Foundation help fund direct mental health therapy for veterans who sought care but still could not reach an available treatment path.",
     recipient: {
       "@type": "NGO",
-      name: "ValorWell",
-      url: SITE_URL,
+      name: "ValorWell Foundation",
+      url: `${SITE_URL}/support`,
       description:
-        "Nonprofit providing mental health care to veterans and military families",
+        "A nonprofit organization supporting donor-funded mental health therapy for veterans.",
       areaServed: {
         "@type": "Country",
         name: "United States",
       },
-      nonprofitStatus: "Nonprofit501c3",
     },
     target: {
       "@type": "EntryPoint",
-      urlTemplate: `${SITE_URL}/partner`,
+      urlTemplate: `${SITE_URL}/donate`,
       actionPlatform: [
         "http://schema.org/DesktopWebPlatform",
         "http://schema.org/MobileWebPlatform",
@@ -329,6 +316,7 @@ interface VideoSchemaProps {
   description: string;
   embedUrl: string;
   thumbnailUrl?: string;
+  uploadDate?: string;
 }
 
 export function VideoObjectSchema({
@@ -336,6 +324,7 @@ export function VideoObjectSchema({
   description,
   embedUrl,
   thumbnailUrl,
+  uploadDate,
 }: VideoSchemaProps) {
   const schema = {
     "@context": "https://schema.org",
@@ -344,7 +333,7 @@ export function VideoObjectSchema({
     description,
     embedUrl,
     thumbnailUrl: thumbnailUrl || `${SITE_URL}/og-image.png`,
-    uploadDate: "2025-01-01",
+    ...(uploadDate ? { uploadDate } : {}),
     publisher: {
       "@type": "Organization",
       name: "ValorWell",

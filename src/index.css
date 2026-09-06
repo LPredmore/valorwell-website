@@ -145,6 +145,11 @@
   }
 }
 
+.home-theme a:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px #F4F1E8, 0 0 0 5px #111814 !important;
+}
+
 @layer utilities {
   .section-padding {
     @apply py-6 md:py-10;

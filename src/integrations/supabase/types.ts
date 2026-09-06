@@ -28372,6 +28372,8 @@ export type Database = {
         | "member_not_found"
         | "no_coverage_for_date"
         | "technical_error"
+        | "demographic_mismatch"
+        | "payer_rejection"
       integration_outbox_status_enum:
         | "pending"
         | "processing"
@@ -28926,6 +28928,8 @@ export const Constants = {
         "member_not_found",
         "no_coverage_for_date",
         "technical_error",
+        "demographic_mismatch",
+        "payer_rejection",
       ],
       integration_outbox_status_enum: [
         "pending",

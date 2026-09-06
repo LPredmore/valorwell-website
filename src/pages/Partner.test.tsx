@@ -27,42 +27,38 @@ function renderPartner() {
 describe("Partner organizational collaboration page", () => {
   afterEach(cleanup);
 
-  it("leads with organizational collaboration rather than a donor campaign", () => {
+  it("leads with a concrete partnership outcome", () => {
     renderPartner();
 
     expect(
       screen.getByRole("heading", {
         level: 1,
-        name: /We do not need more logos around the mission/i,
+        name: /Build a partnership around a specific way to help/i,
       }),
     ).toBeInTheDocument();
-    expect(screen.getByText("What Partnership Means Here")).toBeInTheDocument();
-    expect(screen.getByText("Where Collaboration Can Fit")).toBeInTheDocument();
+    expect(screen.getByText("Partnership Approach")).toBeInTheDocument();
+    expect(screen.getByText("Ways to Work Together")).toBeInTheDocument();
     expect(screen.queryByText("Bridge the Wait")).not.toBeInTheDocument();
   });
 
-  it("routes the primary partnership actions to Contact and Impact", () => {
+  it("routes the primary partnership action to Contact", () => {
     renderPartner();
 
     expect(
       screen.getAllByRole("link", { name: /Start a Partnership Conversation/i })[0],
     ).toHaveAttribute("href", "/contact");
-    expect(
-      screen.getByRole("link", { name: /See What ValorWell Can Verify/i }),
-    ).toHaveAttribute("href", "/impact");
   });
 
-  it("keeps financial support separate from partnership", () => {
+  it("keeps financial support and clinical decisions separate from partnership", () => {
     renderPartner();
 
-    expect(screen.getByText("Partnership vs. Financial Support")).toBeInTheDocument();
+    expect(screen.getByText("Important Boundaries")).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: /Support ValorWell/i }),
-    ).toHaveAttribute("href", "/support");
-    expect(screen.getByRole("link", { name: /Review Impact/i })).toHaveAttribute(
-      "href",
-      "/impact",
-    );
+      screen.getByText(/Financial support does not purchase treatment priority, referrals, endorsements, or Beyond The Yellow editorial selection/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Clinical decisions remain with the treating clinician/i),
+    ).toBeInTheDocument();
   });
 
   it("routes into the current community architecture", () => {
@@ -75,9 +71,9 @@ describe("Partner organizational collaboration page", () => {
       "href",
       "/network",
     );
-    expect(screen.getByRole("link", { name: /Watch ValorWell/i })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: /Contact ValorWell/i })).toHaveAttribute(
       "href",
-      "/watch",
+      "/contact",
     );
   });
 
@@ -88,16 +84,5 @@ describe("Partner organizational collaboration page", () => {
     expect(
       links.some((link) => link.getAttribute("href") === "/operation-claims-success"),
     ).toBe(false);
-  });
-
-  it("states the non-pay-to-play partnership boundaries", () => {
-    renderPartner();
-
-    expect(
-      screen.getByText(/Financial support does not purchase a Beyond The Yellow feature/i),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(/A partner does not control clinician judgment/i),
-    ).toBeInTheDocument();
   });
 });

@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { SEO, BreadcrumbSchema } from "@/components/SEO";
+import { OverflowReferralSourceForm } from "@/components/forms/OverflowReferralSourceForm";
 import { trackHomeEvent } from "@/lib/tracking";
 
 function Eyebrow({ children, light = false }: { children: ReactNode; light?: boolean }) {
@@ -217,6 +218,21 @@ export default function Partner() {
         </section>
 
         <section className="border-b border-[#3B5147]/15 bg-[#F4F1E8]">
+          <div className="container-wide py-20 md:py-24">
+            <div className="mb-10 max-w-4xl">
+              <Eyebrow>Overflow Referral Network</Eyebrow>
+              <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
+                Already serving veterans and military families through your own practice?
+              </h2>
+              <p className="mt-5 text-lg leading-8 text-[#111814]/68">
+                Independent practices that are already credentialed with eligible programs can register as possible overflow referral options when ValorWell cannot accept a veteran or family member.
+              </p>
+            </div>
+            <OverflowReferralSourceForm />
+          </div>
+        </section>
+
+        <section className="border-b border-[#3B5147]/15 bg-white">
           <div className="container-wide grid gap-12 py-20 md:py-28 lg:grid-cols-12 lg:items-start">
             <div className="lg:col-span-5">
               <Eyebrow>What to Include When You Reach Out</Eyebrow>

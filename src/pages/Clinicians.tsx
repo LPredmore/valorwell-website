@@ -3,8 +3,8 @@ import { Helmet } from "react-helmet-async";
 import {
   ArrowRight,
   BadgeCheck,
-  Bridge,
   HeartHandshake,
+  Network,
   Users,
 } from "lucide-react";
 import { Layout } from "@/components/layout";
@@ -201,7 +201,7 @@ export default function Clinicians() {
               </div>
 
               <article className="rounded-3xl border border-[#D7A92E]/35 bg-[#3B5147] p-7 md:p-8">
-                <Bridge className="h-7 w-7 text-[#D7A92E]" aria-hidden="true" />
+                <Network className="h-7 w-7 text-[#D7A92E]" aria-hidden="true" />
                 <p className="mt-6 text-xs font-bold uppercase tracking-[0.18em] text-white/55">ValorWell</p>
                 <h3 className="mt-3 text-2xl font-bold">Handles the machinery that makes the relationship possible.</h3>
                 <p className="mt-4 leading-7 text-white/72">

@@ -81,7 +81,7 @@ export default function ImpactPage() {
     <Layout>
       <SEO
         title="ValorWell Impact | Donor-Funded Therapy for Veterans"
-        description="See how donations to ValorWell funded 540+ hours of direct therapy for 45+ veterans in 2026, read real veteran testimonials, and learn how donated funds pay therapists."
+        description="See how donors helped fund 540+ hours of direct therapy for 45+ veterans in 2026, read real veteran testimonials, and see how donated funds pay therapists."
         canonical="/impact"
       />
 
@@ -109,10 +109,10 @@ export default function ImpactPage() {
             <div className="lg:col-span-8">
               <Eyebrow>2026 Impact</Eyebrow>
               <h1 className="mt-6 max-w-5xl text-4xl font-bold leading-[1.03] sm:text-5xl md:text-6xl lg:text-7xl">
-                Donor-funded therapy, counted after the care is delivered.
+                Veterans asked for help. Donors made sure they got therapy.
               </h1>
               <p className="mt-7 max-w-3xl text-lg leading-8 text-[#111814]/72 md:text-xl">
-                This page reports completed therapy provided through ValorWell&apos;s donor-funded care program for veterans who had sought mental-health care but still did not have an available treatment path.
+                When the normal path failed to get veterans into treatment, ValorWell used donated funds to pay therapists directly. In 2026, that meant 540+ hours of therapy for 45+ veterans who had already sought mental-health care but still did not have an available path into treatment.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <TrackedLink
@@ -120,7 +120,7 @@ export default function ImpactPage() {
                   event="impact_hero_donate"
                   className="inline-flex min-h-12 items-center gap-2 rounded-md bg-[#3B5147] px-6 py-3 text-sm font-bold text-white hover:bg-[#31443b]"
                 >
-                  Support Donor-Funded Therapy
+                  Help Pay for the Next Therapy Session
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </TrackedLink>
                 <div className="inline-flex min-h-12 items-center gap-2 rounded-md border border-[#3B5147]/20 bg-white/70 px-5 py-3 text-sm font-bold text-[#3B5147]">
@@ -133,7 +133,7 @@ export default function ImpactPage() {
             <aside className="lg:col-span-4">
               <div className="rounded-3xl bg-[#111814] p-8 text-white shadow-xl">
                 <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D7A92E]">
-                  Completed care in 2026
+                  What donors made possible in 2026
                 </p>
                 <div className="mt-6 space-y-6">
                   <div>
@@ -142,11 +142,11 @@ export default function ImpactPage() {
                   </div>
                   <div className="border-t border-white/12 pt-6">
                     <p className="text-4xl font-bold">45+</p>
-                    <p className="mt-2 text-sm text-white/60">unique veterans who received donor-funded care</p>
+                    <p className="mt-2 text-sm text-white/60">veterans who received donor-funded care</p>
                   </div>
                 </div>
                 <p className="mt-7 border-t border-white/12 pt-5 text-sm leading-6 text-white/55">
-                  These figures describe the donor-funded therapy program, not every service or activity operated by ValorWell.
+                  This is the impact of ValorWell&apos;s donor-funded therapy program—not every service or activity operated by ValorWell.
                 </p>
               </div>
             </aside>
@@ -158,15 +158,18 @@ export default function ImpactPage() {
             <div className="lg:col-span-5">
               <Eyebrow light>Why the Program Exists</Eyebrow>
               <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                Asking for care does not always end with an available therapist.
+                Asking for help shouldn&apos;t end with another waiting list.
               </h2>
             </div>
             <div className="lg:col-span-7 space-y-5 text-lg leading-8 text-white/75">
               <p>
-                Veterans can encounter authorization, provider-network, capacity, scheduling, and other access barriers even after they have started seeking mental-health care.
+                These veterans had already taken the hardest step: they asked for mental-health care.
               </p>
               <p>
-                The donor-funded program gives ValorWell another way to pay for treatment when an existing pathway has not produced an available therapy option.
+                But authorization problems, provider shortages, scheduling barriers, limited capacity, and other breakdowns still left them without a therapist.
+              </p>
+              <p className="font-semibold text-white">
+                That is the gap this program exists to fill. When the existing care pathway does not get a veteran into treatment, donor funding gives ValorWell another option: pay the therapist and get the veteran into care.
               </p>
             </div>
           </div>
@@ -177,10 +180,10 @@ export default function ImpactPage() {
             <div className="mx-auto max-w-4xl text-center">
               <Eyebrow>How Donor-Funded Care Works</Eyebrow>
               <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                Funding becomes impact when a therapy session is completed.
+                A donation becomes therapy. That&apos;s the point.
               </h2>
               <p className="mx-auto mt-5 max-w-3xl text-lg leading-8 text-[#111814]/65">
-                Support for the ValorWell Foundation helps fund therapy through this program. The impact snapshot counts care that has already occurred rather than projected sessions or fundraising promises.
+                The model is deliberately simple: people donate, ValorWell pays the therapist, and the veteran gets care. We count the impact after treatment is actually delivered—not when money is pledged and not when a session is merely planned.
               </p>
             </div>
 
@@ -188,27 +191,27 @@ export default function ImpactPage() {
               <article className="rounded-3xl border border-[#D7A92E]/35 bg-[#F8F3E4] p-8 text-center">
                 <HeartHandshake className="mx-auto h-8 w-8 text-[#8A6814]" aria-hidden="true" />
                 <p className="mt-5 text-xs font-bold uppercase tracking-[0.18em] text-[#8A6814]">01</p>
-                <h3 className="mt-3 text-2xl font-bold">Support enters the program.</h3>
+                <h3 className="mt-3 text-2xl font-bold">People give.</h3>
                 <p className="mt-3 leading-7 text-[#111814]/62">
-                  Donations support the Foundation&apos;s donor-funded therapy work.
+                  Donations support the ValorWell Foundation&apos;s donor-funded therapy program.
                 </p>
               </article>
 
               <article className="rounded-3xl bg-[#111814] p-8 text-center text-white">
                 <Stethoscope className="mx-auto h-8 w-8 text-[#D7A92E]" aria-hidden="true" />
                 <p className="mt-5 text-xs font-bold uppercase tracking-[0.18em] text-[#D7A92E]">02</p>
-                <h3 className="mt-3 text-2xl font-bold">A therapist provides care.</h3>
+                <h3 className="mt-3 text-2xl font-bold">ValorWell pays the therapist.</h3>
                 <p className="mt-3 leading-7 text-white/62">
-                  The program pays for eligible completed therapy rather than asking the veteran to cover that session.
+                  Donated funds cover the therapist&apos;s time so the veteran does not have to pay for that session.
                 </p>
               </article>
 
               <article className="rounded-3xl border border-[#3B5147]/15 bg-[#F4F1E8] p-8 text-center">
                 <CheckCircle2 className="mx-auto h-8 w-8 text-[#3B5147]" aria-hidden="true" />
                 <p className="mt-5 text-xs font-bold uppercase tracking-[0.18em] text-[#3B5147]">03</p>
-                <h3 className="mt-3 text-2xl font-bold">Completed care is counted.</h3>
+                <h3 className="mt-3 text-2xl font-bold">The veteran gets therapy.</h3>
                 <p className="mt-3 leading-7 text-[#111814]/62">
-                  Therapy time enters the public impact total only after the clinical service has been delivered.
+                  Once the session actually happens, that completed treatment becomes part of the impact shown on this page.
                 </p>
               </article>
             </div>
@@ -217,12 +220,12 @@ export default function ImpactPage() {
 
         <section className="border-b border-white/10 bg-[#3B5147] text-white">
           <div className="container-wide py-16 text-center md:py-20">
-            <Eyebrow light>How Donations Relate to Care</Eyebrow>
+            <Eyebrow light>Where the Money Goes</Eyebrow>
             <h2 className="mx-auto mt-4 max-w-5xl text-3xl font-bold leading-tight md:text-5xl">
               100% of the donated funds ValorWell receives go directly to therapists to pay for treatment.
             </h2>
             <p className="mx-auto mt-5 max-w-3xl text-lg leading-8 text-white/75">
-              Donated funds are not used for administrative, technology, marketing, staffing, or other operating costs. Those expenses are funded separately.
+              Not administration. Not technology. Not marketing. Not staffing. Those costs are funded separately. Donated funds pay therapists to provide mental-health treatment to veterans.
             </p>
           </div>
         </section>
@@ -232,7 +235,7 @@ export default function ImpactPage() {
             <div className="max-w-3xl">
               <Eyebrow>Real Veterans. Real Impact.</Eyebrow>
               <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                The numbers tell us how much care was provided. These veterans tell us what that care meant.
+                540+ hours is a number. This is what some of those hours meant.
               </h2>
             </div>
 
@@ -276,12 +279,12 @@ export default function ImpactPage() {
         <section className="border-b border-[#3B5147]/15 bg-white">
           <div className="container-wide grid gap-12 py-20 md:py-28 lg:grid-cols-12 lg:items-center">
             <div className="lg:col-span-7">
-              <Eyebrow>You Do Not Have to Solve the Whole Problem Yourself</Eyebrow>
+              <Eyebrow>You Don&apos;t Have to Fund It All</Eyebrow>
               <h2 className="mt-4 max-w-4xl text-3xl font-bold leading-tight md:text-5xl">
-                Most supporters are building this one manageable monthly gift at a time.
+                Most of this happens one manageable monthly gift at a time.
               </h2>
               <p className="mt-6 max-w-3xl text-lg leading-8 text-[#111814]/68">
-                Across the donation platforms ValorWell uses, most donors are not funding an entire course of therapy by themselves. Their donations combine with support from other people to make the care possible.
+                You do not have to pay for an entire course of therapy. Across the donation platforms ValorWell uses, supporters combine their donations with gifts from other people to make treatment possible. A lot of people doing something manageable can create something substantial.
               </p>
             </div>
 
@@ -290,7 +293,7 @@ export default function ImpactPage() {
                 <p className="text-5xl font-bold text-[#3B5147]">72%</p>
                 <h3 className="mt-4 text-xl font-bold">of 2026 donors give monthly</h3>
                 <p className="mt-3 leading-7 text-[#111814]/62">
-                  Recurring support gives ValorWell a more dependable way to keep therapy available when veterans reach out.
+                  Recurring donors give ValorWell a more dependable source of therapy funding when the next veteran needs help.
                 </p>
               </article>
 
@@ -298,7 +301,7 @@ export default function ImpactPage() {
                 <p className="text-5xl font-bold text-[#8A6814]">$25</p>
                 <h3 className="mt-4 text-xl font-bold">is the most common monthly gift</h3>
                 <p className="mt-3 leading-7 text-[#111814]/62">
-                  Small recurring gifts matter because many supporters funding care together can do what one donor does not have to do alone.
+                  Twenty-five dollars does not have to fund an entire course of treatment. Combined with other donors, it helps make the next therapy session possible.
                 </p>
               </article>
             </div>
@@ -308,19 +311,19 @@ export default function ImpactPage() {
         <section className="bg-[#111814] text-white">
           <div className="container-wide py-20 text-center md:py-24">
             <HeartHandshake className="mx-auto h-10 w-10 text-[#D7A92E]" aria-hidden="true" />
-            <Eyebrow light>Support Donor-Funded Care</Eyebrow>
+            <Eyebrow light>Help the Next Veteran Get Seen</Eyebrow>
             <h2 className="mx-auto mt-5 max-w-4xl text-3xl font-bold leading-tight md:text-5xl">
-              Help make another completed therapy session possible.
+              The next veteran shouldn&apos;t keep waiting because the system stalled.
             </h2>
             <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-white/70">
-              Support goes through the ValorWell Foundation and helps fund the donor-funded therapy program described on this page.
+              Another veteran will ask for mental-health care and still struggle to reach a therapist. Your donation gives ValorWell another option: you help us pay the therapist, and we help the veteran get into treatment.
             </p>
             <TrackedLink
               to="/donate"
               event="impact_final_donate"
               className="mt-8 inline-flex min-h-12 items-center gap-2 rounded-md bg-[#D7A92E] px-6 py-3 text-sm font-bold text-[#111814] hover:bg-[#e2b943]"
             >
-              Donate to the ValorWell Foundation
+              Help Pay for the Next Therapy Session
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </TrackedLink>
           </div>

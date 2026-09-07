@@ -33,7 +33,7 @@ describe("About ValorWell page", () => {
     expect(
       screen.getByRole("heading", {
         level: 1,
-        name: /ValorWell works at the intersection of mental health care, veteran and family support, and community action/i,
+        name: /Mental health care, donor-funded therapy, public resources, and community conversations under one mission/i,
       }),
     ).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /^Care$/i })).toBeInTheDocument();
@@ -41,13 +41,27 @@ describe("About ValorWell page", () => {
     expect(screen.getByRole("heading", { name: /^Community$/i })).toBeInTheDocument();
   });
 
-  it("publishes the established founder and host role", () => {
+  it("separates operating work from the Foundation and keeps clinical judgment clinician-led", () => {
+    renderAbout();
+
+    expect(screen.getByRole("heading", { name: /Care operations and charitable support have different roles/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Care and operating work/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Charitable support for donor-funded therapy/i })).toBeInTheDocument();
+    expect(
+      screen.getByText(/Clinical assessment, treatment planning, and treatment decisions remain with appropriately licensed treating clinicians/i),
+    ).toBeInTheDocument();
+  });
+
+  it("publishes the founder role without assigning clinical authority to the founder", () => {
     renderAbout();
 
     expect(
       screen.getByRole("heading", {
         name: /Luke Predmore — Founder, ValorWell · Host, Beyond The Yellow/i,
       }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/clinical care remains clinician-led, subject to professional licensure, scope, and judgment/i),
     ).toBeInTheDocument();
   });
 

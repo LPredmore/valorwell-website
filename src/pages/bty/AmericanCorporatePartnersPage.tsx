@@ -196,13 +196,19 @@ export default function AmericanCorporatePartnersPage() {
               <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-[hsl(var(--gold-accent))]">
                 Beyond The Yellow · Feature Story
               </p>
-              <div className="mt-7 inline-flex items-center gap-3 rounded-md border border-white/15 bg-white/[0.06] px-4 py-2.5">
-                <span className="text-xl font-black tracking-[-0.03em] text-[hsl(var(--gold-accent))]">ACP</span>
-                <span className="h-5 w-px bg-white/20" aria-hidden="true" />
-                <span className="text-xs font-bold uppercase tracking-[0.12em] text-white/70">
-                  American Corporate Partners
-                </span>
-              </div>
+              <a
+                href={acpLinks.overview}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Visit American Corporate Partners"
+                className="mt-7 inline-flex rounded-md bg-white p-2 shadow-lg transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[hsl(var(--navy))]"
+              >
+                <img
+                  src="/brand/acp-logo.webp"
+                  alt="American Corporate Partners"
+                  className="h-auto w-48 sm:w-56"
+                />
+              </a>
               <h1 className="mt-7 text-4xl font-black leading-[0.98] tracking-[-0.035em] sm:text-5xl lg:text-6xl xl:text-7xl">
                 A year of career mentorship.
                 <span className="mt-2 block text-[hsl(var(--gold-accent))]">

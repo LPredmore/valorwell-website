@@ -4,7 +4,7 @@ export default function VeteranMentalHealthCare() {
   return (
     <AuthorityPage
       title="Veteran Mental Health Care | Therapy and Support for Veterans"
-      description="ValorWell helps veterans access mental health care, practical tools, ethical documentation support, and family-aware support without being left to navigate the system alone."
+      description="ValorWell helps veterans access mental health care, treatment documentation, family-aware support, and care-navigation education through available telehealth pathways."
       canonical="/veteran-mental-health-care"
       breadcrumbs={[
         { name: "Home", url: "/" },
@@ -12,42 +12,41 @@ export default function VeteranMentalHealthCare() {
       ]}
       eyebrow="Veteran Mental Health Care"
       h1="Mental health care for veterans who need more than another waiting list."
-      subhead="ValorWell helps veterans access practical mental health support through a system built around care, documentation, family strain, and real-world barriers."
+      subhead="ValorWell provides telehealth mental health care for veterans when coverage or authorization, clinician licensure, availability, capacity, and clinical fit align."
       heroCTAs={[
         { label: "Find Care", to: "/get-care" },
         { label: "Support ValorWell", to: "/support", variant: "secondary" },
       ]}
       sections={[
         {
-          heading: "Veterans deserve support that understands the whole system",
-          body: "Veterans often need more than a therapy appointment. They may need clinicians who understand trauma, transition, family stress, care delays, VA access issues, and the documentation that lives alongside real treatment. We build care around all of that, not around a single hour on a calendar.",
+          heading: "Treatment can involve more than the appointment itself",
+          body: "Veterans may be navigating trauma, transition, family stress, care delays, VA access issues, and multiple health systems at the same time. Treatment records can also matter for continuity of care when symptoms, assessment, interventions, functional impact, and progress need to be understood across providers.",
         },
         {
           heading: "What ValorWell helps with",
           cards: [
             { title: "Individual therapy", body: "One-on-one care with licensed clinicians." },
-            { title: "Trauma and stress support", body: "Trauma-informed approaches that respect pace." },
-            { title: "PTSD-related concerns", body: "Symptom-focused care, not labels first." },
-            { title: "Family and relationship strain", body: "Care that sees the people around you." },
-            { title: "Emotional regulation", body: "Practical skills you can actually use." },
-            { title: "Care navigation education", body: "Help understanding the system you're in." },
-            { title: "Appropriate clinical documentation", body: "Records that reflect real treatment." },
-            { title: "Telehealth access", body: "Care from where you are, when possible." },
+            { title: "Trauma and stress support", body: "Treatment approaches selected for the individual clinical situation." },
+            { title: "PTSD-related concerns", body: "Assessment and treatment of trauma-related symptoms when clinically appropriate." },
+            { title: "Family and relationship strain", body: "Care that can account for family and relationship context." },
+            { title: "Emotional regulation", body: "Skills and treatment strategies selected with the treating clinician." },
+            { title: "Care navigation education", body: "Information that can help make the current care system easier to understand." },
+            { title: "Treatment documentation", body: "Records that reflect assessment, treatment, and clinician judgment." },
+            { title: "Telehealth access", body: "Remote outpatient care when the applicable care pathway and clinical requirements align." },
           ],
         },
         {
-          heading: "Why access is difficult",
-          body: "Long waitlists, limited in-network providers, insurance friction, fragmented systems, and confusion around VA Community Care or CHAMPVA all make it harder to get care. The problem usually isn't the veteran. It's the system around the veteran.",
+          heading: "Why access can be difficult",
+          body: "Waitlists, provider availability, coverage rules, authorization, and fragmented handoffs can all delay treatment. The useful next step depends on identifying which part of the care pathway is actually blocking access.",
         },
         {
-          heading: "Our approach",
+          heading: "Clinical scope",
           bullets: [
-            "Care first.",
-            "Documentation when clinically appropriate.",
-            "Practical tools that fit real life.",
-            "Family-aware support.",
-            "Ethical clinical standards.",
-            "Telehealth delivery when available.",
+            "Treatment decisions remain with appropriately licensed treating clinicians.",
+            "Documentation reflects the care, assessment, and information available to the clinician.",
+            "Telehealth care depends on state licensure, availability, capacity, and clinical fit.",
+            "Coverage and authorization requirements remain part of the applicable care pathway.",
+            "ValorWell does not determine VA disability ratings, service connection, or claim outcomes.",
           ],
         },
       ]}
@@ -55,35 +54,35 @@ export default function VeteranMentalHealthCare() {
         {
           question: "Does ValorWell work with veterans?",
           answer:
-            "Yes. Veterans and military-connected families are the core population we serve.",
+            "Yes. Veterans and military-connected families are the core population ValorWell serves through its current care pathways.",
         },
         {
           question: "Is care available by telehealth?",
           answer:
-            "Telehealth is our primary care delivery. Availability depends on state licensure and clinician fit.",
+            "Telehealth is ValorWell's primary care-delivery format. Availability depends on state licensure, coverage or authorization, clinician availability, capacity, and clinical fit.",
         },
         {
           question: "Can ValorWell help with PTSD-related concerns?",
           answer:
-            "Yes. Our clinicians work with trauma-related symptoms using established, evidence-informed approaches.",
+            "ValorWell clinicians can assess and treat trauma-related concerns within their licensure, scope, training, and clinical judgment.",
         },
         {
-          question: "Can therapy documentation support a veteran's broader care record?",
+          question: "What can treatment records document?",
           answer:
-            "When clinically appropriate, treatment records can document symptoms, history, and functional impact. Documentation should be based on real clinical care, accurate records, and ethical professional judgment.",
+            "Treatment records can document clinically relevant symptoms, history, assessment, interventions, functional impact, progress, and plan of care. The content of an individual record is determined by the treating clinician and the care provided.",
         },
         {
-          question: "Does ValorWell guarantee VA disability outcomes?",
+          question: "Does ValorWell determine VA disability outcomes?",
           answer:
-            "No. VA disability decisions are made by the VA. ValorWell does not control, guarantee, or sell those outcomes.",
+            "No. VA determines disability ratings, service connection, and claim outcomes. ValorWell provides clinical care and treatment records; it does not make those administrative decisions.",
         },
         { question: "What should I do if I am in crisis?", answer: CRISIS_NOTE },
       ]}
       related={[
-        { name: "Military Family Therapy", href: "/military-family-therapy", body: "Support for spouses, kids, and the household." },
-        { name: "Clinical Documentation Resources", href: "/resources/documentation", body: "Ethical documentation built on real care." },
-        { name: "CHAMPVA Resources", href: "/resources/champva", body: "Provider access, questions to ask, and current CHAMPVA care-path information." },
-        { name: "VA Community Care Resources", href: "/resources/va-community-care", body: "Understand referrals, authorization, provider paths, and records to keep." },
+        { name: "Military Family Therapy", href: "/military-family-therapy", body: "Support for spouses, family members, and household strain when an appropriate care path is available." },
+        { name: "Clinical Documentation Resources", href: "/resources/documentation", body: "Understand treatment records, functional impact, and documentation boundaries." },
+        { name: "CHAMPVA Resources", href: "/resources/champva", body: "Provider access, assignment, authorization basics, and current CHAMPVA care information." },
+        { name: "VA Community Care Resources", href: "/resources/va-community-care", body: "Understand referrals, authorization, access standards, and records to keep." },
       ]}
       finalCTAs={[
         { label: "Start Care with ValorWell", to: "/get-care" },

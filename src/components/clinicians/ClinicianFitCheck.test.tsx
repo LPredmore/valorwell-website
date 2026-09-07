@@ -1,5 +1,5 @@
-import { fireEvent, render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ClinicianFitCheck } from "./ClinicianFitCheck";
 
 vi.mock("@/lib/tracking", () => ({
@@ -9,6 +9,10 @@ vi.mock("@/lib/tracking", () => ({
 describe("ClinicianFitCheck", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    cleanup();
   });
 
   it("reveals the positive result at four agreements", () => {

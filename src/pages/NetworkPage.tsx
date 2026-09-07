@@ -50,6 +50,15 @@ const organizations = [
     description:
       "John Shaw on housing, food access, community, peer support, and helping veterans rebuild stability after the immediate crisis.",
   },
+  {
+    organization: "American Corporate Partners",
+    title: "A year of career mentorship. Built around the person, not a template.",
+    videoId: "JHuLEqw2yG8",
+    videoUrl: "https://www.youtube.com/watch?v=JHuLEqw2yG8",
+    featureUrl: "/americancorporatepartners",
+    description:
+      "A Beyond The Yellow conversation about ACP's yearlong one-on-one mentorship model for transitioning service members, veterans, and active-duty military spouses.",
+  },
 ];
 
 function OrganizationCard({
@@ -151,7 +160,7 @@ export default function NetworkPage() {
                 Current Features
               </p>
               <h2 className="mt-3 text-3xl font-bold text-[#111814] md:text-4xl">
-                Five organizations currently have dedicated Beyond The Yellow feature pages.
+                Published Beyond The Yellow feature pages.
               </h2>
               <p className="mt-5 text-base leading-8 text-[#111814]/62">
                 This page is a collection of published Beyond The Yellow features, not a comprehensive directory of veteran-service organizations.

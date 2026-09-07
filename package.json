@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/generate-route-html.mjs && node scripts/generate-nonindexed-route-html.mjs && node scripts/normalize-cloudflare-html.mjs && node scripts/normalize-production-origin.mjs",
+    "build": "vite build && node scripts/generate-route-html.mjs && node scripts/generate-nonindexed-route-html.mjs && node scripts/normalize-cloudflare-html.mjs && node scripts/normalize-production-origin.mjs && node scripts/normalize-clinician-recruiting-html.mjs",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -64,7 +64,6 @@
     "react-helmet-async": "^2.0.5",
     "react-hook-form": "^7.61.1",
     "react-resizable-panels": "^2.1.9",
-    "react-router-dom": "^6.30.1",
     "recharts": "^2.15.4",
     "sonner": "^1.7.4",
     "tailwind-merge": "^2.6.0",

@@ -38,10 +38,10 @@ const routes = [
     path: "/impact",
     title: "ValorWell Impact | Donor-Funded Therapy for Veterans",
     description:
-      "See ValorWell's dated donor-funded therapy impact snapshot and how the 540+ therapy hours and 45+ veterans are counted.",
+      "See how donations to ValorWell funded 540+ hours of direct therapy for 45+ veterans in 2026, read real veteran testimonials, and learn how donated funds pay therapists.",
     h1: "Donor-funded therapy, counted after the care is delivered.",
     lead:
-      "This page reports completed therapy provided through ValorWell's donor-funded care program and defines what the public impact figures count, exclude, and represent.",
+      "See completed donor-funded therapy, real veteran testimonials, and how donations are used to pay therapists when veterans still cannot reach care through an available treatment path.",
   },
   {
     path: "/beyond-the-yellow",

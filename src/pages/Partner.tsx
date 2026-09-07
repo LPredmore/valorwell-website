@@ -11,7 +11,6 @@ import {
 import { Layout } from "@/components/layout/Layout";
 import { SEO, BreadcrumbSchema } from "@/components/SEO";
 import { trackHomeEvent } from "@/lib/tracking";
-import partnerCareAccessCommunityAsset from "@/assets/partner-care-access-community.png.asset.json";
 
 function Eyebrow({ children, light = false }: { children: ReactNode; light?: boolean }) {
   return (
@@ -72,6 +71,13 @@ const partnershipTypes = [
     examples: "Clinician networks · technology · strategic introductions",
     Icon: Network,
   },
+] as const;
+
+const partnershipStartPoints = [
+  "Referral or resource connection",
+  "Community collaboration",
+  "Beyond The Yellow introduction",
+  "Clinical, technology, or strategic introduction",
 ] as const;
 
 export default function Partner() {
@@ -142,13 +148,26 @@ export default function Partner() {
             </div>
 
             <div className="lg:col-span-5">
-              <div className="overflow-hidden rounded-3xl border border-[#3B5147]/15 bg-white shadow-xl">
-                <img
-                  src={partnerCareAccessCommunityAsset.url}
-                  alt="Care, access, and community connections"
-                  className="h-auto w-full object-cover"
-                  loading="eager"
-                />
+              <div className="rounded-3xl border border-[#3B5147]/15 bg-white p-7 shadow-xl md:p-8">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#3B5147]">
+                  Current Partnership Paths
+                </p>
+                <h2 className="mt-4 text-2xl font-bold leading-tight md:text-3xl">
+                  Start with the relationship you actually need.
+                </h2>
+                <div className="mt-7 divide-y divide-[#3B5147]/12 border-y border-[#3B5147]/12">
+                  {partnershipStartPoints.map((item, index) => (
+                    <div key={item} className="grid grid-cols-[2rem_1fr] gap-3 py-4">
+                      <span className="text-xs font-bold tracking-[0.12em] text-[#8A6814]">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <p className="font-bold leading-6 text-[#111814]/80">{item}</p>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-6 text-sm leading-6 text-[#111814]/58">
+                  A partnership starts with a defined audience, contribution, next step, and owner. Financial support and clinical or editorial decisions remain separate.
+                </p>
               </div>
             </div>
           </div>

@@ -49,6 +49,7 @@ export default function GetCareWithSignup() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showFloatingIntake, setShowFloatingIntake] = useState(true);
   const lastTriggerRef = useRef<HTMLElement | null>(null);
   const submissionId = useMemo(() => createWebsiteSubmissionKey(), [open]);
 
@@ -59,6 +60,25 @@ export default function GetCareWithSignup() {
     if (params.get("signup") === "1" || params.get("form") === "signup") {
       setOpen(true);
     }
+  }, []);
+
+  // The floating intake shortcut is useful while the hero is on screen, but it
+  // should disappear before the interactive care selector reaches the viewport.
+  // This keeps the shortcut from covering Step 1 or competing with in-page CTAs.
+  useEffect(() => {
+    const careSelector = document.getElementById("find-your-path");
+    if (!careSelector || typeof IntersectionObserver === "undefined") return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowFloatingIntake(!entry.isIntersecting),
+      {
+        rootMargin: "0px 0px 96px 0px",
+        threshold: 0,
+      },
+    );
+
+    observer.observe(careSelector);
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -161,20 +181,20 @@ export default function GetCareWithSignup() {
 
   return (
     <>
-      <div className="pb-24 sm:pb-0">
-        <GetCare />
-      </div>
+      <GetCare />
 
-      <Button
-        type="button"
-        onClick={(event) => {
-          lastTriggerRef.current = event.currentTarget;
-          setOpen(true);
-        }}
-        className="fixed bottom-5 left-4 right-4 z-40 min-h-12 justify-center rounded-full px-6 font-bold shadow-2xl sm:left-auto sm:right-5"
-      >
-        Start CHAMPVA Intake
-      </Button>
+      {showFloatingIntake ? (
+        <Button
+          type="button"
+          onClick={(event) => {
+            lastTriggerRef.current = event.currentTarget;
+            setOpen(true);
+          }}
+          className="fixed bottom-5 left-4 right-4 z-40 min-h-12 justify-center rounded-full px-6 font-bold shadow-2xl md:hidden"
+        >
+          Start CHAMPVA Intake
+        </Button>
+      ) : null}
 
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent

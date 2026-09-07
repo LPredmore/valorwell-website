@@ -2,16 +2,22 @@ import fs from "node:fs";
 import path from "node:path";
 
 const DIST_DIR = path.resolve(process.cwd(), "dist");
+const oldDescription =
+  "Join ValorWell's telehealth clinician network: $75 per completed session, weekly pay, flexible availability, billing support, and independent clinical judgment.";
+const escapedOldDescription =
+  "Join ValorWell&#039;s telehealth clinician network: $75 per completed session, weekly pay, flexible availability, billing support, and independent clinical judgment.";
+const newDescription =
+  "Join ValorWell's clinician network with control over your schedule and clinical work, weekly per-session pay, paid no-shows, and ValorWell-managed credentialing, authorizations, and billing.";
+const escapedNewDescription =
+  "Join ValorWell&#039;s clinician network with control over your schedule and clinical work, weekly per-session pay, paid no-shows, and ValorWell-managed credentialing, authorizations, and billing.";
 
 const replacements = [
   [
     "Mental Health Clinician Opportunities | ValorWell",
     "Telehealth Mental Health Clinician Opportunities | ValorWell",
   ],
-  [
-    "Join ValorWell's telehealth clinician network: $75 per completed session, weekly pay, flexible availability, billing support, and independent clinical judgment.",
-    "Join ValorWell's clinician network with control over your schedule and clinical work, weekly per-session pay, paid no-shows, and ValorWell-managed credentialing, authorizations, and billing.",
-  ],
+  [oldDescription, newDescription],
+  [escapedOldDescription, escapedNewDescription],
   [
     "Provide telehealth care with a schedule you control.",
     "You handle the therapy. We handle almost everything else.",

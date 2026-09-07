@@ -2,13 +2,11 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import {
+  ArrowLeft,
   ArrowRight,
-  Building2,
   HeartHandshake,
-  Network,
   PlayCircle,
   Users,
-  Video,
 } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -23,49 +21,52 @@ import { UnifiedBtyForm } from "@/components/intake/UnifiedBtyForm";
 import { trackHomeEvent } from "@/lib/tracking";
 
 const FORM_ANCHOR = "bty-story-form";
-const LATEST_VIDEO_URL = "https://www.youtube.com/watch?v=A4CUe3c8rJE";
 
-type LaneValue = "share-story" | "nominate";
-
-const featuredOrganizations = [
+const episodes = [
   {
-    name: "Veterans Breakfast Club",
+    organization: "Veterans Breakfast Club",
     route: "/veteransbreakfastclub",
-    statement:
-      "Creating spaces where veterans can tell the stories they have carried—and where families and civilians can hear them.",
+    videoId: "A4CUe3c8rJE",
+    videoUrl: "https://www.youtube.com/watch?v=A4CUe3c8rJE",
+    line: "Some veterans carry a story for decades. Sometimes the right room is what finally lets it out.",
+    current: true,
   },
   {
-    name: "GallantFew",
-    route: "/gallantfew",
-    statement:
-      "Helping veterans find direction, connection, and purpose after military service.",
-  },
-  {
-    name: "Veterans Outreach of Wisconsin",
+    organization: "Veterans Outreach of Wisconsin",
     route: "/VOW",
-    statement:
-      "Tiny homes, food access, peer support, and a path back to permanent stability.",
+    videoId: "hLvZfGcycOQ",
+    videoUrl: "https://www.youtube.com/watch?v=hLvZfGcycOQ",
+    line: "A tiny home is the beginning. Stability takes more than a roof.",
+    current: false,
   },
   {
-    name: "Military Missions in Action",
+    organization: "GallantFew",
+    route: "/gallantfew",
+    videoId: "zsaTKjNVeew",
+    videoUrl: "https://www.youtube.com/watch?v=zsaTKjNVeew",
+    line: "The mission ends. The need for direction doesn’t.",
+    current: false,
+  },
+  {
+    organization: "Military Missions in Action",
     route: "/mmia",
-    statement:
-      "Ramps, furnished homes, transportation, and practical help for veterans and families.",
-  },
-  {
-    name: "VETS2INDUSTRY",
-    route: "/vets2industry",
-    statement:
-      "Making the military and veteran resource ecosystem easier to find and use.",
+    videoId: "19JpCgF-d9Q",
+    videoUrl: "https://www.youtube.com/watch?v=19JpCgF-d9Q",
+    line: "Practical support. A ramp. A furnished room. A ride.",
+    current: false,
   },
 ] as const;
+
+const currentEpisode = episodes[0];
+
+type LaneValue = "share-story" | "nominate";
 
 const faqs = [
   {
     value: "veterans-only",
     question: "Is Beyond The Yellow only for veteran organizations?",
     answer:
-      "No. Veteran-serving and military-family organizations are a priority because they are closely connected to ValorWell's mission, but Beyond The Yellow can feature work in other cause areas when the story is strong and useful to viewers.",
+      "No. Veteran-serving and military-family organizations are a priority because they are closely connected to ValorWell's mission, but Beyond The Yellow can feature work in other cause areas when the story is strong and the work has real substance.",
   },
   {
     value: "cost",
@@ -77,7 +78,7 @@ const faqs = [
     value: "selection",
     question: "How are stories selected?",
     answer:
-      "Beyond The Yellow is curated. We look for a specific body of work, a clear reason the story matters, a conversation that can teach viewers something, and enough substance to support a full feature. Not every submission becomes an episode.",
+      "Beyond The Yellow is curated. We look for work with a real-world consequence, people who would notice if that work disappeared, something viewers can learn from the person doing it, and enough depth to support a full conversation. Not every submission becomes an episode.",
   },
   {
     value: "receive",
@@ -116,8 +117,43 @@ function scrollToForm() {
   });
 }
 
+function circularOffset(index: number, activeIndex: number) {
+  const length = episodes.length;
+  let offset = index - activeIndex;
+  if (offset > length / 2) offset -= length;
+  if (offset < -length / 2) offset += length;
+  return offset;
+}
+
+function carouselStyle(offset: number) {
+  const distance = Math.abs(offset);
+
+  if (distance === 0) {
+    return {
+      opacity: 1,
+      zIndex: 30,
+      transform: "translate(-50%, -50%) translateZ(0) scale(1) rotateY(0deg)",
+    };
+  }
+
+  if (distance === 1) {
+    return {
+      opacity: 0.64,
+      zIndex: 20,
+      transform: `translate(-50%, -50%) translateX(${offset * 64}%) translateZ(-120px) scale(0.8) rotateY(${offset * -38}deg)`,
+    };
+  }
+
+  return {
+    opacity: 0.2,
+    zIndex: 5,
+    transform: "translate(-50%, -50%) translateZ(-330px) scale(0.64) rotateY(0deg)",
+  };
+}
+
 export default function BeyondTheYellowPage() {
   const [selectedLane, setSelectedLane] = useState<LaneValue>("share-story");
+  const [activeEpisode, setActiveEpisode] = useState(0);
 
   useEffect(() => {
     track("bty_page_view");
@@ -135,22 +171,27 @@ export default function BeyondTheYellowPage() {
     window.setTimeout(scrollToForm, 40);
   };
 
+  const rotateEpisodes = (direction: -1 | 1) => {
+    setActiveEpisode((current) => (current + direction + episodes.length) % episodes.length);
+    track("bty_episode_carousel", { direction: direction === 1 ? "next" : "previous" });
+  };
+
   return (
     <>
       <Helmet>
-        <title>Beyond The Yellow | Featured Organizations & Conversations | ValorWell</title>
+        <title>Beyond The Yellow | Meet the People Doing the Work | ValorWell</title>
         <meta
           name="description"
-          content="Beyond The Yellow features conversations with organizations, founders, volunteers, and community leaders doing work worth knowing about."
+          content="Beyond The Yellow puts the focus on people and organizations doing the work—not just talking about the problem. Watch the current conversation and meet the doers."
         />
         <meta property="og:title" content="Beyond The Yellow | ValorWell" />
         <meta
           property="og:description"
-          content="Watch conversations and explore organizations featured through Beyond The Yellow."
+          content="Meet the people who stopped waiting for somebody else to solve the problem and started doing the work."
         />
         <meta
           property="og:image"
-          content="https://i.ytimg.com/vi/A4CUe3c8rJE/maxresdefault.jpg"
+          content={`https://i.ytimg.com/vi/${currentEpisode.videoId}/maxresdefault.jpg`}
         />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
@@ -179,163 +220,256 @@ export default function BeyondTheYellowPage() {
               <div className="absolute -bottom-48 -left-36 h-[30rem] w-[30rem] rounded-full bg-[#3B5147]/35 blur-3xl" />
             </div>
 
-            <div className="container-wide relative grid gap-12 py-16 md:py-24 lg:grid-cols-12 lg:items-center lg:py-28">
-              <div className="lg:col-span-7">
-                <Eyebrow light>Beyond The Yellow</Eyebrow>
-                <h1 className="mt-6 max-w-5xl text-4xl font-bold leading-[1.02] sm:text-5xl md:text-6xl lg:text-7xl">
-                  Conversations with people and organizations doing work worth knowing about.
+            <div className="container-wide relative py-20 md:py-28 lg:py-32">
+              <div className="max-w-6xl">
+                <Eyebrow light>Beyond Awareness. Into Action.</Eyebrow>
+                <h1 className="mt-6 max-w-6xl text-4xl font-bold leading-[1.01] sm:text-5xl md:text-6xl lg:text-7xl">
+                  We hear a lot from people saying someone needs to do something. We built this for the people who already are.
                 </h1>
-                <p className="mt-7 max-w-3xl text-lg leading-8 text-white/72 md:text-xl">
-                  Beyond The Yellow is ValorWell's interview and feature series about organizations, founders, volunteers, and community leaders building programs, services, resources, and opportunities that affect people's lives.
-                </p>
-                <div className="mt-9 flex flex-wrap gap-3">
+                <div className="mt-8 max-w-4xl space-y-5 text-lg leading-8 text-white/72 md:text-xl">
+                  <p>
+                    Every day, people post, share, advocate, wear the ribbon, change the profile picture, and tell the world which causes they support. Awareness can matter.
+                  </p>
+                  <p className="font-bold text-white">
+                    But eventually, somebody has to do the work.
+                  </p>
+                  <p>
+                    Beyond The Yellow exists to find those people, sit down with them, and put the attention back where it belongs: on the people turning concern into something another person can actually feel.
+                  </p>
+                </div>
+
+                <div className="mt-10 flex flex-wrap gap-3">
                   <a
-                    href={LATEST_VIDEO_URL}
+                    href={currentEpisode.videoUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => track("bty_hero_watch")}
-                    className="inline-flex min-h-12 items-center gap-2 rounded-md bg-[#D7A92E] px-6 py-3 text-sm font-bold text-[#111814] transition hover:brightness-95"
+                    className="inline-flex min-h-12 items-center gap-2 rounded-md bg-[#D7A92E] px-6 py-3 text-sm font-bold text-[#111814] transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
                   >
                     <PlayCircle className="h-4 w-4" aria-hidden="true" />
-                    Watch the Latest Conversation
+                    Watch the Current Episode
                   </a>
                   <button
                     type="button"
                     onClick={() => chooseLane("nominate", "bty_hero_nominate")}
-                    className="inline-flex min-h-12 items-center gap-2 rounded-md border border-white/30 px-6 py-3 text-sm font-bold text-white transition hover:bg-white/10"
+                    className="inline-flex min-h-12 items-center gap-2 rounded-md border border-white/30 px-6 py-3 text-sm font-bold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
                   >
-                    Nominate Someone
+                    Nominate a Doer
                   </button>
                 </div>
-              </div>
 
-              <div className="lg:col-span-5">
-                <div className="overflow-hidden rounded-3xl border border-white/12 bg-white/[0.06] shadow-2xl">
-                  <a
-                    href={LATEST_VIDEO_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => track("bty_hero_latest")}
-                    className="group block"
-                  >
-                    <div className="relative aspect-video overflow-hidden">
-                      <img
-                        src="https://i.ytimg.com/vi/A4CUe3c8rJE/maxresdefault.jpg"
-                        alt="Veterans Breakfast Club Beyond The Yellow conversation"
-                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transform-none motion-reduce:transition-none"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" aria-hidden="true" />
-                      <div className="absolute bottom-5 left-5 right-5">
-                        <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#D7A92E]">Latest conversation</p>
-                        <p className="mt-2 text-2xl font-bold text-white">Veterans Breakfast Club</p>
-                      </div>
-                    </div>
-                  </a>
-                </div>
+                <p className="mt-7 text-sm font-bold uppercase tracking-[0.14em] text-white/45">
+                  Current episode · {currentEpisode.organization}
+                </p>
               </div>
             </div>
           </section>
 
           <section className="border-b border-[#3B5147]/15 bg-white">
             <div className="container-wide py-20 md:py-28">
-              <div className="grid gap-10 lg:grid-cols-12 lg:items-end">
-                <div className="lg:col-span-8">
-                  <Eyebrow>Featured Organizations</Eyebrow>
-                  <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                    Explore organizations already featured through Beyond The Yellow.
+              <div className="grid gap-12 lg:grid-cols-12 lg:items-start">
+                <div className="lg:col-span-6">
+                  <Eyebrow>The Question We Should All Ask</Eyebrow>
+                  <h2 className="mt-4 max-w-4xl text-3xl font-bold leading-tight md:text-5xl lg:text-6xl">
+                    If your support disappeared tomorrow, who would notice?
                   </h2>
                 </div>
-                <div className="lg:col-span-4 lg:text-right">
-                  <Link
-                    to="/network"
-                    onClick={() => track("bty_network")}
-                    className="inline-flex min-h-11 items-center gap-2 rounded-md border border-[#3B5147]/25 px-5 py-3 text-sm font-bold text-[#3B5147]"
-                  >
-                    <Network className="h-4 w-4" aria-hidden="true" />
-                    Explore the Network
-                  </Link>
+                <div className="space-y-5 text-lg leading-8 text-[#111814]/68 lg:col-span-6">
+                  <p>
+                    It is easy to say we support veterans, mental health, families, hunger, homelessness, children, or whatever cause matters to us.
+                  </p>
+                  <p className="font-bold text-[#111814]">But support should mean something.</p>
+                  <p>
+                    If you stopped tomorrow, would anyone&apos;s life get harder? Would an organization lose something it needed? Would the people you say you support even know your support disappeared?
+                  </p>
+                  <p>
+                    Those questions are not meant to shame anyone. They matter because there is a difference between caring about a problem and participating in the solution.
+                  </p>
                 </div>
               </div>
 
-              <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-                {featuredOrganizations.map((organization) => (
-                  <Link
-                    key={organization.name}
-                    to={organization.route}
-                    onClick={() => track("bty_featured_org", { organization: organization.name })}
-                    className="group rounded-3xl border border-[#3B5147]/15 bg-[#F4F1E8] p-7 transition hover:-translate-y-0.5 hover:shadow-md motion-reduce:transform-none motion-reduce:transition-none"
-                  >
-                    <Building2 className="h-7 w-7 text-[#3B5147]" aria-hidden="true" />
-                    <h3 className="mt-5 text-2xl font-bold">{organization.name}</h3>
-                    <p className="mt-4 leading-7 text-[#111814]/64">{organization.statement}</p>
-                    <span className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-[#3B5147]">
-                      Read the Feature <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                    </span>
-                  </Link>
+              <div className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                {[
+                  "Would a meal stop being served?",
+                  "Would a safe place disappear?",
+                  "Would someone lose a mentor or a resource?",
+                  "Would anybody know you stopped showing up?",
+                ].map((question) => (
+                  <div key={question} className="rounded-2xl border border-[#3B5147]/15 bg-[#F4F1E8] p-6">
+                    <p className="text-lg font-bold leading-7">{question}</p>
+                  </div>
                 ))}
               </div>
+
+              <div className="mt-12 rounded-3xl bg-[#3B5147] p-8 text-white md:p-10">
+                <Eyebrow light>Our Guests Can Answer That Question</Eyebrow>
+                <h3 className="mt-4 max-w-5xl text-3xl font-bold leading-tight md:text-5xl">
+                  If their work stopped, something would disappear. Someone would notice.
+                </h3>
+                <p className="mt-5 max-w-4xl text-lg leading-8 text-white/72">
+                  People would lose services, opportunities, connection, practical help, or a place to turn. That real-world consequence is the point. Those are the people Beyond The Yellow was created to put in front of the camera.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section className="overflow-hidden border-b border-[#3B5147]/15 bg-[#F4F1E8]">
+            <div className="container-wide py-20 text-center md:py-28">
+              <Eyebrow>Meet the Doers</Eyebrow>
+              <h2 className="mx-auto mt-4 max-w-5xl text-3xl font-bold leading-tight md:text-5xl">
+                These people didn&apos;t wait for somebody else to solve it.
+              </h2>
+              <p className="mx-auto mt-5 max-w-3xl text-lg leading-8 text-[#111814]/65">
+                Start with the current episode, then move through a few of the people and organizations we have already sat down with.
+              </p>
+
+              <div
+                className="relative mx-auto mt-10 h-[270px] max-w-6xl overflow-hidden sm:h-[350px] lg:h-[430px]"
+                style={{ perspective: "1200px" }}
+                aria-label="Beyond The Yellow episode carousel"
+              >
+                {episodes.map((episode, index) => {
+                  const offset = circularOffset(index, activeEpisode);
+                  const distance = Math.abs(offset);
+                  const isActive = distance === 0;
+                  const isSide = distance === 1;
+
+                  return (
+                    <article
+                      key={episode.organization}
+                      className="absolute left-1/2 top-1/2 w-[min(78vw,650px)] overflow-hidden rounded-3xl border border-[#111814]/15 bg-[#111814] text-left shadow-2xl transition-[transform,opacity] duration-500 motion-reduce:transition-none"
+                      style={{
+                        ...carouselStyle(offset),
+                        transformStyle: "preserve-3d",
+                        pointerEvents: distance > 1 ? "none" : "auto",
+                      }}
+                      aria-hidden={distance > 1}
+                    >
+                      <div className="relative aspect-video overflow-hidden">
+                        <img
+                          src={`https://i.ytimg.com/vi/${episode.videoId}/maxresdefault.jpg`}
+                          alt={`${episode.organization} Beyond The Yellow episode`}
+                          className="h-full w-full object-cover"
+                          loading={isActive ? "eager" : "lazy"}
+                          onError={(event) => {
+                            event.currentTarget.src = `https://i.ytimg.com/vi/${episode.videoId}/hqdefault.jpg`;
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" aria-hidden="true" />
+                        <div className="absolute bottom-0 left-0 right-0 p-5 text-white sm:p-7">
+                          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#D7A92E] sm:text-xs">
+                            {episode.current ? "Current episode" : "Past episode"}
+                          </p>
+                          <h3 className="mt-2 text-xl font-bold sm:text-2xl md:text-3xl">{episode.organization}</h3>
+                          <p className="mt-2 hidden max-w-xl text-sm leading-6 text-white/70 sm:block">{episode.line}</p>
+                        </div>
+                      </div>
+
+                      {isActive ? (
+                        <Link
+                          to={episode.route}
+                          onClick={() => track("bty_episode_open", { organization: episode.organization })}
+                          className="absolute inset-0 z-20 rounded-3xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#D7A92E]"
+                          aria-label={`Open ${episode.organization} Beyond The Yellow feature`}
+                        />
+                      ) : isSide ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setActiveEpisode(index);
+                            track("bty_episode_select", { organization: episode.organization });
+                          }}
+                          className="absolute inset-0 z-20 rounded-3xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#D7A92E]"
+                          aria-label={`Bring ${episode.organization} episode forward`}
+                        />
+                      ) : null}
+                    </article>
+                  );
+                })}
+              </div>
+
+              <div className="mt-5 flex items-center justify-center gap-4">
+                <button
+                  type="button"
+                  onClick={() => rotateEpisodes(-1)}
+                  className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-[#3B5147]/25 bg-white text-[#3B5147] transition hover:bg-[#3B5147] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147]"
+                  aria-label="Previous episode"
+                >
+                  <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+                </button>
+                <p className="min-w-24 text-sm font-bold text-[#111814]/55" aria-live="polite">
+                  {activeEpisode + 1} of {episodes.length}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => rotateEpisodes(1)}
+                  className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-[#3B5147]/25 bg-white text-[#3B5147] transition hover:bg-[#3B5147] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147]"
+                  aria-label="Next episode"
+                >
+                  <ArrowRight className="h-5 w-5" aria-hidden="true" />
+                </button>
+              </div>
+
+              <Link
+                to="/network"
+                onClick={() => track("bty_past_episodes")}
+                className="mt-7 inline-flex min-h-11 items-center gap-2 rounded-md px-4 py-2 text-sm font-bold text-[#3B5147] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147]"
+              >
+                See All Past Episodes
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
             </div>
           </section>
 
           <section className="border-b border-white/10 bg-[#3B5147] text-white">
             <div className="container-wide grid gap-12 py-20 md:py-28 lg:grid-cols-12 lg:items-start">
               <div className="lg:col-span-5">
-                <Eyebrow light>What We Look For</Eyebrow>
+                <Eyebrow light>The Beyond The Yellow Test</Eyebrow>
                 <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                  A specific body of work and a conversation worth having.
+                  What happens because you showed up?
                 </h2>
               </div>
               <div className="lg:col-span-7">
                 <div className="divide-y divide-white/12 border-y border-white/12">
                   {[
-                    ["There is something concrete to discuss", "A program, service, organization, project, approach, or result gives the conversation substance."],
-                    ["The audience can learn something", "The guest can explain the problem, the work, the decisions behind it, or how people can participate."],
-                    ["The story can support a full feature", "There is enough depth for a long-form conversation rather than only a short promotional mention."],
+                    [
+                      "Something changes.",
+                      "There should be a real-world consequence to the work. Someone receives something, reaches something, learns something, escapes something, builds something, or becomes better equipped because the work exists.",
+                    ],
+                    [
+                      "Someone would notice if it disappeared.",
+                      "The work has enough consequence that taking it away would leave a real gap for the people who rely on it, participate in it, or benefit from it.",
+                    ],
+                    [
+                      "Others can learn from it.",
+                      "Beyond The Yellow is not an award. The conversation should help the rest of us understand what doing the work actually takes and how other people can participate.",
+                    ],
                   ].map(([title, copy]) => (
                     <div key={title} className="py-7">
-                      <h3 className="text-xl font-bold">{title}</h3>
-                      <p className="mt-2 leading-7 text-white/65">{copy}</p>
+                      <h3 className="text-2xl font-bold">{title}</h3>
+                      <p className="mt-3 leading-7 text-white/68">{copy}</p>
                     </div>
                   ))}
                 </div>
-              </div>
-            </div>
-          </section>
-
-          <section className="border-b border-[#3B5147]/15 bg-[#F4F1E8]">
-            <div className="container-wide grid gap-12 py-20 md:py-28 lg:grid-cols-12 lg:items-center">
-              <div className="lg:col-span-7">
-                <Eyebrow>Watch More</Eyebrow>
-                <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                  Interviews, clips, and other ValorWell video content live in Watch.
-                </h2>
-                <p className="mt-5 max-w-3xl text-lg leading-8 text-[#111814]/65">
-                  Use Watch for Beyond The Yellow conversations alongside practical veteran and family content from ValorWell.
+                <p className="mt-8 text-xl font-bold leading-8 text-white">
+                  You don&apos;t need to be famous. You don&apos;t need the biggest nonprofit. You don&apos;t need a massive following. You need to be doing something worth paying attention to.
                 </p>
-              </div>
-              <div className="lg:col-span-5 lg:text-right">
-                <Link
-                  to="/watch"
-                  onClick={() => track("bty_watch_hub")}
-                  className="inline-flex min-h-12 items-center gap-2 rounded-md bg-[#3B5147] px-6 py-3 text-sm font-bold text-white"
-                >
-                  <Video className="h-4 w-4" aria-hidden="true" />
-                  Watch ValorWell
-                </Link>
               </div>
             </div>
           </section>
 
           <section id={FORM_ANCHOR} className="scroll-mt-24 border-b border-[#3B5147]/15 bg-white">
             <div className="container-wide py-20 md:py-28">
-              <div className="max-w-3xl">
-                <Eyebrow>Submit a Story</Eyebrow>
+              <div className="max-w-4xl">
+                <Eyebrow>Who Are We Missing?</Eyebrow>
                 <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                  Share your work or nominate someone else.
+                  Somebody is doing incredible work right now that almost nobody knows about.
                 </h2>
-                <p className="mt-5 text-lg leading-8 text-[#111814]/65">
-                  Choose the path that matches your relationship to the story. Submissions are reviewed for editorial fit; submitting does not guarantee a feature.
-                </p>
+                <div className="mt-5 max-w-3xl space-y-3 text-lg leading-8 text-[#111814]/65">
+                  <p>Maybe it&apos;s you.</p>
+                  <p>Maybe it&apos;s somebody you have watched quietly keep showing up while everyone else talks about the problem.</p>
+                  <p className="font-bold text-[#111814]">Tell us who they are.</p>
+                </div>
               </div>
 
               <div className="mt-10 flex flex-wrap gap-3" role="tablist" aria-label="Beyond The Yellow submission type">
@@ -344,28 +478,28 @@ export default function BeyondTheYellowPage() {
                   role="tab"
                   aria-selected={selectedLane === "share-story"}
                   onClick={() => chooseLane("share-story", "bty_form_share")}
-                  className={`inline-flex min-h-12 items-center gap-2 rounded-md px-5 py-3 text-sm font-bold ${
+                  className={`inline-flex min-h-12 items-center gap-2 rounded-md px-5 py-3 text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] ${
                     selectedLane === "share-story"
                       ? "bg-[#3B5147] text-white"
                       : "border border-[#3B5147]/25 text-[#3B5147]"
                   }`}
                 >
                   <Users className="h-4 w-4" aria-hidden="true" />
-                  Share My Work
+                  Tell Us What You&apos;re Building
                 </button>
                 <button
                   type="button"
                   role="tab"
                   aria-selected={selectedLane === "nominate"}
                   onClick={() => chooseLane("nominate", "bty_form_nominate")}
-                  className={`inline-flex min-h-12 items-center gap-2 rounded-md px-5 py-3 text-sm font-bold ${
+                  className={`inline-flex min-h-12 items-center gap-2 rounded-md px-5 py-3 text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] ${
                     selectedLane === "nominate"
                       ? "bg-[#3B5147] text-white"
                       : "border border-[#3B5147]/25 text-[#3B5147]"
                   }`}
                 >
                   <HeartHandshake className="h-4 w-4" aria-hidden="true" />
-                  Nominate Someone
+                  Nominate a Doer
                 </button>
               </div>
 
@@ -400,17 +534,28 @@ export default function BeyondTheYellowPage() {
           </section>
 
           <section className="bg-[#111814] text-white">
-            <div className="container-wide py-20 text-center md:py-24">
+            <div className="container-wide py-20 text-center md:py-28">
               <Eyebrow light>Beyond The Yellow</Eyebrow>
-              <h2 className="mx-auto mt-5 max-w-4xl text-3xl font-bold leading-tight md:text-5xl">
-                Know an organization or person whose work deserves a closer look?
+              <h2 className="mx-auto mt-5 max-w-5xl text-3xl font-bold leading-tight md:text-5xl">
+                Caring is where it starts. What you do next is what matters.
               </h2>
+              <div className="mx-auto mt-6 max-w-3xl space-y-4 text-lg leading-8 text-white/70">
+                <p>
+                  There will always be another problem to talk about. Another post to share. Another person saying somebody should do something.
+                </p>
+                <p className="font-bold text-white">
+                  We want to know the people who stopped waiting for “somebody.”
+                </p>
+              </div>
+              <p className="mx-auto mt-8 max-w-4xl text-2xl font-bold text-[#D7A92E] md:text-3xl">
+                Others are going Beyond The Yellow. How about you?
+              </p>
               <button
                 type="button"
                 onClick={() => chooseLane("nominate", "bty_final_nominate")}
-                className="mt-8 inline-flex min-h-12 items-center gap-2 rounded-md bg-white px-6 py-3 text-sm font-bold text-[#111814]"
+                className="mt-9 inline-flex min-h-12 items-center gap-2 rounded-md bg-white px-6 py-3 text-sm font-bold text-[#111814] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D7A92E]"
               >
-                Nominate Someone
+                Nominate a Doer
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </button>
             </div>

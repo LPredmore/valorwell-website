@@ -4,16 +4,7 @@ import { ArrowUpRight, Building2, PlayCircle } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 
-const organizations = [
-  {
-    organization: "Veterans Breakfast Club",
-    title: "Some veterans carry a story for decades. Sometimes the right room is what finally lets it out.",
-    videoId: "A4CUe3c8rJE",
-    videoUrl: "https://www.youtube.com/watch?v=A4CUe3c8rJE",
-    featureUrl: "/veteransbreakfastclub",
-    description:
-      "Shaun Hall on active listening, the stories veterans sometimes never tell their own families, and how Veterans Breakfast Club creates low-pressure spaces where those stories can be heard.",
-  },
+const pastEpisodes = [
   {
     organization: "GallantFew",
     title: "The mission ends. The need for direction doesn’t.",
@@ -50,36 +41,27 @@ const organizations = [
     description:
       "John Shaw on housing, food access, community, peer support, and helping veterans rebuild stability after the immediate crisis.",
   },
-  {
-    organization: "American Corporate Partners",
-    title: "A year of career mentorship. Built around the person, not a template.",
-    videoId: "JHuLEqw2yG8",
-    videoUrl: "https://www.youtube.com/watch?v=JHuLEqw2yG8",
-    featureUrl: "/americancorporatepartners",
-    description:
-      "A Beyond The Yellow conversation about ACP's yearlong one-on-one mentorship model for transitioning service members, veterans, and active-duty military spouses.",
-  },
-];
+] as const;
 
-function OrganizationCard({
+function EpisodeCard({
   organization,
   title,
   videoId,
   videoUrl,
   featureUrl,
   description,
-}: (typeof organizations)[number]) {
+}: (typeof pastEpisodes)[number]) {
   return (
     <article className="overflow-hidden rounded-3xl border border-[#3B5147]/15 bg-white shadow-sm">
       <Link
         to={featureUrl}
-        className="group block overflow-hidden bg-black"
+        className="group block overflow-hidden bg-black focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#D7A92E]"
         aria-label={`Explore ${organization}`}
       >
         <div className="relative aspect-video overflow-hidden">
           <img
             src={`https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`}
-            alt={`${organization} Beyond The Yellow feature`}
+            alt={`${organization} Beyond The Yellow episode`}
             className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02] motion-reduce:transform-none motion-reduce:transition-none"
             loading="lazy"
             onError={(event) => {
@@ -94,17 +76,13 @@ function OrganizationCard({
           <Building2 className="h-4 w-4" aria-hidden="true" />
           Beyond The Yellow
         </div>
-        <h2 className="mt-3 text-2xl font-bold leading-tight text-[#111814]">
-          {organization}
-        </h2>
-        <p className="mt-3 text-sm font-semibold leading-6 text-[#111814]/78">
-          {title}
-        </p>
+        <h2 className="mt-3 text-2xl font-bold leading-tight text-[#111814]">{organization}</h2>
+        <p className="mt-3 text-sm font-semibold leading-6 text-[#111814]/78">{title}</p>
         <p className="mt-4 text-sm leading-7 text-[#111814]/62">{description}</p>
         <div className="mt-6 flex flex-wrap gap-4">
           <Link
             to={featureUrl}
-            className="inline-flex items-center gap-2 text-sm font-bold text-[#3B5147]"
+            className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#3B5147] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147]"
           >
             Read feature
             <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
@@ -113,7 +91,7 @@ function OrganizationCard({
             href={videoUrl}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-2 text-sm font-bold text-[#111814]/55 transition hover:text-[#111814]"
+            className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#111814]/55 transition hover:text-[#111814] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147]"
           >
             <PlayCircle className="h-4 w-4" aria-hidden="true" />
             Watch conversation
@@ -128,10 +106,10 @@ export default function NetworkPage() {
   return (
     <>
       <Helmet>
-        <title>Beyond The Yellow Featured Organizations | ValorWell</title>
+        <title>Past Beyond The Yellow Episodes | ValorWell</title>
         <meta
           name="description"
-          content="Explore organizations featured through Beyond The Yellow, read their feature pages, and watch the conversations behind their work."
+          content="Explore previously published Beyond The Yellow episodes, read their feature pages, and watch the conversations behind the work."
         />
         <meta name="robots" content="index,follow" />
         <link rel="canonical" href="https://www.valorwell.org/network" />
@@ -145,10 +123,10 @@ export default function NetworkPage() {
               Beyond The Yellow
             </p>
             <h1 className="mx-auto mt-5 max-w-4xl text-4xl font-bold leading-tight md:text-6xl">
-              Featured organizations.
+              Past episodes.
             </h1>
             <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-white/72">
-              Explore the organizations already featured through Beyond The Yellow, read their stories, and watch the conversations about how their work operates.
+              The current conversation lives on the Beyond The Yellow page. This archive is for the people and organizations we have already featured—and the work that is still worth knowing about.
             </p>
           </div>
         </section>
@@ -157,19 +135,19 @@ export default function NetworkPage() {
           <div className="mx-auto max-w-6xl px-4">
             <div className="max-w-3xl">
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#3B5147]">
-                Current Features
+                Published Conversations
               </p>
               <h2 className="mt-3 text-3xl font-bold text-[#111814] md:text-4xl">
-                Published Beyond The Yellow feature pages.
+                Go deeper on the work behind each conversation.
               </h2>
               <p className="mt-5 text-base leading-8 text-[#111814]/62">
-                This page is a collection of published Beyond The Yellow features, not a comprehensive directory of veteran-service organizations.
+                Read the feature or watch the full conversation. This is an archive of aired Beyond The Yellow episodes, not a comprehensive directory of veteran-service organizations.
               </p>
             </div>
 
             <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {organizations.map((organization) => (
-                <OrganizationCard key={organization.organization} {...organization} />
+              {pastEpisodes.map((episode) => (
+                <EpisodeCard key={episode.organization} {...episode} />
               ))}
             </div>
           </div>
@@ -178,19 +156,19 @@ export default function NetworkPage() {
         <section className="bg-[#F4F1E8] py-16 md:py-20">
           <div className="mx-auto max-w-4xl px-4 text-center">
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#3B5147]">
-              Submit a Story
+              Who Are We Missing?
             </p>
             <h2 className="mt-4 text-3xl font-bold text-[#111814] md:text-5xl">
-              Know an organization or person that may be a fit for Beyond The Yellow?
+              Know somebody whose work would leave a hole if it disappeared?
             </h2>
             <p className="mx-auto mt-5 max-w-2xl text-base leading-8 text-[#111814]/62">
-              Use the Beyond The Yellow page to share your work or nominate someone else for editorial consideration.
+              Send us back to Beyond The Yellow and tell us who is doing the work.
             </p>
             <Link
-              to="/beyond-the-yellow"
-              className="mt-8 inline-flex items-center gap-2 rounded-md bg-[#3B5147] px-5 py-3 text-sm font-bold text-white"
+              to="/beyond-the-yellow?form=nomination"
+              className="mt-8 inline-flex min-h-12 items-center gap-2 rounded-md bg-[#3B5147] px-5 py-3 text-sm font-bold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2"
             >
-              Explore Beyond The Yellow
+              Nominate a Doer
               <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>

@@ -3,6 +3,7 @@ import path from "node:path";
 
 const DIST_DIR = path.resolve(process.cwd(), "dist");
 const INDEX_PATH = path.join(DIST_DIR, "index.html");
+const SITEMAP_PATH = path.join(DIST_DIR, "sitemap.xml");
 const SITE_URL = "https://www.valorwell.org";
 
 const routes = [
@@ -14,6 +15,7 @@ const routes = [
     h1: "Continuing to the donation checkout.",
     lead:
       "This handoff preserves donation attribution before continuing to the current ValorWell Foundation checkout.",
+    hideFromSitemap: false,
   },
   {
     path: "/pendulo",
@@ -23,6 +25,17 @@ const routes = [
     h1: "Pendulo partner resource.",
     lead:
       "This ValorWell page provides information about an external partner resource and links to Pendulo's own service.",
+    hideFromSitemap: false,
+  },
+  {
+    path: "/americancorporatepartners",
+    title: "American Corporate Partners | Beyond The Yellow | ValorWell",
+    description:
+      "American Corporate Partners Beyond The Yellow feature page.",
+    h1: "American Corporate Partners.",
+    lead:
+      "This Beyond The Yellow feature is not part of the currently published episode collection.",
+    hideFromSitemap: true,
   },
 ];
 
@@ -111,6 +124,22 @@ function renderRoute(baseHtml, route) {
   return html.replace(rootPattern, `<div id="root">${renderShell(route)}</div>`);
 }
 
+function removeHiddenRoutesFromBuiltSitemap() {
+  if (!fs.existsSync(SITEMAP_PATH)) return;
+
+  let sitemap = fs.readFileSync(SITEMAP_PATH, "utf8");
+
+  for (const route of routes.filter((item) => item.hideFromSitemap)) {
+    const escapedUrl = escapeRegExp(`${SITE_URL}${route.path}`);
+    sitemap = sitemap.replace(
+      new RegExp(`\\s*<url><loc>${escapedUrl}<\\/loc><\\/url>`, "g"),
+      "",
+    );
+  }
+
+  fs.writeFileSync(SITEMAP_PATH, `${sitemap.trim()}\n`, "utf8");
+}
+
 if (!fs.existsSync(INDEX_PATH)) {
   throw new Error(`Expected Vite build output at ${INDEX_PATH}`);
 }
@@ -128,6 +157,8 @@ for (const route of routes) {
   fs.writeFileSync(extensionlessPath, html, "utf8");
 }
 
+removeHiddenRoutesFromBuiltSitemap();
+
 console.log(
-  `Generated noindex HTML and extensionless-compatible HTML for ${routes.length} valid non-sitemap routes.`,
+  `Generated noindex HTML and extensionless-compatible HTML for ${routes.length} routes.`,
 );

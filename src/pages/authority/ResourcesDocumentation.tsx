@@ -4,7 +4,7 @@ export default function ResourcesDocumentation() {
   return (
     <AuthorityPage
       title="Clinical Documentation Resources for Veterans"
-      description="Resources on ethical clinical documentation, therapy records, treatment history, functional impact, and avoiding documentation shortcuts that compromise care."
+      description="Resources on treatment records, clinical documentation, functional impact, continuity of care, and the boundaries between clinical records and administrative decisions."
       canonical="/resources/documentation"
       breadcrumbs={[
         { name: "Home", url: "/" },
@@ -13,34 +13,38 @@ export default function ResourcesDocumentation() {
       ]}
       eyebrow="Resource Category"
       h1="Clinical Documentation Resources for Veterans"
-      subhead="Understand what responsible clinical documentation is for, what it can support, and where the boundaries belong."
+      subhead="Understand what treatment records can contain, how they support continuity of care, and where clinical documentation ends and administrative decision-making begins."
       sections={[
         {
           heading: "Use this category for",
           bullets: [
-            "Understanding how clinical records grow out of real treatment",
-            "Distinguishing treatment documentation from letters or records created only to support a desired outcome",
-            "Thinking about functional impact, treatment history, and continuity of care",
-            "Understanding what clinicians can document and what they should not promise",
-            "Recognizing predatory or outcome-driven documentation models",
-            "Keeping your own records organized when multiple systems or providers are involved",
+            "Understanding how treatment records are created as part of clinical care",
+            "Learning the kinds of symptoms, history, assessment, interventions, functional impact, progress, and plans a record may contain",
+            "Understanding how records can support continuity when care involves multiple clinicians or health systems",
+            "Knowing why documentation varies by clinical situation, provider, setting, and treatment provided",
+            "Keeping copies of relevant records organized when multiple systems are involved",
+            "Separating a clinician's treatment record from decisions made by VA, insurers, employers, courts, or other administrative systems",
           ],
         },
         {
-          heading: "The standard",
-          body: "Documentation should reflect what a clinician can responsibly support from actual care, records, assessment, and professional judgment. It should not be reverse-engineered to guarantee a disability rating, service connection, claim approval, or any other administrative outcome.",
+          heading: "What determines the record",
+          body: "Clinical documentation reflects the care provided, the information available to the clinician, applicable documentation requirements, and the clinician's professional assessment and judgment. Not every record will contain the same level of detail or address the same questions.",
+        },
+        {
+          heading: "Clinical records and administrative outcomes are different",
+          body: "A treatment record may be reviewed by another health system or administrative program, but the treating clinician does not control how that outside organization evaluates it. VA disability ratings, service connection, insurance decisions, legal determinations, and similar outcomes are made by the responsible organization under its own rules.",
         },
       ]}
       related={[
-        { name: "Veteran Mental Health Resources", href: "/resources/veteran-mental-health", body: "Care access, PTSD support, family strain, telehealth, and when to seek help." },
-        { name: "Find Care", href: "/get-care", body: "See the care pathways ValorWell can currently support." },
+        { name: "Veteran Mental Health Resources", href: "/resources/veteran-mental-health", body: "Care access, PTSD-related concerns, family strain, telehealth, and when to seek help." },
+        { name: "Find Care", href: "/get-care", body: "See the care pathways ValorWell currently supports." },
         { name: "All Resources", href: "/resources", body: "Return to the full ValorWell resource hub." },
       ]}
       finalCTAs={[
         { label: "Find Care", to: "/get-care" },
         { label: "Support ValorWell", to: "/support", variant: "secondary" },
       ]}
-      finalNote="Clinical documentation should be based on real care, accurate records, and ethical professional judgment."
+      finalNote="The content of an individual treatment record is determined by the care provided, applicable requirements, and the treating clinician's professional judgment."
     />
   );
 }

@@ -66,7 +66,7 @@ describe("ClinicianInterestForm", () => {
 
   it("validates required fields before invoking the function", async () => {
     render(<ClinicianInterestForm />);
-    fireEvent.click(screen.getByRole("button", { name: "Start My Onboarding" }));
+    fireEvent.click(screen.getByRole("button", { name: "Raise My Hand" }));
 
     expect(await screen.findByText("First name is required.")).toBeInTheDocument();
     expect(screen.getByText("Last name is required.")).toBeInTheDocument();
@@ -78,7 +78,7 @@ describe("ClinicianInterestForm", () => {
   it("normalizes the email, provisions access, and tracks verified success", async () => {
     render(<ClinicianInterestForm />);
     fillRequired(" Clinician@Example.com ");
-    fireEvent.click(screen.getByRole("button", { name: "Start My Onboarding" }));
+    fireEvent.click(screen.getByRole("button", { name: "Raise My Hand" }));
 
     await waitFor(() => expect(mocks.invoke).toHaveBeenCalledTimes(1));
     expect(mocks.invoke).toHaveBeenCalledWith("register-clinician-interest", {
@@ -97,7 +97,7 @@ describe("ClinicianInterestForm", () => {
     );
 
     expect(await screen.findByRole("status")).toHaveTextContent(
-      /Thank you for expressing interest in joining the growing ValorWell clinician movement/i,
+      /You raised your hand. We'll take it from here./i,
     );
     expect(screen.getByRole("status")).toHaveTextContent(
       /Check your email for the next steps/i,
@@ -112,7 +112,7 @@ describe("ClinicianInterestForm", () => {
 
     render(<ClinicianInterestForm />);
     fillRequired();
-    fireEvent.click(screen.getByRole("button", { name: "Start My Onboarding" }));
+    fireEvent.click(screen.getByRole("button", { name: "Raise My Hand" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "We could not register your interest right now. Please try again.",

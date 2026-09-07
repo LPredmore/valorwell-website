@@ -11,37 +11,37 @@ const routes = [
     path: "/",
     title: "ValorWell | Mental Health Care for Veterans & Military Families",
     description:
-      "ValorWell provides telehealth mental health care pathways for veterans and military families, funds therapy when access breaks down, and connects communities through Beyond The Yellow.",
+      "ValorWell provides telehealth mental health care pathways for veterans and military families, donor-funded therapy for veterans, and Beyond The Yellow community conversations.",
     h1: "Mental health care and support for veterans and military families.",
     lead:
-      "ValorWell provides telehealth care pathways, supports donor-funded therapy for veterans, and connects communities through Beyond The Yellow.",
+      "ValorWell operates telehealth care pathways, supports donor-funded therapy for veterans who still cannot reach care, and publishes Beyond The Yellow conversations with organizations doing useful work.",
   },
   {
     path: "/mission",
-    title: "ValorWell Mission | Mental Health Care, Access & Community",
+    title: "ValorWell Mission | Make Mental Health Support Easier to Reach",
     description:
-      "ValorWell works to make mental health care and support easier to reach for veterans and military families while connecting communities around useful action.",
+      "ValorWell works to make mental health care and support easier to reach for veterans and military families through care, donor-funded therapy, resources, and community work.",
     h1: "Make mental health care and support easier to reach, understand, and use.",
     lead:
-      "ValorWell focuses on practical barriers around treatment, coverage, provider availability, referrals, authorization, and the handoffs that can keep people from reaching care.",
+      "ValorWell focuses on veterans and military families because care often sits behind coverage rules, provider availability, referrals, authorizations, and handoffs that can keep people from reaching treatment.",
   },
   {
     path: "/about",
     title: "About ValorWell | Veterans, Families, Care & Community",
     description:
-      "Learn about ValorWell's mental health care work for veterans and military families, donor-funded therapy impact, Beyond The Yellow, and community partnerships.",
-    h1: "ValorWell works at the intersection of mental health care, veteran and family support, and community action.",
+      "Learn how ValorWell's care work, the ValorWell Foundation's donor-funded therapy support, Beyond The Yellow, and public resources fit together.",
+    h1: "Mental health care, donor-funded therapy, public resources, and community conversations under one mission.",
     lead:
-      "ValorWell's public work centers on telehealth mental health care, donor-funded therapy for veterans, educational resources, partnerships, and Beyond The Yellow.",
+      "ValorWell's public work centers on telehealth mental health care, a donor-funded therapy program for veterans who still cannot reach care, and Beyond The Yellow conversations with organizations and people doing useful work.",
   },
   {
     path: "/impact",
     title: "ValorWell Impact | Donor-Funded Therapy for Veterans",
     description:
-      "See how ValorWell Foundation funding is being used for direct therapy, including current treatment hours, veterans reached, and the methodology behind the figures.",
-    h1: "Donor funding is paying for direct therapy for veterans.",
+      "See ValorWell's dated donor-funded therapy impact snapshot and how the 540+ therapy hours and 45+ veterans are counted.",
+    h1: "Donor-funded therapy, counted after the care is delivered.",
     lead:
-      "ValorWell tracks donor-funded therapy so supporters can see the treatment hours and veterans reached through the program.",
+      "This page reports completed therapy provided through ValorWell's donor-funded care program and defines what the public impact figures count, exclude, and represent.",
   },
   {
     path: "/beyond-the-yellow",
@@ -191,10 +191,10 @@ const routes = [
     path: "/support",
     title: "Support ValorWell | Help Fund Therapy for Veterans",
     description:
-      "Support the ValorWell Foundation and help fund direct therapy for veterans who sought mental health care but still could not reach a therapist.",
+      "Support the ValorWell Foundation's donor-funded therapy program and review the dated completed-care impact that the program reports.",
     h1: "Help fund therapy for veterans who still cannot reach care.",
     lead:
-      "Donor funding allows the ValorWell Foundation to support therapy for veterans who sought mental health care but still did not have an available treatment path.",
+      "The ValorWell Foundation supports a donor-funded therapy program for veterans who have sought mental-health care but still do not have an available treatment path.",
   },
   {
     path: "/contact",

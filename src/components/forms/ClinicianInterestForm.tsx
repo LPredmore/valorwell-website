@@ -81,19 +81,18 @@ export function ClinicianInterestForm() {
     return (
       <div
         role="status"
-        className="border border-[color:var(--cl-canvas)]/20 bg-[color:var(--cl-canvas)]/5 p-8 text-center md:p-12"
+        className="rounded-3xl border border-white/15 bg-white/[0.06] p-8 text-center md:p-12"
       >
         <CheckCircle2
-          className="mx-auto h-14 w-14 text-[color:var(--cl-ember)]"
+          className="mx-auto h-14 w-14 text-[#D7A92E]"
           aria-hidden="true"
         />
-        <h3 className="mt-6 text-2xl font-bold leading-tight text-[color:var(--cl-canvas)] md:text-3xl">
-          Thank you for expressing interest in joining the growing ValorWell
-          clinician movement.
+        <h3 className="mt-6 text-2xl font-bold leading-tight text-white md:text-3xl">
+          You raised your hand. We'll take it from here.
         </h3>
-        <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-[color:var(--cl-canvas)]/75 md:text-lg">
-          Check your email for the next steps and access to continue learning
-          about ValorWell.
+        <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-white/72 md:text-lg">
+          Check your email for the next steps and the information you need to
+          keep exploring ValorWell as a clinician.
         </p>
       </div>
     );
@@ -102,41 +101,41 @@ export function ClinicianInterestForm() {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="border border-[color:var(--cl-canvas)]/20 bg-[color:var(--cl-canvas)]/5 p-6 md:p-9"
+      className="rounded-3xl border border-white/15 bg-white/[0.06] p-6 md:p-9"
       noValidate
     >
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
-          <Label htmlFor="clinician-first-name" className="text-[color:var(--cl-canvas)]">
+          <Label htmlFor="clinician-first-name" className="text-white">
             First name
           </Label>
           <Input
             id="clinician-first-name"
             autoComplete="given-name"
-            className="mt-2 border-[color:var(--cl-canvas)]/30 bg-[color:var(--cl-canvas)] text-[color:var(--cl-ink)]"
+            className="mt-2 border-white/25 bg-white text-[#111814]"
             aria-invalid={Boolean(errors.firstName)}
             {...register("firstName")}
           />
           {errors.firstName ? (
-            <p className="mt-2 text-sm text-[color:var(--cl-ember)]">
+            <p className="mt-2 text-sm text-[#F2B7AA]">
               {errors.firstName.message}
             </p>
           ) : null}
         </div>
 
         <div>
-          <Label htmlFor="clinician-last-name" className="text-[color:var(--cl-canvas)]">
+          <Label htmlFor="clinician-last-name" className="text-white">
             Last name
           </Label>
           <Input
             id="clinician-last-name"
             autoComplete="family-name"
-            className="mt-2 border-[color:var(--cl-canvas)]/30 bg-[color:var(--cl-canvas)] text-[color:var(--cl-ink)]"
+            className="mt-2 border-white/25 bg-white text-[#111814]"
             aria-invalid={Boolean(errors.lastName)}
             {...register("lastName")}
           />
           {errors.lastName ? (
-            <p className="mt-2 text-sm text-[color:var(--cl-ember)]">
+            <p className="mt-2 text-sm text-[#F2B7AA]">
               {errors.lastName.message}
             </p>
           ) : null}
@@ -144,21 +143,19 @@ export function ClinicianInterestForm() {
       </div>
 
       <div className="mt-5">
-        <Label htmlFor="clinician-email" className="text-[color:var(--cl-canvas)]">
+        <Label htmlFor="clinician-email" className="text-white">
           Email
         </Label>
         <Input
           id="clinician-email"
           type="email"
           autoComplete="email"
-          className="mt-2 border-[color:var(--cl-canvas)]/30 bg-[color:var(--cl-canvas)] text-[color:var(--cl-ink)]"
+          className="mt-2 border-white/25 bg-white text-[#111814]"
           aria-invalid={Boolean(errors.email)}
           {...register("email")}
         />
         {errors.email ? (
-          <p className="mt-2 text-sm text-[color:var(--cl-ember)]">
-            {errors.email.message}
-          </p>
+          <p className="mt-2 text-sm text-[#F2B7AA]">{errors.email.message}</p>
         ) : null}
       </div>
 
@@ -173,10 +170,10 @@ export function ClinicianInterestForm() {
       </div>
 
       <div className="mt-6">
-        <label className="flex cursor-pointer items-start gap-3 text-sm leading-relaxed text-[color:var(--cl-canvas)]/80">
+        <label className="flex cursor-pointer items-start gap-3 text-sm leading-relaxed text-white/80">
           <input
             type="checkbox"
-            className="mt-1 h-4 w-4 shrink-0 accent-[color:var(--cl-ember)]"
+            className="mt-1 h-4 w-4 shrink-0 accent-[#D7A92E]"
             aria-invalid={Boolean(errors.communicationConsent)}
             {...register("communicationConsent")}
           />
@@ -186,7 +183,7 @@ export function ClinicianInterestForm() {
           </span>
         </label>
         {errors.communicationConsent ? (
-          <p className="mt-2 text-sm text-[color:var(--cl-ember)]">
+          <p className="mt-2 text-sm text-[#F2B7AA]">
             {errors.communicationConsent.message}
           </p>
         ) : null}
@@ -195,7 +192,7 @@ export function ClinicianInterestForm() {
       {submitError ? (
         <p
           role="alert"
-          className="mt-6 border border-[color:var(--cl-ember)]/50 bg-[color:var(--cl-ember)]/10 p-4 text-sm text-[color:var(--cl-canvas)]"
+          className="mt-6 rounded-xl border border-[#B24A3A]/60 bg-[#B24A3A]/15 p-4 text-sm text-white"
         >
           {submitError}
         </p>
@@ -204,21 +201,22 @@ export function ClinicianInterestForm() {
       <Button
         type="submit"
         disabled={isSubmitting}
-        className="mt-7 min-h-12 w-full rounded-none bg-[color:var(--cl-ember)] px-7 text-sm font-bold uppercase tracking-wide text-white hover:bg-[color:var(--cl-canvas)] hover:text-[color:var(--cl-ink)]"
+        className="mt-7 min-h-12 w-full rounded-md bg-[#D7A92E] px-7 text-sm font-bold text-[#111814] hover:brightness-95"
       >
         {isSubmitting ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
-            Creating access…
+            Sending…
           </>
         ) : (
-          "Start My Onboarding"
+          "Raise My Hand"
         )}
       </Button>
 
-      <p className="mt-5 text-xs leading-relaxed text-[color:var(--cl-canvas)]/60">
-        This interest step is for independently licensed clinicians. Registering
-        interest does not guarantee acceptance, referrals, or caseload volume.
+      <p className="mt-5 text-xs leading-relaxed text-white/55">
+        This first step is for independently licensed clinicians. Registering
+        interest is not a full application and does not guarantee acceptance,
+        referrals, or caseload volume.
       </p>
     </form>
   );

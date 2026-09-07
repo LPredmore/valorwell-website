@@ -4,9 +4,7 @@ import {
   ArrowRight,
   BadgeCheck,
   Bridge,
-  Clock3,
   HeartHandshake,
-  ShieldCheck,
   Users,
 } from "lucide-react";
 import { Layout } from "@/components/layout";
@@ -20,7 +18,7 @@ const jobPostingSchema = {
   "@type": "JobPosting",
   title: "Licensed Mental Health Therapist",
   description:
-    "Join ValorWell as an independently licensed telehealth mental-health clinician serving veterans and military families. Clinicians control their availability and clinical work while ValorWell manages credentialing, authorizations, billing, and payer administration. Straightforward per-session compensation is paid weekly, including qualifying no-shows.",
+    "Join ValorWell as an independently licensed telehealth mental-health clinician serving veterans and military families. Clinicians control their availability and clinical work while ValorWell manages credentialing, authorizations, billing, and payer administration. Straightforward per-session compensation is paid weekly, including no-shows.",
   hiringOrganization: {
     "@type": "Organization",
     name: "ValorWell",

@@ -14,7 +14,7 @@ const DEFAULT_TITLE =
   "ValorWell | Mental Health Care for Veterans & Military Families";
 const DEFAULT_DESCRIPTION =
   "ValorWell provides telehealth mental health care pathways for veterans and military families, funds therapy when access breaks down, and connects communities through Beyond The Yellow.";
-const SITE_URL = "https://www.valorwell.org";
+const SITE_URL = "https://valorwell.org";
 const DEFAULT_IMAGE = `${SITE_URL}/og-image.png`;
 
 function buildPageTitle(title?: string) {
@@ -35,13 +35,11 @@ export function SEO({
 
   return (
     <Helmet>
-      {/* Primary Meta Tags */}
       <title>{fullTitle}</title>
       <meta name="description" content={description} />
       {noIndex && <meta name="robots" content="noindex,nofollow" />}
       {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
 
-      {/* Open Graph / Facebook */}
       <meta property="og:type" content={type} />
       <meta property="og:site_name" content={SITE_NAME} />
       <meta property="og:title" content={fullTitle} />
@@ -49,7 +47,6 @@ export function SEO({
       <meta property="og:image" content={image} />
       {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
 
-      {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={description} />
@@ -58,15 +55,14 @@ export function SEO({
   );
 }
 
-// JSON-LD Structured Data Components
 export function OrganizationSchema() {
   const schema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "@id": "https://www.valorwell.org/#organization",
+    "@id": `${SITE_URL}/#organization`,
     name: "ValorWell",
-    url: "https://www.valorwell.org",
-    logo: "https://www.valorwell.org/brand/valorwell-logo.png",
+    url: SITE_URL,
+    logo: `${SITE_URL}/brand/valorwell-logo.png`,
     description:
       "ValorWell provides telehealth mental health care pathways for veterans and military families, supports donor-funded therapy through the ValorWell Foundation, and connects communities through Beyond The Yellow.",
     sameAs: ["https://www.youtube.com/@ValorWell"],
@@ -207,7 +203,6 @@ export function BreadcrumbSchema({ items }: BreadcrumbSchemaProps) {
   );
 }
 
-// JobPostingSchema for therapist recruitment
 export function JobPostingSchema() {
   const schema = {
     "@context": "https://schema.org",
@@ -244,7 +239,6 @@ export function JobPostingSchema() {
   );
 }
 
-// Structured data for the separate ValorWell Foundation nonprofit entity.
 export function NonprofitOrganizationSchema() {
   const schema = {
     "@context": "https://schema.org",
@@ -274,7 +268,6 @@ export function NonprofitOrganizationSchema() {
   );
 }
 
-// DonateActionSchema for donor engagement
 export function DonateActionSchema() {
   const schema = {
     "@context": "https://schema.org",
@@ -310,7 +303,6 @@ export function DonateActionSchema() {
   );
 }
 
-// VideoObjectSchema for embedded videos
 interface VideoSchemaProps {
   name: string;
   description: string;

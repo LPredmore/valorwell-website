@@ -119,9 +119,15 @@ const baseHtml = fs.readFileSync(INDEX_PATH, "utf8");
 
 for (const route of routes) {
   const html = renderRoute(baseHtml, route);
-  const routeDirectory = path.join(DIST_DIR, route.path.replace(/^\//, ""));
+  const relativeRoute = route.path.replace(/^\//, "");
+  const routeDirectory = path.join(DIST_DIR, relativeRoute);
+  const extensionlessPath = path.join(DIST_DIR, `${relativeRoute}.html`);
+
   fs.mkdirSync(routeDirectory, { recursive: true });
   fs.writeFileSync(path.join(routeDirectory, "index.html"), html, "utf8");
+  fs.writeFileSync(extensionlessPath, html, "utf8");
 }
 
-console.log(`Generated noindex HTML for ${routes.length} valid non-sitemap routes.`);
+console.log(
+  `Generated noindex HTML and extensionless-compatible HTML for ${routes.length} valid non-sitemap routes.`,
+);

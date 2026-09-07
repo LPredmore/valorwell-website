@@ -277,33 +277,61 @@ export default function ImpactPage() {
         </section>
 
         <section className="border-b border-[#3B5147]/15 bg-white">
-          <div className="container-wide grid gap-12 py-20 md:py-28 lg:grid-cols-12 lg:items-center">
-            <div className="lg:col-span-7">
-              <Eyebrow>You Don&apos;t Have to Fund It All</Eyebrow>
-              <h2 className="mt-4 max-w-4xl text-3xl font-bold leading-tight md:text-5xl">
-                Most of this happens one manageable monthly gift at a time.
-              </h2>
-              <p className="mt-6 max-w-3xl text-lg leading-8 text-[#111814]/68">
-                You do not have to pay for an entire course of therapy. Across the donation platforms ValorWell uses, supporters combine their donations with gifts from other people to make treatment possible. A lot of people doing something manageable can create something substantial.
-              </p>
+          <div className="container-wide py-20 md:py-28">
+            <div className="grid gap-12 lg:grid-cols-12 lg:items-start">
+              <div className="lg:col-span-7">
+                <Eyebrow>This Only Works Because People Do It Together</Eyebrow>
+                <h2 className="mt-4 max-w-4xl text-3xl font-bold leading-tight md:text-5xl">
+                  Most people don&apos;t change their whole budget to help. They change one small priority.
+                </h2>
+                <div className="mt-6 max-w-3xl space-y-5 text-lg leading-8 text-[#111814]/68">
+                  <p>
+                    For one person, it might be one meal out each month. For someone else, it might be one Starbucks coffee a week.
+                  </p>
+                  <p>
+                    On its own, that doesn&apos;t feel like much. <strong className="text-[#111814]">But you&apos;re not doing this on your own.</strong>
+                  </p>
+                  <p>
+                    You&apos;re joining other people who have already decided that helping a veteran get mental-health treatment matters more than one small thing they could have spent that money on instead.
+                  </p>
+                  <p className="font-bold text-[#3B5147]">
+                    And when enough people make that choice together, those small decisions become something much bigger: they become therapy.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid gap-5 sm:grid-cols-2 lg:col-span-5 lg:grid-cols-1">
+                <article className="rounded-3xl border border-[#3B5147]/15 bg-[#F4F1E8] p-7">
+                  <p className="text-5xl font-bold text-[#3B5147]">72%</p>
+                  <h3 className="mt-4 text-xl font-bold">of 2026 donors give monthly</h3>
+                  <p className="mt-3 leading-7 text-[#111814]/62">
+                    Most of the people supporting this work aren&apos;t writing enormous checks. They&apos;re simply deciding, month after month, that this belongs on the list of things worth making room for.
+                  </p>
+                </article>
+
+                <article className="rounded-3xl border border-[#D7A92E]/35 bg-[#F8F3E4] p-7">
+                  <p className="text-5xl font-bold text-[#8A6814]">$25</p>
+                  <h3 className="mt-4 text-xl font-bold">is the most common monthly gift</h3>
+                  <p className="mt-3 leading-7 text-[#111814]/62">
+                    Twenty-five dollars does not have to fund an entire course of therapy. It doesn&apos;t have to. Another person gives $25. Someone else gives $50. Someone else gives what they can. Together, it becomes enough to put a veteran in front of a therapist.
+                  </p>
+                </article>
+              </div>
             </div>
 
-            <div className="grid gap-5 sm:grid-cols-2 lg:col-span-5 lg:grid-cols-1">
-              <article className="rounded-3xl border border-[#3B5147]/15 bg-[#F4F1E8] p-7">
-                <p className="text-5xl font-bold text-[#3B5147]">72%</p>
-                <h3 className="mt-4 text-xl font-bold">of 2026 donors give monthly</h3>
-                <p className="mt-3 leading-7 text-[#111814]/62">
-                  Recurring donors give ValorWell a more dependable source of therapy funding when the next veteran needs help.
-                </p>
-              </article>
-
-              <article className="rounded-3xl border border-[#D7A92E]/35 bg-[#F8F3E4] p-7">
-                <p className="text-5xl font-bold text-[#8A6814]">$25</p>
-                <h3 className="mt-4 text-xl font-bold">is the most common monthly gift</h3>
-                <p className="mt-3 leading-7 text-[#111814]/62">
-                  Twenty-five dollars does not have to fund an entire course of treatment. Combined with other donors, it helps make the next therapy session possible.
-                </p>
-              </article>
+            <div className="mt-12 rounded-3xl bg-[#111814] p-8 text-white md:p-10">
+              <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#D7A92E]">
+                The Question Is Smaller Than You Think
+              </p>
+              <h3 className="mt-4 max-w-4xl text-2xl font-bold leading-tight md:text-4xl">
+                What is one thing in your month that matters less to you than helping make sure a veteran gets care?
+              </h3>
+              <p className="mt-5 max-w-3xl text-lg leading-8 text-white/72">
+                A dinner out. A few coffees. Another subscription. Something else entirely.
+              </p>
+              <p className="mt-5 max-w-3xl text-lg font-bold leading-8 text-white">
+                A lot of people have already made that choice. You can be one of them.
+              </p>
             </div>
           </div>
         </section>

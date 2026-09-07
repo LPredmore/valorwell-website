@@ -4,7 +4,7 @@ export default function ResourcesChampva() {
   return (
     <AuthorityPage
       title="CHAMPVA Mental Health Resources"
-      description="Practical CHAMPVA mental health resources for families navigating provider access, telehealth, questions to ask, and care barriers."
+      description="Practical CHAMPVA mental health resources for families navigating provider access, telehealth, assignment, preauthorization questions, and care barriers."
       canonical="/resources/champva"
       breadcrumbs={[
         { name: "Home", url: "/" },
@@ -13,20 +13,29 @@ export default function ResourcesChampva() {
       ]}
       eyebrow="Resource Category"
       h1="CHAMPVA Mental Health Resources"
-      subhead="A starting point for CHAMPVA-connected families trying to find and use mental health care without pretending the process is simpler than it is."
+      subhead="A starting point for CHAMPVA-connected families trying to understand provider participation, mental health coverage, preauthorization questions, and care access."
       lastReviewed="September 6, 2026"
       sourceNote={
         <>
-          Primary source: {" "}
+          Primary VA sources: {" "}
           <a
             href="https://www.va.gov/resources/champva-care/"
             target="_blank"
             rel="noopener noreferrer"
             className="font-bold underline underline-offset-2"
           >
-            VA CHAMPVA care
+            CHAMPVA care for beneficiaries
           </a>
-          . VA states that CHAMPVA has no specific provider network, recommends asking whether a provider accepts CHAMPVA assignment, covers mental health care, and generally does not require prior authorization except for specified services such as inpatient mental health and substance-use care.
+          {" "}and {" "}
+          <a
+            href="https://department.va.gov/vha/community-care/family-member-care/champva/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-bold underline underline-offset-2"
+          >
+            CHAMPVA provider guidance
+          </a>
+          . VA's public materials use different levels of detail when describing mental-health preauthorization. Confirm the specific service with CHAMPVA before relying on coverage or authorization status.
         </>
       }
       sections={[
@@ -36,6 +45,7 @@ export default function ResourcesChampva() {
             "Finding mental health providers who will work with CHAMPVA",
             "Asking whether a provider accepts CHAMPVA assignment before scheduling",
             "Understanding common access and participation barriers",
+            "Knowing what to verify about preauthorization for the specific level of mental health care being considered",
             "Thinking through telehealth as a care option",
             "Keeping track of the information you receive from providers and CHAMPVA",
             "Knowing when the fastest useful next step is to ask ValorWell about current care availability",
@@ -45,13 +55,14 @@ export default function ResourcesChampva() {
           heading: "Current CHAMPVA basics",
           bullets: [
             "VA does not maintain a specific network of CHAMPVA providers.",
-            "CHAMPVA covers mental health care, subject to the program's benefit rules and cost sharing.",
-            "VA says most CHAMPVA care does not require prior authorization; specified services, including inpatient mental health and substance-use care, do require approval.",
+            "VA recommends asking whether a provider accepts CHAMPVA assignment before receiving care.",
+            "CHAMPVA covers mental health care, subject to the program's benefit rules, cost sharing, and any applicable preauthorization requirement.",
+            "VA's beneficiary page says most CHAMPVA care does not require prior authorization and specifically identifies certain mental health and substance-use services that do. VA's provider guidance describes preauthorization more broadly for mental health and substance-use services. Verify the specific service with CHAMPVA before treatment.",
           ],
         },
         {
           heading: "Verify the details that can change",
-          body: "Coverage rules, provider participation, billing practices, and administrative requirements can change. Use these resources to understand the problem and the questions to ask, then verify current benefit and provider information with VA and the provider before making a care or financial decision.",
+          body: "Coverage rules, provider participation, billing practices, and administrative requirements can change. Use these resources to understand the questions to ask, then confirm current benefits, assignment, and any required preauthorization with CHAMPVA and the provider before making a care or financial decision.",
         },
       ]}
       related={[

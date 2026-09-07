@@ -4,16 +4,39 @@ import {
   ArrowRight,
   CalendarDays,
   CheckCircle2,
-  Clock,
   HeartHandshake,
+  Quote,
   Stethoscope,
-  Users,
 } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { SEO } from "@/components/SEO";
 import { trackHomeEvent } from "@/lib/tracking";
 
 const SNAPSHOT_DATE = "September 5, 2026";
+
+const testimonials = [
+  {
+    initials: "J.B.",
+    branch: "U.S. Army",
+    state: "Michigan",
+    quote:
+      "For years, I was just a name on a VA waiting list. I was a soldier, a wife, and a mother, but I felt like I was disappearing. ValorWell stepped in when the system failed, providing the therapy I desperately needed to be present for my children again. They didn't just provide a service; they gave me my family back.",
+  },
+  {
+    initials: "M.G.",
+    branch: "U.S. Marine Corps",
+    state: "Nevada",
+    quote:
+      "I spent years believing I had to fight the war in my head alone. When I finally asked for help, the VA told me I was on a list—but while I waited, the walls were closing in. I felt invisible to the country I served. ValorWell didn't just find me a therapist; they gave me a lifeline when I was at my lowest point. For the first time in a decade, I feel like I’m finally coming home.",
+  },
+  {
+    initials: "B.F.",
+    branch: "U.S. Navy",
+    state: "Arkansas",
+    quote:
+      "I could feel my family slipping away from me. My marriage was fracturing, and I was becoming a stranger to my own children. I reached out to the VA repeatedly, but my crisis was treated like a clerical error—I was told to wait, over and over, while my home life fell apart. ValorWell stepped in when I had nothing left to give. They provided the therapy that gave me the tools to understand my trauma and, more importantly, how to communicate through it. Because of ValorWell, I didn't just get help—I got my family back.",
+  },
+];
 
 function Eyebrow({ children, light = false }: { children: ReactNode; light?: boolean }) {
   return (
@@ -58,7 +81,7 @@ export default function ImpactPage() {
     <Layout>
       <SEO
         title="ValorWell Impact | Donor-Funded Therapy for Veterans"
-        description="See ValorWell's dated donor-funded therapy impact snapshot and how the 540+ therapy hours and 45+ veterans are counted."
+        description="See how donations to ValorWell funded 540+ hours of direct therapy for 45+ veterans in 2026, read real veteran testimonials, and learn how donated funds pay therapists."
         canonical="/impact"
       />
 
@@ -192,75 +215,60 @@ export default function ImpactPage() {
           </div>
         </section>
 
-        <section className="border-b border-[#3B5147]/15 bg-[#F4F1E8]">
-          <div className="container-wide py-20 md:py-28">
-            <div className="max-w-3xl">
-              <Eyebrow>Impact Methodology</Eyebrow>
-              <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                What the 540+ hours and 45+ veterans mean.
-              </h2>
-              <p className="mt-5 text-lg leading-8 text-[#111814]/65">
-                The point of the snapshot is to make the measurement understandable enough to scrutinize.
-              </p>
-            </div>
-
-            <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-              <article className="rounded-3xl border border-[#3B5147]/15 bg-white p-7">
-                <Clock className="h-7 w-7 text-[#3B5147]" aria-hidden="true" />
-                <h3 className="mt-5 text-xl font-bold">Direct therapy hours</h3>
-                <p className="mt-3 leading-7 text-[#111814]/62">
-                  Time spent directly between a veteran and a therapist during completed donor-funded therapy.
-                </p>
-              </article>
-
-              <article className="rounded-3xl border border-[#3B5147]/15 bg-white p-7">
-                <Users className="h-7 w-7 text-[#3B5147]" aria-hidden="true" />
-                <h3 className="mt-5 text-xl font-bold">Unique veterans</h3>
-                <p className="mt-3 leading-7 text-[#111814]/62">
-                  Each veteran is counted once in the participant total even when that person receives multiple sessions.
-                </p>
-              </article>
-
-              <article className="rounded-3xl border border-[#3B5147]/15 bg-white p-7">
-                <CheckCircle2 className="h-7 w-7 text-[#3B5147]" aria-hidden="true" />
-                <h3 className="mt-5 text-xl font-bold">Completed care only</h3>
-                <p className="mt-3 leading-7 text-[#111814]/62">
-                  Scheduled, planned, pledged, or projected sessions are not included in the completed-care total.
-                </p>
-              </article>
-
-              <article className="rounded-3xl bg-[#111814] p-7 text-white">
-                <HeartHandshake className="h-7 w-7 text-[#D7A92E]" aria-hidden="true" />
-                <h3 className="mt-5 text-xl font-bold">Program scope</h3>
-                <p className="mt-3 leading-7 text-white/65">
-                  Administrative work, case management, marketing, technology, and other organizational activity are not counted as therapy hours.
-                </p>
-              </article>
-            </div>
-
-            <div className="mt-8 rounded-3xl border border-[#3B5147]/15 bg-white p-7 md:p-9">
-              <p className="text-sm leading-7 text-[#111814]/65">
-                Financial accounting and the clinical impact metric answer different questions. This page reports completed care; it does not use the therapy-hour total to make a universal claim about the disposition of every donated dollar. Payment-processing fees, fundraising receipts, and organizational accounting are handled separately from the completed-care count.
-              </p>
-            </div>
+        <section className="border-b border-white/10 bg-[#3B5147] text-white">
+          <div className="container-wide py-16 text-center md:py-20">
+            <Eyebrow light>How Donations Relate to Care</Eyebrow>
+            <h2 className="mx-auto mt-4 max-w-5xl text-3xl font-bold leading-tight md:text-5xl">
+              100% of the donated funds ValorWell receives go directly to therapists to pay for treatment.
+            </h2>
+            <p className="mx-auto mt-5 max-w-3xl text-lg leading-8 text-white/75">
+              Donated funds are not used for administrative, technology, marketing, staffing, or other operating costs. Those expenses are funded separately.
+            </p>
           </div>
         </section>
 
-        <section className="border-b border-white/10 bg-[#111814] text-white">
-          <div className="container-wide grid gap-12 py-20 md:py-28 lg:grid-cols-12 lg:items-center">
-            <div className="lg:col-span-5">
-              <Eyebrow light>What the Numbers Cannot Show</Eyebrow>
+        <section className="border-b border-[#3B5147]/15 bg-[#F4F1E8]">
+          <div className="container-wide py-20 md:py-28">
+            <div className="max-w-3xl">
+              <Eyebrow>Real Veterans. Real Impact.</Eyebrow>
               <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                Clinical outcomes belong to the people receiving care—not to a marketing claim.
+                The numbers tell us how much care was provided. These veterans tell us what that care meant.
               </h2>
             </div>
-            <div className="lg:col-span-7 space-y-5 text-lg leading-8 text-white/72">
-              <p>
-                The public impact snapshot intentionally reports care delivered rather than promising a particular recovery, family, disability, or mental-health outcome.
-              </p>
-              <p>
-                Individual stories may be shared publicly only when there is a documented basis to do so. Aggregate impact does not require a veteran to become a testimonial.
-              </p>
+
+            <div className="mt-12 grid gap-6 lg:grid-cols-3">
+              {testimonials.map((testimonial, index) => (
+                <article
+                  key={testimonial.initials}
+                  className={
+                    index === 1
+                      ? "flex h-full flex-col rounded-3xl bg-[#111814] p-8 text-white"
+                      : "flex h-full flex-col rounded-3xl border border-[#3B5147]/15 bg-white p-8"
+                  }
+                >
+                  <Quote
+                    className={index === 1 ? "h-8 w-8 text-[#D7A92E]" : "h-8 w-8 text-[#3B5147]"}
+                    aria-hidden="true"
+                  />
+                  <blockquote
+                    className={
+                      index === 1
+                        ? "mt-6 flex-1 text-lg leading-8 text-white/78"
+                        : "mt-6 flex-1 text-lg leading-8 text-[#111814]/68"
+                    }
+                  >
+                    “{testimonial.quote}”
+                  </blockquote>
+                  <div className={index === 1 ? "mt-8 border-t border-white/12 pt-5" : "mt-8 border-t border-[#3B5147]/12 pt-5"}>
+                    <p className={index === 1 ? "font-bold text-white" : "font-bold text-[#111814]"}>
+                      {testimonial.initials}
+                    </p>
+                    <p className={index === 1 ? "mt-1 text-sm text-white/55" : "mt-1 text-sm text-[#111814]/55"}>
+                      {testimonial.branch} · {testimonial.state}
+                    </p>
+                  </div>
+                </article>
+              ))}
             </div>
           </div>
         </section>
@@ -268,28 +276,31 @@ export default function ImpactPage() {
         <section className="border-b border-[#3B5147]/15 bg-white">
           <div className="container-wide grid gap-12 py-20 md:py-28 lg:grid-cols-12 lg:items-center">
             <div className="lg:col-span-7">
-              <Eyebrow>How Donations Relate to Care</Eyebrow>
+              <Eyebrow>You Do Not Have to Solve the Whole Problem Yourself</Eyebrow>
               <h2 className="mt-4 max-w-4xl text-3xl font-bold leading-tight md:text-5xl">
-                A donation supports the program; it does not purchase a specific patient, appointment, or outcome.
+                Most supporters are building this one manageable monthly gift at a time.
               </h2>
               <p className="mt-6 max-w-3xl text-lg leading-8 text-[#111814]/68">
-                Funding is used within the donor-funded therapy program as eligible care opportunities arise. Care remains subject to clinician availability, capacity, clinical fit, and the program&apos;s operating requirements.
+                Across the donation platforms ValorWell uses, most donors are not funding an entire course of therapy by themselves. Their donations combine with support from other people to make the care possible.
               </p>
             </div>
-            <div className="lg:col-span-5">
-              <div className="rounded-3xl bg-[#F4F1E8] p-8">
-                <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#3B5147]">Current public snapshot</p>
-                <p className="mt-5 text-4xl font-bold text-[#111814]">540+ hours</p>
-                <p className="mt-2 text-[#111814]/60">45+ veterans · through {SNAPSHOT_DATE}</p>
-                <TrackedLink
-                  to="/support"
-                  event="impact_support_details"
-                  className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#3B5147]"
-                >
-                  How to Support the Program
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </TrackedLink>
-              </div>
+
+            <div className="grid gap-5 sm:grid-cols-2 lg:col-span-5 lg:grid-cols-1">
+              <article className="rounded-3xl border border-[#3B5147]/15 bg-[#F4F1E8] p-7">
+                <p className="text-5xl font-bold text-[#3B5147]">72%</p>
+                <h3 className="mt-4 text-xl font-bold">of 2026 donors give monthly</h3>
+                <p className="mt-3 leading-7 text-[#111814]/62">
+                  Recurring support gives ValorWell a more dependable way to keep therapy available when veterans reach out.
+                </p>
+              </article>
+
+              <article className="rounded-3xl border border-[#D7A92E]/35 bg-[#F8F3E4] p-7">
+                <p className="text-5xl font-bold text-[#8A6814]">$25</p>
+                <h3 className="mt-4 text-xl font-bold">is the most common monthly gift</h3>
+                <p className="mt-3 leading-7 text-[#111814]/62">
+                  Small recurring gifts matter because many supporters funding care together can do what one donor does not have to do alone.
+                </p>
+              </article>
             </div>
           </div>
         </section>

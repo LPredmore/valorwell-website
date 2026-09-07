@@ -22,4 +22,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://www.valorwell.org/sitemap.xml
+Sitemap: https://valorwell.org/sitemap.xml

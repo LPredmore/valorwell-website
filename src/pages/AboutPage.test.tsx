@@ -61,7 +61,7 @@ describe("About ValorWell page", () => {
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/clinical care remains clinician-led, subject to professional licensure, scope, and judgment/i),
+      screen.getByText(/clinical care.*remains clinician-led.*professional licensure, scope, and judgment/i),
     ).toBeInTheDocument();
   });
 

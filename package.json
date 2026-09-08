@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/generate-route-html.mjs && node scripts/generate-nonindexed-route-html.mjs && node scripts/normalize-cloudflare-html.mjs && node scripts/normalize-production-origin.mjs && node scripts/normalize-clinician-recruiting-html.mjs",
+    "build": "vite build && node scripts/generate-route-html.mjs && node scripts/generate-nonindexed-route-html.mjs && node scripts/remove-retired-routes.mjs && node scripts/normalize-cloudflare-html.mjs && node scripts/normalize-production-origin.mjs && node scripts/normalize-clinician-recruiting-html.mjs",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",

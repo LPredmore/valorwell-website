@@ -19,7 +19,6 @@ const CANONICAL_PAGES = new Set([
   "/resources/veteran-mental-health",
   "/resources/family-systems",
   "/partner",
-  "/support",
   "/contact",
   "/gallantfew",
   "/VOW",
@@ -28,7 +27,6 @@ const CANONICAL_PAGES = new Set([
   "/veteransbreakfastclub",
   "/americancorporatepartners",
   "/privacy",
-  "/donate",
   "/pendulo",
 ]);
 
@@ -40,11 +38,13 @@ const LEGACY_REDIRECTS = new Map([
   ["/get-started", "/get-care"],
   ["/how-it-works", "/get-care"],
   ["/partners", "/partner"],
-  ["/fund-access-to-care", "/support"],
-  ["/sponsors", "/support"],
-  ["/sponsor-care", "/support"],
-  ["/monthly-supporters", "/support"],
-  ["/funders", "/support"],
+  ["/support", "/impact"],
+  ["/donate", "/impact"],
+  ["/fund-access-to-care", "/impact"],
+  ["/sponsors", "/impact"],
+  ["/sponsor-care", "/impact"],
+  ["/monthly-supporters", "/impact"],
+  ["/funders", "/impact"],
   ["/referral-partners", "/partner"],
   ["/mission-one-pager", "/partner"],
   ["/faq", "/contact"],
@@ -112,6 +112,10 @@ export default {
 
     if (pathname !== "/" && pathname.endsWith("/")) {
       const withoutTrailingSlash = pathname.slice(0, -1);
+      const legacyTarget = LEGACY_REDIRECTS.get(withoutTrailingSlash);
+      if (legacyTarget) {
+        return redirect(url, legacyTarget);
+      }
       if (CANONICAL_PAGES.has(withoutTrailingSlash)) {
         return redirect(url, withoutTrailingSlash);
       }

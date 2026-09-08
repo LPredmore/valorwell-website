@@ -8,22 +8,39 @@ const retiredRoutes = ["/support", "/donate"];
 
 for (const route of retiredRoutes) {
   const relativeRoute = route.replace(/^\//, "");
-  fs.rmSync(path.join(DIST_DIR, relativeRoute), { recursive: true, force: true });
-  fs.rmSync(path.join(DIST_DIR, `${relativeRoute}.html`), { force: true });
+  const routeDirectory = path.join(DIST_DIR, relativeRoute);
+  const extensionlessPath = path.join(DIST_DIR, `${relativeRoute}.html`);
+
+  fs.rmSync(routeDirectory, { recursive: true, force: true });
+  fs.rmSync(extensionlessPath, { force: true });
+
+  if (fs.existsSync(routeDirectory) || fs.existsSync(extensionlessPath)) {
+    throw new Error(`Retired route output still exists for ${route}`);
+  }
 }
 
 if (fs.existsSync(SITEMAP_PATH)) {
   let sitemap = fs.readFileSync(SITEMAP_PATH, "utf8");
 
   for (const route of retiredRoutes) {
-    const url = `${SITE_URL}${route}`.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const escapedUrl = `${SITE_URL}${route}`.replace(
+      /[.*+?^${}()|[\]\\]/g,
+      "\\$&",
+    );
     sitemap = sitemap.replace(
-      new RegExp(`\\s*<url><loc>${url}<\\/loc><\\/url>`, "g"),
+      new RegExp(`\\s*<url><loc>${escapedUrl}<\\/loc><\\/url>`, "g"),
       "",
     );
   }
 
-  fs.writeFileSync(SITEMAP_PATH, `${sitemap.trim()}\n`, "utf8");
+  sitemap = `${sitemap.trim()}\n`;
+  fs.writeFileSync(SITEMAP_PATH, sitemap, "utf8");
+
+  for (const route of retiredRoutes) {
+    if (sitemap.includes(`${SITE_URL}${route}`)) {
+      throw new Error(`Retired route remains in sitemap: ${route}`);
+    }
+  }
 }
 
 console.log(`Removed retired route output: ${retiredRoutes.join(", ")}`);

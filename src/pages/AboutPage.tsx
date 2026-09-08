@@ -197,7 +197,7 @@ export default function AboutPage() {
                 [Stethoscope, "Need care", "Review current care pathways and start the intake process.", "/get-care", "Find Care", "about_path_care"],
                 [BookOpen, "Need information", "Browse resources on CHAMPVA, Community Care, veteran mental health, and family systems.", "/resources", "Browse Resources", "about_path_resources"],
                 [Building2, "Represent an organization", "Explore referral, service, community, and mission-aligned partnerships.", "/partner", "Partner With ValorWell", "about_path_partner"],
-                [HeartHandshake, "Want to support care", "Review the completed-care impact and support the donor-funded therapy program.", "/support", "Support ValorWell", "about_path_support"],
+                [HeartHandshake, "Want to support care", "Review the completed-care impact and support the donor-funded therapy program.", "/impact", "Support ValorWell", "about_path_support"],
               ].map(([Icon, title, copy, to, cta, event]) => {
                 const CardIcon = Icon as typeof Stethoscope;
                 return (
@@ -245,7 +245,7 @@ export default function AboutPage() {
                 <p className="mt-6 text-xs font-bold uppercase tracking-[0.18em] text-[#8A6814]">ValorWell Foundation</p>
                 <h3 className="mt-3 text-2xl font-bold">Charitable support for donor-funded therapy</h3>
                 <p className="mt-4 leading-7 text-[#111814]/68">
-                  The Foundation receives charitable support for the donor-funded therapy program described on the Support and Impact pages.
+                  The Foundation receives charitable support for the donor-funded therapy program described on the Impact page.
                 </p>
                 <p className="mt-4 text-sm leading-6 text-[#111814]/55">
                   A donation supports the program; it does not purchase a referral, select a patient, direct clinical judgment, or guarantee an outcome.
@@ -257,7 +257,7 @@ export default function AboutPage() {
               <TrackedLink to="/impact" event="about_structure_impact" className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#3B5147]">
                 Review Impact Methodology <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </TrackedLink>
-              <TrackedLink to="/support" event="about_structure_support" className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#3B5147]">
+              <TrackedLink to="/impact" event="about_structure_support" className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#3B5147]">
                 Support the Foundation <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </TrackedLink>
             </div>

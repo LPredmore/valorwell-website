@@ -1,56 +1,49 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { MemoryRouter } from "react-router-dom";
-import { DonateButton } from "./DonateButton";
+import { DonateButton, ZEFFY_DONATION_FORM_URL } from "./DonateButton";
 
-function linkUrl(name: string) {
-  const href = screen.getByRole("link", { name }).getAttribute("href");
-  expect(href).toBeTruthy();
-  return new URL(href!, "https://valorwell.org");
-}
-
-describe("DonateButton routing", () => {
-  afterEach(cleanup);
-
-  it("routes donation CTAs outside the partner page without overwriting acquisition UTMs", () => {
-    render(
-      <MemoryRouter initialEntries={["/mission"]}>
-        <DonateButton source="mission-test" utmCampaign="mission-support">
-          Support ValorWell
-        </DonateButton>
-      </MemoryRouter>,
-    );
-
-    const url = linkUrl("Support ValorWell");
-    expect(url.pathname).toBe("/partner");
-    expect(url.searchParams.get("vw_entry_source")).toBe("mission-test");
-    expect(url.searchParams.get("vw_entry_medium")).toBe("site");
-    expect(url.searchParams.get("vw_entry_campaign")).toBe("mission-support");
-    expect(url.searchParams.has("utm_source")).toBe(false);
+describe("DonateButton", () => {
+  afterEach(() => {
+    cleanup();
+    document.getElementById("zeffy-embed-script")?.remove();
   });
 
-  it("routes partner-page CTAs through an idempotent checkout handoff", () => {
+  it("uses the ValorWell Bridge Fund Zeffy modal as the only donation destination", () => {
     render(
-      <MemoryRouter initialEntries={["/partner"]}>
-        <DonateButton
-          source="partner-test"
-          utmCampaign="bridge-the-wait"
-          utmContent="campaign-card"
-        >
-          Fund a Session
-        </DonateButton>
-      </MemoryRouter>,
+      <DonateButton source="mission-test" utmCampaign="mission-support">
+        Support ValorWell
+      </DonateButton>,
     );
 
-    const url = linkUrl("Fund a Session");
-    expect(url.pathname).toBe("/donate");
-    expect(url.searchParams.get("vw_checkout_source")).toBe("partner-test");
-    expect(url.searchParams.get("vw_checkout_medium")).toBe("site");
-    expect(url.searchParams.get("vw_checkout_campaign")).toBe("bridge-the-wait");
-    expect(url.searchParams.get("vw_checkout_content")).toBe("campaign-card");
-    expect(url.searchParams.get("vw_handoff_id")).toMatch(
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+    const link = screen.getByRole("link", { name: "Support ValorWell" });
+    expect(link.getAttribute("href")).toBe(ZEFFY_DONATION_FORM_URL);
+    expect(link.getAttribute("zeffy-form-link")).toBe(ZEFFY_DONATION_FORM_URL);
+    expect(link.getAttribute("aria-haspopup")).toBe("dialog");
+  });
+
+  it("keeps CTA attribution in ValorWell data attributes and loads Zeffy's embed script", () => {
+    render(
+      <DonateButton
+        source="impact-test"
+        utmMedium="site"
+        utmCampaign="the-valorwell-bridge-fund"
+        utmContent="campaign-card"
+      >
+        Fund a Session
+      </DonateButton>,
     );
-    expect(url.searchParams.has("utm_source")).toBe(false);
+
+    const link = screen.getByRole("link", { name: "Fund a Session" });
+    expect(link.getAttribute("data-donate-source")).toBe("impact-test");
+    expect(link.getAttribute("data-donate-medium")).toBe("site");
+    expect(link.getAttribute("data-donate-campaign")).toBe(
+      "the-valorwell-bridge-fund",
+    );
+    expect(link.getAttribute("data-donate-content")).toBe("campaign-card");
+
+    const script = document.getElementById("zeffy-embed-script");
+    expect(script?.getAttribute("src")).toBe(
+      "https://www.zeffy.com/embed/v2/zeffy-embed.js",
+    );
   });
 });

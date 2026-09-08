@@ -1,27 +1,33 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { DonateButton, ZEFFY_DONATION_FORM_URL } from "./DonateButton";
 
 describe("DonateButton", () => {
-  afterEach(() => {
-    cleanup();
-    document.getElementById("zeffy-embed-script")?.remove();
-  });
+  afterEach(cleanup);
 
-  it("uses the ValorWell Bridge Fund Zeffy modal as the only donation destination", () => {
+  it("opens the ValorWell Bridge Fund inside an on-site modal instead of navigating", () => {
     render(
       <DonateButton source="mission-test" utmCampaign="mission-support">
         Support ValorWell
       </DonateButton>,
     );
 
-    const link = screen.getByRole("link", { name: "Support ValorWell" });
-    expect(link.getAttribute("href")).toBe(ZEFFY_DONATION_FORM_URL);
-    expect(link.getAttribute("zeffy-form-link")).toBe(ZEFFY_DONATION_FORM_URL);
-    expect(link.getAttribute("aria-haspopup")).toBe("dialog");
+    const button = screen.getByRole("button", { name: "Support ValorWell" });
+    expect(button.getAttribute("data-state")).toBe("closed");
+
+    fireEvent.click(button);
+
+    expect(screen.getByRole("dialog")).toBeTruthy();
+    expect(
+      screen.getByText("Donate to the ValorWell Bridge Fund"),
+    ).toBeTruthy();
+
+    const frame = screen.getByTitle("ValorWell Bridge Fund donation form");
+    expect(frame.getAttribute("src")).toBe(ZEFFY_DONATION_FORM_URL);
+    expect(frame.getAttribute("allow")).toBe("payment *");
   });
 
-  it("keeps CTA attribution in ValorWell data attributes and loads Zeffy's embed script", () => {
+  it("keeps CTA attribution on the modal trigger", () => {
     render(
       <DonateButton
         source="impact-test"
@@ -33,17 +39,12 @@ describe("DonateButton", () => {
       </DonateButton>,
     );
 
-    const link = screen.getByRole("link", { name: "Fund a Session" });
-    expect(link.getAttribute("data-donate-source")).toBe("impact-test");
-    expect(link.getAttribute("data-donate-medium")).toBe("site");
-    expect(link.getAttribute("data-donate-campaign")).toBe(
+    const button = screen.getByRole("button", { name: "Fund a Session" });
+    expect(button.getAttribute("data-donate-source")).toBe("impact-test");
+    expect(button.getAttribute("data-donate-medium")).toBe("site");
+    expect(button.getAttribute("data-donate-campaign")).toBe(
       "the-valorwell-bridge-fund",
     );
-    expect(link.getAttribute("data-donate-content")).toBe("campaign-card");
-
-    const script = document.getElementById("zeffy-embed-script");
-    expect(script?.getAttribute("src")).toBe(
-      "https://www.zeffy.com/embed/v2/zeffy-embed.js",
-    );
+    expect(button.getAttribute("data-donate-content")).toBe("campaign-card");
   });
 });

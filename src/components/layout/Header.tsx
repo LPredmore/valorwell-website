@@ -13,7 +13,6 @@ const primary = [
 const getInvolved = [
   { name: "Clinicians", href: "/clinicians" },
   { name: "Partner With ValorWell", href: "/partner" },
-  { name: "Support ValorWell", href: "/support" },
   { name: "Watch", href: "/watch" },
   { name: "Contact", href: "/contact" },
 ];

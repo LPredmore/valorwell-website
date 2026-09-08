@@ -1,13 +1,17 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Heart } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { trackDonationCheckoutStart } from "@/lib/tracking";
 
 export const ZEFFY_DONATION_FORM_URL =
   "https://www.zeffy.com/embed/donation-form/the-valorwell-bridge-fund?modal=true";
-
-const ZEFFY_EMBED_SCRIPT_URL = "https://www.zeffy.com/embed/v2/zeffy-embed.js";
-const ZEFFY_EMBED_SCRIPT_ID = "zeffy-embed-script";
 
 type Variant = "solid" | "outline" | "link";
 type Size = "sm" | "md" | "lg";
@@ -28,9 +32,9 @@ interface DonateButtonProps {
 /**
  * Single source of truth for donation CTAs.
  *
- * Every donation CTA opens the ValorWell Bridge Fund in Zeffy's modal. The
- * direct Zeffy URL remains on the anchor as a fallback if the embed script is
- * unavailable, while click metadata stays internal to ValorWell analytics.
+ * Donation CTAs open the ValorWell Bridge Fund in a controlled on-site modal.
+ * The Zeffy campaign stays inside an iframe so clicking a CTA never navigates
+ * the visitor away from the current ValorWell route.
  */
 export function DonateButton({
   source,
@@ -44,22 +48,7 @@ export function DonateButton({
   utmContent,
 }: DonateButtonProps) {
   const [handoffId] = useState(() => crypto.randomUUID());
-
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-    if (
-      document.getElementById(ZEFFY_EMBED_SCRIPT_ID) ||
-      document.querySelector(`script[src="${ZEFFY_EMBED_SCRIPT_URL}"]`)
-    ) {
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.id = ZEFFY_EMBED_SCRIPT_ID;
-    script.src = ZEFFY_EMBED_SCRIPT_URL;
-    script.async = true;
-    document.body.appendChild(script);
-  }, []);
+  const [open, setOpen] = useState(false);
 
   const handleClick = () => {
     trackDonationCheckoutStart(handoffId, {
@@ -88,19 +77,37 @@ export function DonateButton({
         : "bg-accent text-accent-foreground shadow-sm hover:brightness-95";
 
   return (
-    <a
-      href={ZEFFY_DONATION_FORM_URL}
-      {...{ "zeffy-form-link": ZEFFY_DONATION_FORM_URL }}
-      data-donate-source={source}
-      data-donate-medium={utmMedium}
-      data-donate-campaign={utmCampaign}
-      data-donate-content={utmContent}
-      aria-haspopup="dialog"
-      className={cn(base, variant !== "link" && sizeCls, variantCls, className)}
-      onClick={handleClick}
-    >
-      {withIcon && <Heart className="h-4 w-4" aria-hidden />}
-      {children}
-    </a>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <button
+          type="button"
+          data-donate-source={source}
+          data-donate-medium={utmMedium}
+          data-donate-campaign={utmCampaign}
+          data-donate-content={utmContent}
+          className={cn(base, variant !== "link" && sizeCls, variantCls, className)}
+          onClick={handleClick}
+        >
+          {withIcon && <Heart className="h-4 w-4" aria-hidden />}
+          {children}
+        </button>
+      </DialogTrigger>
+
+      <DialogContent className="flex h-[calc(100dvh-1rem)] w-[calc(100vw-1rem)] max-w-3xl flex-col gap-0 overflow-hidden border-0 bg-white p-0 sm:h-[min(90dvh,900px)]">
+        <div className="shrink-0 border-b border-border bg-background px-5 py-4 pr-14">
+          <DialogTitle>Donate to the ValorWell Bridge Fund</DialogTitle>
+          <DialogDescription className="mt-1">
+            Complete your donation securely through Zeffy without leaving ValorWell.
+          </DialogDescription>
+        </div>
+        <iframe
+          title="ValorWell Bridge Fund donation form"
+          src={ZEFFY_DONATION_FORM_URL}
+          className="min-h-0 flex-1 border-0 bg-white"
+          allow="payment *"
+          referrerPolicy="strict-origin-when-cross-origin"
+        />
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -9,6 +9,7 @@ import {
   Stethoscope,
   Users,
 } from "lucide-react";
+import { DonateButton } from "@/components/DonateButton";
 import { Layout } from "@/components/layout/Layout";
 import { SEO, BreadcrumbSchema } from "@/components/SEO";
 import { trackHomeEvent } from "@/lib/tracking";
@@ -99,14 +100,15 @@ export default function Support() {
               </p>
 
               <div className="mt-9 flex flex-wrap gap-3">
-                <TrackedLink
-                  to="/donate?vw_entry_source=support-hero&vw_entry_medium=site&vw_entry_campaign=support-valorwell&vw_entry_content=hero"
-                  event="support_hero_donate"
-                  className="inline-flex min-h-12 items-center gap-2 rounded-md bg-[#D7A92E] px-6 py-3 text-sm font-bold text-[#111814] transition hover:brightness-95"
+                <DonateButton
+                  source="support-hero"
+                  utmCampaign="support-valorwell"
+                  utmContent="hero"
+                  className="min-h-12 bg-[#D7A92E] px-6 py-3 text-sm font-bold text-[#111814] transition hover:brightness-95"
                 >
                   Donate to the Foundation
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </TrackedLink>
+                </DonateButton>
                 <TrackedLink
                   to="/impact"
                   event="support_hero_impact"
@@ -187,7 +189,7 @@ export default function Support() {
                 </div>
               </div>
               <p className="mt-6 text-sm leading-6 text-white/55">
-                Payment processors may deduct fees before funds are received. Financial accounting and the completed-care impact metric are separate: the public therapy-hour total does not attempt to describe the disposition of every donated dollar.
+                ValorWell uses Zeffy for online donations. Financial accounting and the completed-care impact metric are separate: the public therapy-hour total does not attempt to describe the disposition of every donated dollar.
               </p>
             </div>
           </div>
@@ -281,14 +283,15 @@ export default function Support() {
               Help fund additional therapy through the ValorWell Foundation.
             </h2>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
-              <TrackedLink
-                to="/donate?vw_entry_source=support-final&vw_entry_medium=site&vw_entry_campaign=support-valorwell&vw_entry_content=final"
-                event="support_final_donate"
-                className="inline-flex min-h-12 items-center gap-2 rounded-md bg-white px-6 py-3 text-sm font-bold text-[#3B5147] hover:bg-[#F4F1E8]"
+              <DonateButton
+                source="support-final"
+                utmCampaign="support-valorwell"
+                utmContent="final"
+                className="min-h-12 bg-white px-6 py-3 text-sm font-bold text-[#3B5147] hover:bg-[#F4F1E8]"
               >
                 Donate to the ValorWell Foundation
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </TrackedLink>
+              </DonateButton>
               <TrackedLink
                 to="/impact"
                 event="support_final_impact"

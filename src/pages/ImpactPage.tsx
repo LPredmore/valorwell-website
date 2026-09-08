@@ -8,6 +8,7 @@ import {
   Quote,
   Stethoscope,
 } from "lucide-react";
+import { DonateButton } from "@/components/DonateButton";
 import { Layout } from "@/components/layout/Layout";
 import { SEO } from "@/components/SEO";
 import { trackHomeEvent } from "@/lib/tracking";
@@ -115,14 +116,15 @@ export default function ImpactPage() {
                 When the normal path failed to get veterans into treatment, ValorWell used donated funds to pay therapists directly. In 2026, that meant 540+ hours of therapy for 45+ veterans who had already sought mental-health care but still did not have an available path into treatment.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <TrackedLink
-                  to="/donate"
-                  event="impact_hero_donate"
-                  className="inline-flex min-h-12 items-center gap-2 rounded-md bg-[#3B5147] px-6 py-3 text-sm font-bold text-white hover:bg-[#31443b]"
+                <DonateButton
+                  source="impact-hero"
+                  utmCampaign="the-valorwell-bridge-fund"
+                  utmContent="hero"
+                  className="min-h-12 bg-[#3B5147] px-6 py-3 text-sm font-bold text-white hover:bg-[#31443b]"
                 >
                   Help Pay for the Next Therapy Session
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </TrackedLink>
+                </DonateButton>
                 <div className="inline-flex min-h-12 items-center gap-2 rounded-md border border-[#3B5147]/20 bg-white/70 px-5 py-3 text-sm font-bold text-[#3B5147]">
                   <CalendarDays className="h-4 w-4" aria-hidden="true" />
                   Snapshot {SNAPSHOT_DATE}
@@ -346,14 +348,15 @@ export default function ImpactPage() {
             <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-white/70">
               Another veteran will ask for mental-health care and still struggle to reach a therapist. Your donation gives ValorWell another option: you help us pay the therapist, and we help the veteran get into treatment.
             </p>
-            <TrackedLink
-              to="/donate"
-              event="impact_final_donate"
-              className="mt-8 inline-flex min-h-12 items-center gap-2 rounded-md bg-[#D7A92E] px-6 py-3 text-sm font-bold text-[#111814] hover:bg-[#e2b943]"
+            <DonateButton
+              source="impact-final"
+              utmCampaign="the-valorwell-bridge-fund"
+              utmContent="final"
+              className="mt-8 min-h-12 bg-[#D7A92E] px-6 py-3 text-sm font-bold text-[#111814] hover:bg-[#e2b943]"
             >
               Help Pay for the Next Therapy Session
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </TrackedLink>
+            </DonateButton>
           </div>
         </section>
       </div>

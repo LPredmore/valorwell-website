@@ -8,16 +8,6 @@ const SITE_URL = "https://www.valorwell.org";
 
 const routes = [
   {
-    path: "/donate",
-    title: "Donate | ValorWell",
-    description:
-      "Continue from ValorWell to the current donation checkout for the ValorWell Foundation.",
-    h1: "Continuing to the donation checkout.",
-    lead:
-      "This handoff preserves donation attribution before continuing to the current ValorWell Foundation checkout.",
-    hideFromSitemap: false,
-  },
-  {
     path: "/pendulo",
     title: "Pendulo Partner Resource | ValorWell",
     description:

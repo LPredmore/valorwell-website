@@ -1,8 +1,13 @@
-import { useState, type MouseEvent } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { trackDonationCheckoutStartAndRedirect } from "@/lib/tracking";
+import { trackDonationCheckoutStart } from "@/lib/tracking";
+
+export const ZEFFY_DONATION_FORM_URL =
+  "https://www.zeffy.com/embed/donation-form/the-valorwell-bridge-fund?modal=true";
+
+const ZEFFY_EMBED_SCRIPT_URL = "https://www.zeffy.com/embed/v2/zeffy-embed.js";
+const ZEFFY_EMBED_SCRIPT_ID = "zeffy-embed-script";
 
 type Variant = "solid" | "outline" | "link";
 type Size = "sm" | "md" | "lg";
@@ -23,9 +28,9 @@ interface DonateButtonProps {
 /**
  * Single source of truth for donation CTAs.
  *
- * Internal CTA metadata uses vw_* parameters so it never overwrites the ad or
- * referral UTMs captured when the visitor first arrived. Site-wide CTAs route
- * through /partner; only the final click from /partner records checkout intent.
+ * Every donation CTA opens the ValorWell Bridge Fund in Zeffy's modal. The
+ * direct Zeffy URL remains on the anchor as a fallback if the embed script is
+ * unavailable, while click metadata stays internal to ValorWell analytics.
  */
 export function DonateButton({
   source,
@@ -35,47 +40,31 @@ export function DonateButton({
   className,
   withIcon = false,
   utmMedium = "site",
-  utmCampaign = "ocs",
+  utmCampaign = "the-valorwell-bridge-fund",
   utmContent,
 }: DonateButtonProps) {
-  const location = useLocation();
   const [handoffId] = useState(() => crypto.randomUUID());
-  const isPartnerPage = location.pathname === "/partner";
-  const currentParams = new URLSearchParams(location.search);
-  const params = new URLSearchParams();
 
-  if (isPartnerPage) {
-    for (const key of [
-      "vw_entry_source",
-      "vw_entry_medium",
-      "vw_entry_campaign",
-      "vw_entry_content",
-    ]) {
-      const value = currentParams.get(key);
-      if (value) params.set(key, value);
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (
+      document.getElementById(ZEFFY_EMBED_SCRIPT_ID) ||
+      document.querySelector(`script[src="${ZEFFY_EMBED_SCRIPT_URL}"]`)
+    ) {
+      return;
     }
-    params.set("vw_checkout_source", source);
-    params.set("vw_checkout_medium", utmMedium);
-    params.set("vw_checkout_campaign", utmCampaign);
-    if (utmContent) params.set("vw_checkout_content", utmContent);
-    params.set("vw_handoff_id", handoffId);
-  } else {
-    params.set("vw_entry_source", source);
-    params.set("vw_entry_medium", utmMedium);
-    params.set("vw_entry_campaign", utmCampaign);
-    if (utmContent) params.set("vw_entry_content", utmContent);
-  }
 
-  const destination = isPartnerPage ? "/donate" : "/partner";
-  const href = `${destination}?${params.toString()}`;
+    const script = document.createElement("script");
+    script.id = ZEFFY_EMBED_SCRIPT_ID;
+    script.src = ZEFFY_EMBED_SCRIPT_URL;
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
 
-  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
-    if (!isPartnerPage || event.defaultPrevented || event.button !== 0) return;
-    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-
-    event.preventDefault();
-    trackDonationCheckoutStartAndRedirect(href, handoffId, {
+  const handleClick = () => {
+    trackDonationCheckoutStart(handoffId, {
       source,
+      medium: utmMedium,
       campaign: utmCampaign,
       content: utmContent,
     });
@@ -99,14 +88,19 @@ export function DonateButton({
         : "bg-accent text-accent-foreground shadow-sm hover:brightness-95";
 
   return (
-    <Link
-      to={href}
+    <a
+      href={ZEFFY_DONATION_FORM_URL}
+      {...{ "zeffy-form-link": ZEFFY_DONATION_FORM_URL }}
       data-donate-source={source}
+      data-donate-medium={utmMedium}
+      data-donate-campaign={utmCampaign}
+      data-donate-content={utmContent}
+      aria-haspopup="dialog"
       className={cn(base, variant !== "link" && sizeCls, variantCls, className)}
       onClick={handleClick}
     >
       {withIcon && <Heart className="h-4 w-4" aria-hidden />}
       {children}
-    </Link>
+    </a>
   );
 }

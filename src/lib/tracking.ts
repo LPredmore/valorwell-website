@@ -20,6 +20,7 @@ const recentFallbackSubmissionIds = new Map<
 
 interface DonationCheckoutMetadata {
   source: string;
+  medium?: string;
   campaign?: string;
   content?: string;
 }
@@ -44,9 +45,51 @@ function resolvePublicFormSubmissionId(
 }
 
 /**
- * Records the final click from /partner into the donation checkout. The Ads
- * action represents checkout intent only; completed gifts are imported from
- * Givebutter with their actual values.
+ * Records donation-checkout intent without navigating away from the current
+ * page. This is used by the Zeffy modal so analytics never blocks the modal.
+ */
+export function trackDonationCheckoutStart(
+  handoffId: string,
+  metadata: DonationCheckoutMetadata,
+) {
+  if (typeof window === "undefined") return;
+
+  const dedupeKey = `valorwell_donation_checkout:${handoffId}`;
+  try {
+    if (window.sessionStorage.getItem(dedupeKey)) return;
+    window.sessionStorage.setItem(dedupeKey, new Date().toISOString());
+  } catch {
+    // Conversion deduplication is best effort when browser storage is blocked.
+  }
+
+  const gtagFn = window.gtag;
+  if (typeof gtagFn !== "function") return;
+
+  try {
+    gtagFn("event", "begin_donation", {
+      event_id: handoffId,
+      cta_source: metadata.source,
+      cta_medium: metadata.medium,
+      cta_campaign: metadata.campaign,
+      cta_content: metadata.content,
+      transport_type: "beacon",
+    });
+
+    gtagFn("event", "conversion", {
+      send_to: DONATION_CHECKOUT_CONVERSION,
+      value: 1,
+      currency: "USD",
+      transaction_id: handoffId,
+      transport_type: "beacon",
+    });
+  } catch {
+    // Analytics is best effort and must never block the donation modal.
+  }
+}
+
+/**
+ * Records donation-checkout intent before a legacy route redirects. New Zeffy
+ * modal buttons use trackDonationCheckoutStart so they stay on the current page.
  */
 export function trackDonationCheckoutStartAndRedirect(
   destinationUrl: string,
@@ -86,6 +129,7 @@ export function trackDonationCheckoutStartAndRedirect(
     gtagFn("event", "begin_donation", {
       event_id: handoffId,
       cta_source: metadata.source,
+      cta_medium: metadata.medium,
       cta_campaign: metadata.campaign,
       cta_content: metadata.content,
       transport_type: "beacon",

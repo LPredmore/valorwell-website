@@ -16,7 +16,6 @@ import {
 import { HelmetProvider } from "react-helmet-async";
 
 // Preserved functional (non-shell) routes
-import Donate from "./pages/Donate";
 import NotFound from "./pages/NotFound";
 import HomePage from "./pages/HomePage";
 import WatchPage from "./pages/WatchPage";
@@ -24,7 +23,6 @@ import NetworkPage from "./pages/NetworkPage";
 import MissionPage from "./pages/MissionPage";
 import AboutPage from "./pages/AboutPage";
 import ImpactPage from "./pages/ImpactPage";
-import Support from "./pages/Support";
 import BtyBillingHubPage from "./pages/BtyBillingHubPage";
 import Clinicians from "./pages/Clinicians";
 import GetCareWithSignup from "./pages/GetCareWithSignup";
@@ -72,11 +70,13 @@ const legacyRedirects: { from: string; to: string }[] = [
   { from: "/get-started", to: "/get-care" },
   { from: "/how-it-works", to: "/get-care" },
   { from: "/partners", to: "/partner" },
-  { from: "/fund-access-to-care", to: "/support" },
-  { from: "/sponsors", to: "/support" },
-  { from: "/sponsor-care", to: "/support" },
-  { from: "/monthly-supporters", to: "/support" },
-  { from: "/funders", to: "/support" },
+  { from: "/support", to: "/impact" },
+  { from: "/donate", to: "/impact" },
+  { from: "/fund-access-to-care", to: "/impact" },
+  { from: "/sponsors", to: "/impact" },
+  { from: "/sponsor-care", to: "/impact" },
+  { from: "/monthly-supporters", to: "/impact" },
+  { from: "/funders", to: "/impact" },
   { from: "/referral-partners", to: "/partner" },
   { from: "/mission-one-pager", to: "/partner" },
   { from: "/faq", to: "/contact" },
@@ -134,7 +134,6 @@ const App = () => (
             <Route path="/mission" element={<MissionPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/impact" element={<ImpactPage />} />
-            <Route path="/support" element={<Support />} />
             <Route path="/beyondtheyellow" element={<LegacyBtyRedirect />} />
             <Route path="/beyond-the-yellow" element={<BtyBillingHubPage />} />
             <Route path="/gallantfew" element={<GallantFewPage />} />
@@ -183,7 +182,7 @@ const App = () => (
             <Route path="/family-systems" element={<AuthorityFamilySystems />} />
             <Route
               path="/military-family-therapy"
-              element={<AuthorityMilitaryFamilyTherapy />} 
+              element={<AuthorityMilitaryFamilyTherapy />}
             />
             <Route
               path="/veteran-mental-health-care"
@@ -202,7 +201,6 @@ const App = () => (
               />
             ))}
 
-            <Route path="/donate" element={<Donate />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

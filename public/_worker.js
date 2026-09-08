@@ -112,6 +112,10 @@ export default {
 
     if (pathname !== "/" && pathname.endsWith("/")) {
       const withoutTrailingSlash = pathname.slice(0, -1);
+      const legacyTarget = LEGACY_REDIRECTS.get(withoutTrailingSlash);
+      if (legacyTarget) {
+        return redirect(url, legacyTarget);
+      }
       if (CANONICAL_PAGES.has(withoutTrailingSlash)) {
         return redirect(url, withoutTrailingSlash);
       }

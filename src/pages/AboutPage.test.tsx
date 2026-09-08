@@ -82,7 +82,7 @@ describe("About ValorWell page", () => {
     );
     expect(screen.getAllByRole("link", { name: /Support ValorWell/i })[0]).toHaveAttribute(
       "href",
-      "/support",
+      "/impact",
     );
     expect(screen.getAllByRole("link", { name: /Beyond The Yellow/i })[0]).toHaveAttribute(
       "href",

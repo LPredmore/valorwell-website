@@ -24,12 +24,20 @@ const FORM_ANCHOR = "bty-story-form";
 
 const episodes = [
   {
+    organization: "American Corporate Partners",
+    route: "/americancorporatepartners",
+    videoId: "JHuLEqw2yG8",
+    videoUrl: "https://www.youtube.com/watch?v=JHuLEqw2yG8",
+    line: "A year of mentorship can turn military experience into a clearer civilian career path.",
+    current: true,
+  },
+  {
     organization: "Veterans Breakfast Club",
     route: "/veteransbreakfastclub",
     videoId: "A4CUe3c8rJE",
     videoUrl: "https://www.youtube.com/watch?v=A4CUe3c8rJE",
     line: "Some veterans carry a story for decades. Sometimes the right room is what finally lets it out.",
-    current: true,
+    current: false,
   },
   {
     organization: "Veterans Outreach of Wisconsin",
@@ -45,14 +53,6 @@ const episodes = [
     videoId: "zsaTKjNVeew",
     videoUrl: "https://www.youtube.com/watch?v=zsaTKjNVeew",
     line: "The mission ends. The need for direction doesn’t.",
-    current: false,
-  },
-  {
-    organization: "Military Missions in Action",
-    route: "/mmia",
-    videoId: "19JpCgF-d9Q",
-    videoUrl: "https://www.youtube.com/watch?v=19JpCgF-d9Q",
-    line: "Practical support. A ramp. A furnished room. A ride.",
     current: false,
   },
 ] as const;

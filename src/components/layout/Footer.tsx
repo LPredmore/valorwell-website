@@ -30,6 +30,7 @@ const groups: { title: string; links: { name: string; href: string }[] }[] = [
   {
     title: "Get Involved",
     links: [
+      { name: "Support the Foundation", href: "/impact" },
       { name: "Partner With ValorWell", href: "/partner" },
       { name: "Contact", href: "/contact" },
     ],
@@ -55,7 +56,7 @@ export function Footer() {
               <span className="sr-only">ValorWell</span>
             </Link>
             <p className="mt-3 max-w-xs text-sm leading-6 text-muted-foreground">
-              Mental health care and support for veterans and military families, donor-funded therapy, and Beyond The Yellow.
+              ValorWell is a nationwide mental-health care platform for veterans and military families. The ValorWell Foundation is a separate organization that funds therapy for veterans who cannot reach care through the appropriate VA channels.
             </p>
           </div>
           {groups.map((group) => (
@@ -85,9 +86,14 @@ export function Footer() {
               Privacy
             </Link>
           </div>
-          <p className="max-w-3xl">
-            Care and coverage pathways are subject to eligibility or authorization, clinician licensure, availability, capacity, and clinical fit. ValorWell does not control VA authorization or disability outcomes.
-          </p>
+          <div className="max-w-3xl space-y-2">
+            <p>
+              ValorWell and the ValorWell Foundation are separate organizations. 100% of donations to the ValorWell Foundation go directly to qualified mental-health therapists providing treatment to veterans; none of those donations go to ValorWell.
+            </p>
+            <p>
+              Care and coverage pathways are subject to eligibility or authorization, clinician licensure, availability, capacity, and clinical fit. ValorWell does not control VA authorization or disability outcomes.
+            </p>
+          </div>
         </div>
       </div>
     </footer>

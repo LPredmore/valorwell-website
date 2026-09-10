@@ -64,7 +64,7 @@ export default function HomePage() {
     <Layout>
       <SEO
         title="ValorWell | Mental Health Care for Veterans & Military Families"
-        description="ValorWell provides telehealth mental health care pathways for veterans and military families, donor-funded therapy for veterans, and Beyond The Yellow community conversations."
+        description="ValorWell is a nationwide mental-health care platform for veterans and military families. The separate ValorWell Foundation pays qualified community therapists for veteran treatment when appropriate VA care channels do not produce access."
         canonical="/"
       />
       <OrganizationSchema />
@@ -96,7 +96,10 @@ export default function HomePage() {
                 Mental health care and support for veterans and military families.
               </h1>
               <p className="mt-7 max-w-2xl text-lg leading-8 text-[#111814]/70 md:text-xl">
-                ValorWell operates telehealth care pathways, supports donor-funded therapy for veterans who still cannot reach care, and publishes Beyond The Yellow conversations with organizations doing useful work.
+                ValorWell is a nationwide platform for providing mental-health therapy to veterans and their families. The ValorWell Foundation is a separate organization that pays qualified community therapists when veterans cannot get seen through the appropriate VA care channels.
+              </p>
+              <p className="mt-5 max-w-2xl text-base font-bold leading-7 text-[#3B5147]">
+                100% of donations to the ValorWell Foundation go directly to therapists providing treatment. None of those donations go to ValorWell.
               </p>
 
               <div className="mt-9 flex flex-wrap items-center gap-3">
@@ -121,27 +124,27 @@ export default function HomePage() {
             <aside className="lg:col-span-5">
               <div className="rounded-3xl bg-[#111814] p-8 text-white shadow-xl md:p-9">
                 <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D7A92E]">
-                  2026 completed-care snapshot
+                  Foundation-funded therapy
                 </p>
                 <div className="mt-7 grid gap-6 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
                   <div>
                     <p className="text-5xl font-bold text-[#D7A92E]">540+</p>
-                    <p className="mt-2 text-sm leading-6 text-white/65">hours of direct donor-funded therapy</p>
+                    <p className="mt-2 text-sm leading-6 text-white/65">hours of direct therapy paid for</p>
                   </div>
                   <div className="border-t border-white/12 pt-6 sm:border-l sm:border-t-0 sm:pl-6 sm:pt-0 lg:border-l-0 lg:border-t lg:pl-0 lg:pt-6 xl:border-l xl:border-t-0 xl:pl-6 xl:pt-0">
-                    <p className="text-5xl font-bold">45+</p>
-                    <p className="mt-2 text-sm leading-6 text-white/65">unique veterans who received donor-funded care</p>
+                    <p className="text-5xl font-bold">$75</p>
+                    <p className="mt-2 text-sm leading-6 text-white/65">funds one completed therapy session</p>
                   </div>
                 </div>
                 <p className="mt-7 border-t border-white/12 pt-5 text-sm leading-6 text-white/55">
-                  Snapshot through September 5, 2026. Counts completed direct therapy; see the Impact page for definitions and scope.
+                  Snapshot through September 5, 2026. Foundation impact is reported as completed therapy delivered rather than total dollars raised or spent.
                 </p>
                 <TrackedLink
                   to="/impact"
                   event="homepage_hero_impact_methodology"
                   className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-white"
                 >
-                  Review Impact Methodology
+                  See Foundation Impact
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </TrackedLink>
               </div>
@@ -189,19 +192,19 @@ export default function HomePage() {
         <section className="border-b border-[#3B5147]/15 bg-white">
           <div className="container-wide py-20 md:py-28">
             <div className="max-w-3xl">
-              <Eyebrow>What ValorWell Does</Eyebrow>
+              <Eyebrow>How the Work Fits Together</Eyebrow>
               <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                Care, impact, and community serve different parts of the same mission.
+                ValorWell provides care. The separate Foundation funds therapy when VA access fails.
               </h2>
             </div>
 
             <div className="mt-12 grid gap-5 lg:grid-cols-3">
               <article className="rounded-3xl border border-[#3B5147]/15 bg-[#F4F1E8] p-8">
                 <Stethoscope className="h-8 w-8 text-[#3B5147]" aria-hidden="true" />
-                <p className="mt-7 text-xs font-bold uppercase tracking-[0.18em] text-[#3B5147]">Care</p>
-                <h3 className="mt-3 text-2xl font-bold">Mental health care and access pathways.</h3>
+                <p className="mt-7 text-xs font-bold uppercase tracking-[0.18em] text-[#3B5147]">ValorWell Care</p>
+                <h3 className="mt-3 text-2xl font-bold">Mental-health care and access pathways.</h3>
                 <p className="mt-4 leading-7 text-[#111814]/65">
-                  Telehealth treatment, clinician infrastructure, coverage pathways, and the operational systems that support care.
+                  Nationwide telehealth treatment, clinician infrastructure, coverage pathways, and the operational systems that support care for veterans and military families.
                 </p>
                 <TrackedLink to="/get-care" event="homepage_model_care" className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#3B5147]">
                   Find Care <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -210,13 +213,16 @@ export default function HomePage() {
 
               <article className="rounded-3xl bg-[#111814] p-8 text-white">
                 <HeartHandshake className="h-8 w-8 text-[#D7A92E]" aria-hidden="true" />
-                <p className="mt-7 text-xs font-bold uppercase tracking-[0.18em] text-[#D7A92E]">Impact</p>
-                <h3 className="mt-3 text-2xl font-bold">Completed donor-funded therapy.</h3>
+                <p className="mt-7 text-xs font-bold uppercase tracking-[0.18em] text-[#D7A92E]">ValorWell Foundation</p>
+                <h3 className="mt-3 text-2xl font-bold">Direct payment for veteran therapy.</h3>
                 <p className="mt-4 leading-7 text-white/65">
-                  As of September 5, 2026, the donor-funded program reports 540+ hours of completed direct therapy for 45+ veterans.
+                  The Foundation is separate from ValorWell. It pays qualified community therapists for veteran treatment when the appropriate VA care channels do not produce access. $75 funds one completed session.
+                </p>
+                <p className="mt-4 text-sm font-bold leading-6 text-white">
+                  100% of Foundation donations go to therapists. None goes to ValorWell.
                 </p>
                 <TrackedLink to="/impact" event="homepage_model_impact" className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-white">
-                  See the Impact <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  See Foundation Impact <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </TrackedLink>
               </article>
 
@@ -239,12 +245,12 @@ export default function HomePage() {
           <div className="container-wide py-20 md:py-28">
             <div className="grid gap-12 lg:grid-cols-12 lg:items-end">
               <div className="lg:col-span-7">
-                <Eyebrow light>2026 Impact</Eyebrow>
+                <Eyebrow light>Foundation Impact</Eyebrow>
                 <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                  540+ hours of therapy for 45+ veterans.
+                  540+ hours of therapy. $75 funds one session.
                 </h2>
                 <p className="mt-6 max-w-3xl text-lg leading-8 text-white/68">
-                  These figures count completed donor-funded time spent directly between veterans and therapists. Administrative work and other operating activity are not included as therapy hours.
+                  These figures count completed therapy paid for by the ValorWell Foundation. The Foundation reports treatment delivered rather than total dollars raised or spent.
                 </p>
               </div>
               <div className="lg:col-span-5 lg:text-right">
@@ -253,7 +259,7 @@ export default function HomePage() {
                   event="homepage_impact_detail"
                   className="inline-flex min-h-12 items-center gap-2 rounded-md border border-white/30 px-6 py-3 text-sm font-bold text-white transition hover:bg-white/10"
                 >
-                  View Impact Details
+                  View Foundation Impact
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </TrackedLink>
               </div>
@@ -389,12 +395,12 @@ export default function HomePage() {
 
               <article className="rounded-3xl border border-[#D7A92E]/35 bg-[#F8F3E4] p-8">
                 <HeartHandshake className="h-8 w-8 text-[#8A6814]" aria-hidden="true" />
-                <h3 className="mt-6 text-2xl font-bold">Supporters</h3>
+                <h3 className="mt-6 text-2xl font-bold">Foundation Supporters</h3>
                 <p className="mt-4 leading-7 text-[#111814]/64">
-                  Help fund therapy for veterans who have asked for care but still cannot reach a therapist.
+                  $75 funds one completed therapy session for a veteran who could not reach care through the appropriate VA channels. 100% of Foundation donations go directly to therapists.
                 </p>
-                <TrackedLink to="/support" event="homepage_support" className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#3B5147]">
-                  Support the Work <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                <TrackedLink to="/impact" event="homepage_support" className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#3B5147]">
+                  Support the Foundation <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </TrackedLink>
               </article>
             </div>
@@ -410,10 +416,10 @@ export default function HomePage() {
               </h2>
             </div>
             <div className="flex flex-wrap gap-3 lg:col-span-4 lg:justify-end">
-              <TrackedLink to="/get-care" event="homepage_final_care" className="inline-flex min-h-12 items-center gap-2 rounded-md bg-white px-6 py-3 text-sm font-bold text-[#111814]">
+              <TrackedLink to="/get-care" event="homepage_final_care" className="inline-flex min-h-12 items-center rounded-md bg-white px-6 py-3 text-sm font-bold text-[#111814]">
                 Find Care
               </TrackedLink>
-              <TrackedLink to="/about" event="homepage_final_about" className="inline-flex min-h-12 items-center gap-2 rounded-md border border-white/30 px-6 py-3 text-sm font-bold text-white">
+              <TrackedLink to="/about" event="homepage_final_about" className="inline-flex min-h-12 items-center rounded-md border border-white/30 px-6 py-3 text-sm font-bold text-white">
                 About ValorWell
               </TrackedLink>
             </div>

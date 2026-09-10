@@ -4,7 +4,7 @@ import path from "node:path";
 const DIST_DIR = path.resolve(process.cwd(), "dist");
 const SITEMAP_PATH = path.join(DIST_DIR, "sitemap.xml");
 const SITE_URL = "https://www.valorwell.org";
-const retiredRoutes = ["/support", "/donate"];
+const retiredRoutes = ["/becomeapatient", "/support", "/donate"];
 
 for (const route of retiredRoutes) {
   const relativeRoute = route.replace(/^\//, "");

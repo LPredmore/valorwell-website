@@ -56,8 +56,8 @@ export default function AboutPage() {
   return (
     <Layout>
       <SEO
-        title="About ValorWell | Veterans, Families, Care & Community"
-        description="Learn how ValorWell's care work, the ValorWell Foundation's donor-funded therapy support, Beyond The Yellow, and public resources fit together."
+        title="About ValorWell | Care Platform & ValorWell Foundation"
+        description="Learn the difference between ValorWell, a nationwide mental-health care platform for veterans and military families, and the separate ValorWell Foundation, which pays qualified community therapists for veteran treatment."
         canonical="/about"
       />
       <BreadcrumbSchema
@@ -91,10 +91,13 @@ export default function AboutPage() {
             <div className="max-w-5xl">
               <Eyebrow>About ValorWell</Eyebrow>
               <h1 className="mt-6 text-4xl font-bold leading-[1.03] sm:text-5xl md:text-6xl lg:text-7xl">
-                Mental health care, donor-funded therapy, public resources, and community conversations under one mission.
+                ValorWell provides care. The ValorWell Foundation separately funds therapy.
               </h1>
               <p className="mt-7 max-w-3xl text-lg leading-8 text-[#111814]/70 md:text-xl">
-                ValorWell&apos;s public work centers on telehealth mental health care for veterans and military families, a donor-funded therapy program for veterans who still cannot reach care, and Beyond The Yellow conversations with organizations and people doing useful work in their communities.
+                ValorWell is a nationwide platform for providing mental-health therapy to veterans and their families. The ValorWell Foundation is a separate organization that pays qualified mental-health therapists in the community to treat veterans who cannot get seen through the appropriate VA care channels.
+              </p>
+              <p className="mt-5 max-w-3xl text-lg font-bold leading-8 text-[#3B5147]">
+                100% of donations to the ValorWell Foundation go directly to therapists providing that treatment. None of those donations go to ValorWell.
               </p>
               <div className="mt-9 flex flex-wrap gap-3">
                 <TrackedLink
@@ -106,11 +109,11 @@ export default function AboutPage() {
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </TrackedLink>
                 <TrackedLink
-                  to="/mission"
-                  event="about_hero_mission"
+                  to="/impact"
+                  event="about_hero_foundation"
                   className="inline-flex min-h-12 items-center gap-2 rounded-md border border-[#3B5147]/30 px-6 py-3 text-sm font-bold text-[#3B5147] transition hover:bg-white/60"
                 >
-                  Read the Mission
+                  See Foundation Impact
                 </TrackedLink>
               </div>
             </div>
@@ -121,29 +124,31 @@ export default function AboutPage() {
           <div className="container-wide py-20 md:py-28">
             <div className="max-w-3xl">
               <Eyebrow light>At a Glance</Eyebrow>
-              <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">Three connected areas of work.</h2>
+              <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
+                Care, charitable funding, and community work have different roles.
+              </h2>
             </div>
 
             <div className="mt-12 grid gap-5 lg:grid-cols-3">
               <article className="rounded-3xl border border-white/12 bg-white/[0.05] p-8">
                 <Stethoscope className="h-8 w-8 text-[#D7A92E]" aria-hidden="true" />
-                <h3 className="mt-6 text-2xl font-bold">Care</h3>
+                <h3 className="mt-6 text-2xl font-bold">ValorWell Care</h3>
                 <p className="mt-4 leading-7 text-white/65">
-                  Telehealth mental health treatment and the clinician, coverage, billing, and access systems that support it.
+                  Nationwide telehealth mental-health treatment and the clinician, coverage, billing, scheduling, and access systems that support it.
                 </p>
                 <TrackedLink to="/get-care" event="about_care" className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-white">
                   Care Options <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </TrackedLink>
               </article>
 
-              <article className="rounded-3xl border border-white/12 bg-white/[0.05] p-8">
+              <article className="rounded-3xl border border-[#D7A92E]/35 bg-[#D7A92E]/10 p-8">
                 <HeartHandshake className="h-8 w-8 text-[#D7A92E]" aria-hidden="true" />
-                <h3 className="mt-6 text-2xl font-bold">Impact</h3>
+                <h3 className="mt-6 text-2xl font-bold">ValorWell Foundation</h3>
                 <p className="mt-4 leading-7 text-white/65">
-                  Donor-funded therapy for veterans who sought mental health care but still did not have an available treatment path.
+                  A separate organization that pays qualified community therapists when veterans have sought care but still cannot reach treatment through the appropriate VA channels.
                 </p>
                 <TrackedLink to="/impact" event="about_impact" className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-white">
-                  Impact Details <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  Foundation Impact <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </TrackedLink>
               </article>
 
@@ -166,18 +171,18 @@ export default function AboutPage() {
             <div className="lg:col-span-5">
               <Eyebrow>Who We Serve</Eyebrow>
               <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                Veterans and military families are the center of our care work.
+                Veterans and military families are the center of ValorWell&apos;s care work.
               </h2>
             </div>
             <div className="lg:col-span-7 space-y-5 text-lg leading-8 text-[#111814]/68">
               <p>
-                Veterans often navigate mental health needs alongside VA access, military transition, trauma, disability, and other systems shaped by service.
+                Veterans often navigate mental-health needs alongside VA access, military transition, trauma, disability, and other systems shaped by service.
               </p>
               <p>
-                Military family members have their own mental health needs and barriers to care. ValorWell treats family care as a core part of the clinical mission rather than an extension of veteran care.
+                Military family members have their own mental-health needs and barriers to care. ValorWell treats family care as a core part of the clinical mission.
               </p>
               <p>
-                Beyond The Yellow reaches more broadly by featuring organizations whose work benefits veterans, families, and other communities.
+                The ValorWell Foundation&apos;s charitable funding is specifically used to pay for veteran therapy when the appropriate VA care pathway has not produced access to treatment.
               </p>
             </div>
           </div>
@@ -185,10 +190,59 @@ export default function AboutPage() {
 
         <section className="border-b border-[#3B5147]/15 bg-[#F4F1E8]">
           <div className="container-wide py-20 md:py-28">
-            <div className="max-w-3xl">
-              <Eyebrow>How to Use ValorWell</Eyebrow>
+            <div className="max-w-4xl">
+              <Eyebrow>Organization Structure</Eyebrow>
               <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                Go directly to the part of the organization that matches what you need.
+                ValorWell and the ValorWell Foundation are not the same organization.
+              </h2>
+              <p className="mt-5 text-lg leading-8 text-[#111814]/65">
+                They work toward the same goal of getting veterans into appropriate mental-health treatment, but they have different functions and separate funding roles.
+              </p>
+            </div>
+
+            <div className="mt-12 grid gap-5 lg:grid-cols-2">
+              <article className="rounded-3xl bg-[#111814] p-8 text-white">
+                <Stethoscope className="h-8 w-8 text-[#D7A92E]" aria-hidden="true" />
+                <p className="mt-6 text-xs font-bold uppercase tracking-[0.18em] text-[#D7A92E]">ValorWell</p>
+                <h3 className="mt-3 text-2xl font-bold">Nationwide mental-health care platform</h3>
+                <p className="mt-4 leading-7 text-white/68">
+                  ValorWell provides therapy pathways for veterans and military families and operates the clinical, technology, scheduling, billing, resource, and partnership infrastructure represented across this website.
+                </p>
+                <p className="mt-4 text-sm font-semibold leading-6 text-white">
+                  Foundation donation dollars do not fund ValorWell&apos;s operations.
+                </p>
+              </article>
+
+              <article className="rounded-3xl border border-[#D7A92E]/35 bg-[#F8F3E4] p-8">
+                <HeartHandshake className="h-8 w-8 text-[#8A6814]" aria-hidden="true" />
+                <p className="mt-6 text-xs font-bold uppercase tracking-[0.18em] text-[#8A6814]">ValorWell Foundation</p>
+                <h3 className="mt-3 text-2xl font-bold">Direct payment for veteran therapy</h3>
+                <p className="mt-4 leading-7 text-[#111814]/68">
+                  The Foundation pays qualified mental-health therapists in the community for treatment provided to veterans who cannot get seen through the appropriate VA care channels.
+                </p>
+                <p className="mt-4 text-sm font-bold leading-6 text-[#111814]">
+                  100% of Foundation donations go directly to those therapists. None goes to ValorWell. $75 funds one completed therapy session.
+                </p>
+              </article>
+            </div>
+
+            <div className="mt-8 flex flex-wrap gap-3">
+              <TrackedLink to="/impact" event="about_structure_impact" className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#3B5147]">
+                Review Foundation Impact <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </TrackedLink>
+              <TrackedLink to="/impact" event="about_structure_support" className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#3B5147]">
+                Support the Foundation <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </TrackedLink>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-b border-[#3B5147]/15 bg-white">
+          <div className="container-wide py-20 md:py-28">
+            <div className="max-w-3xl">
+              <Eyebrow>How to Use the Site</Eyebrow>
+              <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
+                Go directly to the part of the work that matches what you need.
               </h2>
             </div>
 
@@ -196,12 +250,12 @@ export default function AboutPage() {
               {[
                 [Stethoscope, "Need care", "Review current care pathways and start the intake process.", "/get-care", "Find Care", "about_path_care"],
                 [BookOpen, "Need information", "Browse resources on CHAMPVA, Community Care, veteran mental health, and family systems.", "/resources", "Browse Resources", "about_path_resources"],
-                [Building2, "Represent an organization", "Explore referral, service, community, and mission-aligned partnerships.", "/partner", "Partner With ValorWell", "about_path_partner"],
-                [HeartHandshake, "Want to support care", "Review the completed-care impact and support the donor-funded therapy program.", "/impact", "Support ValorWell", "about_path_support"],
+                [Building2, "Represent an organization", "Explore referral, service, community, and mission-aligned partnerships with ValorWell.", "/partner", "Partner With ValorWell", "about_path_partner"],
+                [HeartHandshake, "Want to fund therapy", "$75 funds one completed veteran therapy session through the ValorWell Foundation.", "/impact", "Support the Foundation", "about_path_support"],
               ].map(([Icon, title, copy, to, cta, event]) => {
                 const CardIcon = Icon as typeof Stethoscope;
                 return (
-                  <article key={title as string} className="rounded-3xl border border-[#3B5147]/15 bg-white p-7">
+                  <article key={title as string} className="rounded-3xl border border-[#3B5147]/15 bg-[#F4F1E8] p-7">
                     <CardIcon className="h-7 w-7 text-[#3B5147]" aria-hidden="true" />
                     <h3 className="mt-5 text-xl font-bold">{title as string}</h3>
                     <p className="mt-3 leading-7 text-[#111814]/62">{copy as string}</p>
@@ -211,55 +265,6 @@ export default function AboutPage() {
                   </article>
                 );
               })}
-            </div>
-          </div>
-        </section>
-
-        <section className="border-b border-[#3B5147]/15 bg-white">
-          <div className="container-wide py-20 md:py-28">
-            <div className="max-w-3xl">
-              <Eyebrow>Organization Structure</Eyebrow>
-              <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                Care operations and charitable support have different roles.
-              </h2>
-              <p className="mt-5 text-lg leading-8 text-[#111814]/65">
-                Keeping those roles explicit makes it easier to understand what a care decision, a donation, and a public program each represent.
-              </p>
-            </div>
-
-            <div className="mt-12 grid gap-5 lg:grid-cols-2">
-              <article className="rounded-3xl bg-[#111814] p-8 text-white">
-                <Stethoscope className="h-8 w-8 text-[#D7A92E]" aria-hidden="true" />
-                <p className="mt-6 text-xs font-bold uppercase tracking-[0.18em] text-[#D7A92E]">ValorWell</p>
-                <h3 className="mt-3 text-2xl font-bold">Care and operating work</h3>
-                <p className="mt-4 leading-7 text-white/68">
-                  ValorWell operates the public care pathways, clinician infrastructure, resources, technology, partnerships, and Beyond The Yellow work represented across this website.
-                </p>
-                <p className="mt-4 text-sm leading-6 text-white/55">
-                  Clinical assessment, treatment planning, and treatment decisions remain with appropriately licensed treating clinicians.
-                </p>
-              </article>
-
-              <article className="rounded-3xl border border-[#D7A92E]/35 bg-[#F8F3E4] p-8">
-                <HeartHandshake className="h-8 w-8 text-[#8A6814]" aria-hidden="true" />
-                <p className="mt-6 text-xs font-bold uppercase tracking-[0.18em] text-[#8A6814]">ValorWell Foundation</p>
-                <h3 className="mt-3 text-2xl font-bold">Charitable support for donor-funded therapy</h3>
-                <p className="mt-4 leading-7 text-[#111814]/68">
-                  The Foundation receives charitable support for the donor-funded therapy program described on the Impact page.
-                </p>
-                <p className="mt-4 text-sm leading-6 text-[#111814]/55">
-                  A donation supports the program; it does not purchase a referral, select a patient, direct clinical judgment, or guarantee an outcome.
-                </p>
-              </article>
-            </div>
-
-            <div className="mt-8 flex flex-wrap gap-3">
-              <TrackedLink to="/impact" event="about_structure_impact" className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#3B5147]">
-                Review Impact Methodology <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </TrackedLink>
-              <TrackedLink to="/impact" event="about_structure_support" className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#3B5147]">
-                Support the Foundation <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </TrackedLink>
             </div>
           </div>
         </section>
@@ -299,10 +304,10 @@ export default function AboutPage() {
             <div className="lg:col-span-8">
               <Eyebrow>Public Proof</Eyebrow>
               <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                Use the work itself to evaluate ValorWell.
+                Use the work itself to evaluate ValorWell and the Foundation.
               </h2>
               <p className="mt-6 max-w-3xl text-lg leading-8 text-[#111814]/68">
-                Review current care pathways, the dated impact methodology, published Beyond The Yellow conversations, featured organization pages, resources, clinician terms, and partnership routes directly from this site.
+                Review current care pathways, the Foundation&apos;s completed-therapy impact, published Beyond The Yellow conversations, featured organization pages, resources, clinician terms, and partnership routes directly from this site.
               </p>
             </div>
           </div>
@@ -313,18 +318,15 @@ export default function AboutPage() {
             <div className="lg:col-span-8">
               <Eyebrow light>Next Step</Eyebrow>
               <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                Learn why ValorWell exists, review the work, or start with care.
+                Find care, understand the organizations, or help fund a therapy session.
               </h2>
             </div>
             <div className="flex flex-wrap gap-3 lg:col-span-4 lg:justify-end">
-              <TrackedLink to="/mission" event="about_final_mission" className="inline-flex min-h-12 items-center rounded-md bg-white px-5 py-3 text-sm font-bold text-[#111814]">
-                Mission
+              <TrackedLink to="/get-care" event="about_final_care" className="inline-flex min-h-12 items-center rounded-md bg-white px-5 py-3 text-sm font-bold text-[#111814]">
+                Find Care
               </TrackedLink>
               <TrackedLink to="/impact" event="about_final_impact" className="inline-flex min-h-12 items-center rounded-md border border-white/30 px-5 py-3 text-sm font-bold text-white">
-                Impact
-              </TrackedLink>
-              <TrackedLink to="/get-care" event="about_final_care" className="inline-flex min-h-12 items-center rounded-md border border-white/30 px-5 py-3 text-sm font-bold text-white">
-                Find Care
+                Foundation Impact
               </TrackedLink>
             </div>
           </div>

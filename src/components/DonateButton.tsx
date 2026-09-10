@@ -32,9 +32,9 @@ interface DonateButtonProps {
 /**
  * Single source of truth for donation CTAs.
  *
- * Donation CTAs open the ValorWell Bridge Fund in a controlled on-site modal.
- * The Zeffy campaign stays inside an iframe so clicking a CTA never navigates
- * the visitor away from the current ValorWell route.
+ * Donation CTAs open the ValorWell Foundation's Bridge Fund in a controlled
+ * on-site modal. The Zeffy campaign stays inside an iframe so clicking a CTA
+ * never navigates the visitor away from the current ValorWell route.
  */
 export function DonateButton({
   source,
@@ -95,13 +95,13 @@ export function DonateButton({
 
       <DialogContent className="flex h-[calc(100dvh-1rem)] w-[calc(100vw-1rem)] max-w-3xl flex-col gap-0 overflow-hidden border-0 bg-white p-0 sm:h-[min(90dvh,900px)]">
         <div className="shrink-0 border-b border-border bg-background px-5 py-4 pr-14">
-          <DialogTitle>Donate to the ValorWell Bridge Fund</DialogTitle>
-          <DialogDescription className="mt-1">
-            Complete your donation securely through Zeffy without leaving ValorWell.
+          <DialogTitle>Donate to the ValorWell Foundation</DialogTitle>
+          <DialogDescription className="mt-1 leading-6">
+            $75 funds one therapy session. 100% of donations to the ValorWell Foundation go directly to qualified mental-health therapists providing treatment to veterans. None of the donation goes to ValorWell.
           </DialogDescription>
         </div>
         <iframe
-          title="ValorWell Bridge Fund donation form"
+          title="ValorWell Foundation Bridge Fund donation form"
           src={ZEFFY_DONATION_FORM_URL}
           className="min-h-0 flex-1 border-0 bg-white"
           allow="payment *"

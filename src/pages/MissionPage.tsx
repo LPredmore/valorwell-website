@@ -53,8 +53,8 @@ export default function MissionPage() {
   return (
     <Layout>
       <SEO
-        title="ValorWell Mission | Make Mental Health Support Easier to Reach"
-        description="ValorWell works to make mental health care and support easier to reach for veterans and military families through care, donor-funded therapy, resources, and community work."
+        title="ValorWell Mission | Better Access to Mental Health Care"
+        description="ValorWell works to make mental-health care easier to reach for veterans and military families. The separate ValorWell Foundation pays qualified community therapists when veterans cannot reach treatment through appropriate VA channels."
         canonical="/mission"
       />
 
@@ -85,7 +85,7 @@ export default function MissionPage() {
                 Make mental health care and support easier to reach, understand, and use.
               </h1>
               <p className="mt-7 max-w-2xl text-lg leading-8 text-[#111814]/70 md:text-xl">
-                ValorWell focuses on veterans and military families because care often sits behind a complicated mix of coverage rules, provider availability, referrals, authorizations, and handoffs. Our work is designed to reduce that burden and create additional paths when existing ones fail.
+                ValorWell focuses on veterans and military families because care often sits behind a complicated mix of coverage rules, provider availability, referrals, authorizations, and handoffs. ValorWell builds the nationwide care platform; the separate ValorWell Foundation creates an additional funding path when a veteran still cannot reach treatment through the appropriate VA channels.
               </p>
               <div className="mt-9 flex flex-wrap gap-3">
                 <TrackedLink
@@ -113,15 +113,15 @@ export default function MissionPage() {
                   <div className="flex gap-4 py-5">
                     <Stethoscope className="mt-0.5 h-6 w-6 shrink-0 text-[#D7A92E]" aria-hidden="true" />
                     <div>
-                      <p className="font-bold">Telehealth mental health care</p>
-                      <p className="mt-1 text-sm leading-6 text-white/60">Care pathways for veterans and military families where coverage, licensure, capacity, and fit align.</p>
+                      <p className="font-bold">Telehealth mental-health care</p>
+                      <p className="mt-1 text-sm leading-6 text-white/60">Nationwide care pathways for veterans and military families where coverage, licensure, capacity, and fit align.</p>
                     </div>
                   </div>
                   <div className="flex gap-4 py-5">
                     <HeartHandshake className="mt-0.5 h-6 w-6 shrink-0 text-[#D7A92E]" aria-hidden="true" />
                     <div>
-                      <p className="font-bold">Donor-funded therapy</p>
-                      <p className="mt-1 text-sm leading-6 text-white/60">540+ completed direct-therapy hours for 45+ veterans through September 5, 2026.</p>
+                      <p className="font-bold">Foundation-funded therapy</p>
+                      <p className="mt-1 text-sm leading-6 text-white/60">The separate ValorWell Foundation has paid for 540+ hours of direct veteran therapy. $75 funds one completed session.</p>
                     </div>
                   </div>
                   <div className="flex gap-4 py-5">
@@ -154,13 +154,13 @@ export default function MissionPage() {
             </div>
             <div className="lg:col-span-7 space-y-5 text-lg leading-8 text-white/70">
               <p>
-                People seeking mental health care may have to understand eligibility rules, locate an available clinician, obtain authorization, coordinate records, and repeat their story across disconnected systems.
+                People seeking mental-health care may have to understand eligibility rules, locate an available clinician, obtain authorization, coordinate records, and repeat their story across disconnected systems.
               </p>
               <p>
                 When one part of that chain breaks, the practical result can be the same as having no service at all: the person still does not receive care.
               </p>
               <p>
-                ValorWell addresses those gaps through treatment, clearer pathways, clinician infrastructure, donor-funded care, public resources, and community relationships.
+                ValorWell addresses those gaps through treatment, clearer pathways, clinician infrastructure, public resources, and community relationships. When a veteran still cannot reach treatment through the appropriate VA care channels, the separate ValorWell Foundation can pay a qualified community therapist to provide that care.
               </p>
             </div>
           </div>
@@ -170,16 +170,16 @@ export default function MissionPage() {
           <div className="container-wide py-20 md:py-28">
             <div className="max-w-3xl">
               <Eyebrow>How the Mission Works</Eyebrow>
-              <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">Care. Impact. Community.</h2>
+              <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">Care. Foundation Impact. Community.</h2>
               <p className="mt-5 text-lg leading-8 text-[#111814]/65">Each area addresses a different part of access and support.</p>
             </div>
 
             <div className="mt-12 grid gap-6 lg:grid-cols-3">
               <article className="rounded-3xl border border-[#3B5147]/15 bg-[#F4F1E8] p-8">
                 <Stethoscope className="h-8 w-8 text-[#3B5147]" aria-hidden="true" />
-                <h3 className="mt-6 text-2xl font-bold">Care</h3>
+                <h3 className="mt-6 text-2xl font-bold">ValorWell Care</h3>
                 <p className="mt-4 leading-7 text-[#111814]/64">
-                  Provide telehealth mental health treatment and maintain the clinician, billing, coverage, and access systems required to support it.
+                  Provide telehealth mental-health treatment and maintain the clinician, billing, coverage, and access systems required to support it.
                 </p>
                 <TrackedLink to="/get-care" event="mission_care" className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#3B5147]">
                   Find Care <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -188,12 +188,15 @@ export default function MissionPage() {
 
               <article className="rounded-3xl bg-[#111814] p-8 text-white">
                 <HeartHandshake className="h-8 w-8 text-[#D7A92E]" aria-hidden="true" />
-                <h3 className="mt-6 text-2xl font-bold">Impact</h3>
+                <h3 className="mt-6 text-2xl font-bold">ValorWell Foundation</h3>
                 <p className="mt-4 leading-7 text-white/64">
-                  Support donor-funded therapy when veterans have sought help through existing systems but still cannot reach an available clinician.
+                  The Foundation is separate from ValorWell. It pays qualified mental-health therapists in the community when veterans have sought care but still cannot get seen through the appropriate VA channels.
+                </p>
+                <p className="mt-4 text-sm font-bold leading-6 text-white">
+                  100% of Foundation donations go directly to therapists. None goes to ValorWell.
                 </p>
                 <TrackedLink to="/impact" event="mission_impact" className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-white">
-                  See Impact <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  See Foundation Impact <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </TrackedLink>
               </article>
 
@@ -224,7 +227,7 @@ export default function MissionPage() {
                 Veterans may need care shaped by military service, transition, trauma, disability, VA access, and the systems around those experiences.
               </p>
               <p>
-                Military family members face their own mental health needs, pressures, and coverage questions. Their care is not treated as secondary to the veteran&apos;s care.
+                Military family members face their own mental-health needs, pressures, and coverage questions. Their care is not treated as secondary to the veteran&apos;s care.
               </p>
               <p>
                 Beyond The Yellow extends the mission into the wider community by highlighting organizations that turn support into programs, services, opportunities, and direct help.
@@ -238,17 +241,17 @@ export default function MissionPage() {
             <div className="max-w-3xl">
               <Eyebrow light>What We Measure</Eyebrow>
               <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                Public impact should be defined well enough to check.
+                Foundation impact is measured in therapy delivered.
               </h2>
               <p className="mt-6 text-lg leading-8 text-white/70">
-                ValorWell reports donor-funded therapy separately from broader organizational activity. As of September 5, 2026, the program reported 540+ hours of completed direct therapy for 45+ veterans, with definitions and exclusions published on the Impact page.
+                The ValorWell Foundation reports completed therapy rather than total dollars raised or spent. As of September 5, 2026, the Foundation had paid for 540+ hours of direct veteran therapy, and $75 funds one completed therapy session.
               </p>
               <TrackedLink
                 to="/impact"
                 event="mission_measure_impact"
                 className="mt-8 inline-flex min-h-12 items-center gap-2 rounded-md bg-white px-6 py-3 text-sm font-bold text-[#3B5147]"
               >
-                View Impact Methodology
+                View Foundation Impact
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </TrackedLink>
             </div>
@@ -260,7 +263,7 @@ export default function MissionPage() {
             <div className="lg:col-span-8">
               <Eyebrow light>Next Step</Eyebrow>
               <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                Start with care, learn about the organization, or review the work already underway.
+                Start with care, learn about the organizations, or review the work already underway.
               </h2>
             </div>
             <div className="flex flex-wrap gap-3 lg:col-span-4 lg:justify-end">

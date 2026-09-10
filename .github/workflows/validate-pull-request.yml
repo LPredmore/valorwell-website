@@ -18,6 +18,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Reject retired Supabase dependencies
         run: bash .github/scripts/check-retired-supabase-references.sh
+      - name: Enforce website positioning guardrails
+        run: node scripts/check-positioning-guardrails.mjs
       - uses: actions/setup-node@v4
         with:
           node-version: 20

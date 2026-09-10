@@ -11,37 +11,37 @@ const routes = [
     path: "/",
     title: "ValorWell | Mental Health Care for Veterans & Military Families",
     description:
-      "ValorWell provides telehealth mental health care pathways for veterans and military families, donor-funded therapy for veterans, and Beyond The Yellow community conversations.",
+      "ValorWell is a nationwide mental-health care platform for veterans and military families. The separate ValorWell Foundation pays qualified community therapists when veterans cannot reach treatment through appropriate VA channels.",
     h1: "Mental health care and support for veterans and military families.",
     lead:
-      "ValorWell operates telehealth care pathways, supports donor-funded therapy for veterans who still cannot reach care, and publishes Beyond The Yellow conversations with organizations doing useful work.",
+      "ValorWell provides nationwide mental-health care pathways for veterans and military families. The ValorWell Foundation is a separate organization: $75 funds one therapy session, and 100% of Foundation donations go directly to therapists providing veteran treatment—not to ValorWell.",
   },
   {
     path: "/mission",
-    title: "ValorWell Mission | Make Mental Health Support Easier to Reach",
+    title: "ValorWell Mission | Better Access to Mental Health Care",
     description:
-      "ValorWell works to make mental health care and support easier to reach for veterans and military families through care, donor-funded therapy, resources, and community work.",
+      "ValorWell works to make mental-health care easier to reach for veterans and military families. The separate ValorWell Foundation pays qualified community therapists when veterans cannot reach treatment through appropriate VA channels.",
     h1: "Make mental health care and support easier to reach, understand, and use.",
     lead:
-      "ValorWell focuses on veterans and military families because care often sits behind coverage rules, provider availability, referrals, authorizations, and handoffs that can keep people from reaching treatment.",
+      "ValorWell builds the nationwide care platform. The separate ValorWell Foundation creates an additional funding path when a veteran still cannot reach treatment through the appropriate VA channels.",
   },
   {
     path: "/about",
-    title: "About ValorWell | Veterans, Families, Care & Community",
+    title: "About ValorWell | Care Platform & ValorWell Foundation",
     description:
-      "Learn how ValorWell's care work, the ValorWell Foundation's donor-funded therapy support, Beyond The Yellow, and public resources fit together.",
-    h1: "Mental health care, donor-funded therapy, public resources, and community conversations under one mission.",
+      "Learn the difference between ValorWell, a nationwide mental-health care platform for veterans and military families, and the separate ValorWell Foundation, which pays qualified community therapists for veteran treatment.",
+    h1: "ValorWell provides care. The ValorWell Foundation separately funds therapy.",
     lead:
-      "ValorWell's public work centers on telehealth mental health care, a donor-funded therapy program for veterans who still cannot reach care, and Beyond The Yellow conversations with organizations and people doing useful work.",
+      "ValorWell and the ValorWell Foundation are not the same organization. 100% of donations to the Foundation go directly to qualified mental-health therapists providing veteran treatment, and none of those donations go to ValorWell.",
   },
   {
     path: "/impact",
-    title: "ValorWell Impact | Donor-Funded Therapy for Veterans",
+    title: "ValorWell Foundation Impact | $75 Funds One Therapy Session",
     description:
-      "See how donors helped fund 540+ hours of direct therapy for 45+ veterans in 2026, read real veteran testimonials, and see how donated funds pay therapists.",
-    h1: "Veterans asked for help. Donors made sure they got therapy.",
+      "See the ValorWell Foundation's therapy impact. $75 funds one completed therapy session, and 100% of Foundation donations go directly to qualified mental-health therapists—not to ValorWell.",
+    h1: "Every Foundation donation pays for therapy. None goes to ValorWell.",
     lead:
-      "When the normal path failed to get veterans into treatment, ValorWell used donated funds to pay therapists directly. In 2026, that meant 540+ hours of therapy for 45+ veterans who still did not have an available path into treatment.",
+      "The ValorWell Foundation is separate from ValorWell. It pays qualified community mental-health therapists to treat veterans who cannot get seen through the appropriate VA care channels. The Foundation reports completed therapy delivered: 540+ hours, with $75 funding one session.",
   },
   {
     path: "/beyond-the-yellow",
@@ -189,12 +189,12 @@ const routes = [
   },
   {
     path: "/support",
-    title: "Support ValorWell | Help Fund Therapy for Veterans",
+    title: "Support the ValorWell Foundation | $75 Funds One Therapy Session",
     description:
-      "Support the ValorWell Foundation's donor-funded therapy program and review the dated completed-care impact that the program reports.",
-    h1: "Help fund therapy for veterans who still cannot reach care.",
+      "$75 funds one completed veteran therapy session through the ValorWell Foundation. 100% of Foundation donations go directly to qualified mental-health therapists, and none goes to ValorWell.",
+    h1: "$75 funds one therapy session.",
     lead:
-      "The ValorWell Foundation supports a donor-funded therapy program for veterans who have sought mental-health care but still do not have an available treatment path.",
+      "The ValorWell Foundation is separate from ValorWell. It pays qualified community therapists for veteran treatment when the appropriate VA care channels do not produce access, and 100% of Foundation donations go directly to those therapists.",
   },
   {
     path: "/contact",
@@ -323,7 +323,7 @@ function renderShell(route) {
           <a href="/" style="color:#111814;font-weight:800;text-decoration:none;font-size:1.1rem">ValorWell</a>
           <nav aria-label="Primary" style="display:flex;flex-wrap:wrap;gap:1rem;font-size:.9rem">
             <a href="/about" style="color:#3B5147">About</a>
-            <a href="/impact" style="color:#3B5147">Impact</a>
+            <a href="/impact" style="color:#3B5147">Foundation Impact</a>
             <a href="/beyond-the-yellow" style="color:#3B5147">Beyond The Yellow</a>
             <a href="/resources" style="color:#3B5147">Resources</a>
             <a href="/get-care" style="color:#111814;font-weight:700">Find Care</a>

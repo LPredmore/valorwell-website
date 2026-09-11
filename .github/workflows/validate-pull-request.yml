@@ -29,3 +29,5 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      - name: Prove real React server prerendering
+        run: node scripts/run-prerender-proof.mjs

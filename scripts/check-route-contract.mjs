@@ -53,6 +53,44 @@ const representativeBodyContent = new Map([
   ],
 ]);
 
+const progressiveEnhancementContent = new Map([
+  [
+    "/get-care",
+    [
+      "You can begin the CHAMPVA intake process now.",
+      "VA Community Care starts with a real authorization and an eligible provider path.",
+      "ValorWell is still completing the TRICARE contracting pathway.",
+      'href="https://client.valorwell.org"',
+      'href="/resources/va-community-care"',
+      'href="mailto:info@valorwell.org?subject=TRICARE%20mental%20health%20care%20interest"',
+    ],
+  ],
+  [
+    "/donate",
+    [
+      'href="https://www.zeffy.com/embed/donation-form/the-valorwell-bridge-fund?modal=true"',
+      "Fund a Session",
+    ],
+  ],
+  [
+    "/contact",
+    [
+      'href="/get-care"',
+      'href="/clinicians"',
+      'href="/partner"',
+      'href="mailto:info@valorwell.org"',
+    ],
+  ],
+  [
+    "/clinicians",
+    [
+      "You handle the therapy. We handle almost everything else.",
+      "The ValorWell Fit Check",
+      "We Trust the License",
+    ],
+  ],
+]);
+
 validateRouteContract();
 
 function routeDirectory(route) {
@@ -129,6 +167,17 @@ function assertRealPrerenderedOutput(route, filePath) {
     }
     if (!html.includes('type="application/ld+json"')) {
       throw new Error(`Structured data is missing from representative route ${route.path}.`);
+    }
+  }
+
+  const progressiveContent = progressiveEnhancementContent.get(route.path);
+  if (progressiveContent) {
+    for (const content of progressiveContent) {
+      if (!html.includes(content)) {
+        throw new Error(
+          `Progressive-enhancement content is missing from ${route.path}: ${content}`,
+        );
+      }
     }
   }
 }
@@ -313,5 +362,5 @@ if (!supportRedirect || supportRedirect.to !== "/impact") {
 }
 
 console.log(
-  `Route contract passed: ${canonicalRoutes.length} real-prerendered canonical routes, ${redirects.length} redirects, ${retiredRoutes.length} fully retired route(s), hydration enabled, Cloudflare Worker deployment configured.`,
+  `Route contract passed: ${canonicalRoutes.length} real-prerendered canonical routes, ${redirects.length} redirects, ${retiredRoutes.length} fully retired route(s), hydration enabled, progressive-enhancement checks passed, Cloudflare Worker deployment configured.`,
 );

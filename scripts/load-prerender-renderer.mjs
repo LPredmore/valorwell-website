@@ -1,5 +1,4 @@
 import fs from "node:fs";
-import os from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { build } from "vite";
@@ -8,12 +7,13 @@ const ROOT = process.cwd();
 
 /**
  * Build the real React server entry into an isolated temporary directory and
- * load its render function. The caller owns cleanup so the bundle remains
- * available for every route rendered during the current build step.
+ * load its render function. Keep the temporary bundle under the repository
+ * root so Node can resolve Vite-externalized runtime packages from the
+ * project's node_modules during the build-time import.
  */
 export async function loadPrerenderRenderer(label = "prerender") {
   const tempRoot = fs.mkdtempSync(
-    path.join(os.tmpdir(), `valorwell-${label}-`),
+    path.join(ROOT, `.prerender-runtime-${label}-`),
   );
   const serverDir = path.join(tempRoot, "server");
   const serverEntry = path.join(serverDir, "entry-server.js");

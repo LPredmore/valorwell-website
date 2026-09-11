@@ -134,6 +134,8 @@ const pathDetails: Record<Coverage, PathDetail> = {
   },
 };
 
+const pathwayOverviewOrder: Coverage[] = ["champva", "vaccn", "tricare", "unsure"];
+
 const serviceGroups = [
   {
     title: "Anxiety, depression, grief, and stress",
@@ -237,6 +239,38 @@ function PathAction({ detail }: { detail: PathDetail }) {
           {detail.secondaryCta}
         </Link>
       ) : null}
+    </div>
+  );
+}
+
+function PathwayOverview() {
+  return (
+    <div className="mt-8 border-t border-[#3B5147]/12 pt-8">
+      <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#3B5147]">
+        Current pathway status
+      </p>
+      <h2 className="mt-3 text-2xl font-bold">All current care pathways</h2>
+      <div className="mt-5 grid gap-4 lg:grid-cols-2">
+        {pathwayOverviewOrder.map((pathway) => {
+          const detail = pathDetails[pathway];
+          return (
+            <article
+              key={pathway}
+              className={`rounded-2xl border p-5 md:p-6 ${toneClasses[detail.tone]}`}
+            >
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3B5147]">
+                {detail.eyebrow}
+              </p>
+              <h3 className="mt-3 text-xl font-bold leading-snug">{detail.title}</h3>
+              <p className="mt-3 leading-7 text-[#111814]/66">{detail.body}</p>
+              <p className="mt-3 text-sm leading-6 text-[#111814]/55">{detail.note}</p>
+              <div className="mt-5">
+                <PathAction detail={detail} />
+              </div>
+            </article>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -388,6 +422,8 @@ export default function GetCare() {
                   </div>
                 </div>
               ) : null}
+
+              <PathwayOverview />
             </div>
           </div>
         </section>

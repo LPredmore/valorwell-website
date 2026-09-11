@@ -5,17 +5,18 @@ import { DonateButton, ZEFFY_DONATION_FORM_URL } from "./DonateButton";
 describe("DonateButton", () => {
   afterEach(cleanup);
 
-  it("opens the ValorWell Bridge Fund inside an on-site modal instead of navigating", () => {
+  it("keeps a real donation link while enhancing it into an on-site modal", () => {
     render(
       <DonateButton source="mission-test" utmCampaign="mission-support">
         Support ValorWell
       </DonateButton>,
     );
 
-    const button = screen.getByRole("button", { name: "Support ValorWell" });
-    expect(button.getAttribute("data-state")).toBe("closed");
+    const link = screen.getByRole("link", { name: "Support ValorWell" });
+    expect(link.getAttribute("href")).toBe(ZEFFY_DONATION_FORM_URL);
+    expect(link.getAttribute("data-state")).toBe("closed");
 
-    fireEvent.click(button);
+    fireEvent.click(link);
 
     expect(screen.getByRole("dialog")).toBeTruthy();
     expect(
@@ -27,7 +28,7 @@ describe("DonateButton", () => {
     expect(frame.getAttribute("allow")).toBe("payment *");
   });
 
-  it("keeps CTA attribution on the modal trigger", () => {
+  it("keeps CTA attribution on the donation link", () => {
     render(
       <DonateButton
         source="impact-test"
@@ -39,12 +40,13 @@ describe("DonateButton", () => {
       </DonateButton>,
     );
 
-    const button = screen.getByRole("button", { name: "Fund a Session" });
-    expect(button.getAttribute("data-donate-source")).toBe("impact-test");
-    expect(button.getAttribute("data-donate-medium")).toBe("site");
-    expect(button.getAttribute("data-donate-campaign")).toBe(
+    const link = screen.getByRole("link", { name: "Fund a Session" });
+    expect(link.getAttribute("href")).toBe(ZEFFY_DONATION_FORM_URL);
+    expect(link.getAttribute("data-donate-source")).toBe("impact-test");
+    expect(link.getAttribute("data-donate-medium")).toBe("site");
+    expect(link.getAttribute("data-donate-campaign")).toBe(
       "the-valorwell-bridge-fund",
     );
-    expect(button.getAttribute("data-donate-content")).toBe("campaign-card");
+    expect(link.getAttribute("data-donate-content")).toBe("campaign-card");
   });
 });

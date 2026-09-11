@@ -34,7 +34,7 @@ const representativeBodyContent = new Map([
       "93-3129745",
       "Two organizations. Two jobs. One transparent line between them.",
       "The Foundation receives charitable gifts and uses 100% of those donated funds to pay qualified community mental-health therapists for treatment provided to veterans and their immediate family members.",
-      "$0 of Foundation donations goes to ValorWell",
+      "No Foundation donation dollars are transferred to ValorWell.",
       "veterans and their immediate family members",
     ],
   ],

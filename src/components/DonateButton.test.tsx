@@ -19,10 +19,10 @@ describe("DonateButton", () => {
 
     expect(screen.getByRole("dialog")).toBeTruthy();
     expect(
-      screen.getByText("Donate to the ValorWell Bridge Fund"),
+      screen.getByText("Donate to the ValorWell Foundation"),
     ).toBeTruthy();
 
-    const frame = screen.getByTitle("ValorWell Bridge Fund donation form");
+    const frame = screen.getByTitle("ValorWell Foundation Bridge Fund donation form");
     expect(frame.getAttribute("src")).toBe(ZEFFY_DONATION_FORM_URL);
     expect(frame.getAttribute("allow")).toBe("payment *");
   });

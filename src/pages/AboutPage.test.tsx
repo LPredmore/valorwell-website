@@ -33,22 +33,22 @@ describe("About ValorWell page", () => {
     expect(
       screen.getByRole("heading", {
         level: 1,
-        name: /Mental health care, donor-funded therapy, public resources, and community conversations under one mission/i,
+        name: /ValorWell provides care\. The ValorWell Foundation separately funds therapy\./i,
       }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /^Care$/i })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /^Impact$/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /^ValorWell Care$/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /^ValorWell Foundation$/i })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /^Community$/i })).toBeInTheDocument();
   });
 
   it("separates operating work from the Foundation and keeps clinical judgment clinician-led", () => {
     renderAbout();
 
-    expect(screen.getByRole("heading", { name: /Care operations and charitable support have different roles/i })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /Care and operating work/i })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /Charitable support for donor-funded therapy/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Care, charitable funding, and community work have different roles/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Nationwide mental-health care platform/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Direct payment for veteran therapy/i })).toBeInTheDocument();
     expect(
-      screen.getByText(/Clinical assessment, treatment planning, and treatment decisions remain with appropriately licensed treating clinicians/i),
+      screen.getByText(/remains clinician-led and subject to professional licensure/i),
     ).toBeInTheDocument();
   });
 
@@ -72,7 +72,7 @@ describe("About ValorWell page", () => {
       "href",
       "/mission",
     );
-    expect(screen.getAllByRole("link", { name: /Impact Details/i })[0]).toHaveAttribute(
+    expect(screen.getAllByRole("link", { name: /Foundation Impact/i })[0]).toHaveAttribute(
       "href",
       "/impact",
     );
@@ -80,7 +80,7 @@ describe("About ValorWell page", () => {
       "href",
       "/get-care",
     );
-    expect(screen.getAllByRole("link", { name: /Support ValorWell/i })[0]).toHaveAttribute(
+    expect(screen.getAllByRole("link", { name: /Support the Foundation/i })[0]).toHaveAttribute(
       "href",
       "/impact",
     );

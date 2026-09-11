@@ -69,6 +69,21 @@ function routeExtensionlessPath(route) {
     : path.join(DIST_DIR, `${route.replace(/^\//, "")}.html`);
 }
 
+function decodeHtmlText(value) {
+  return value
+    .replaceAll("&amp;", "&")
+    .replaceAll("&lt;", "<")
+    .replaceAll("&gt;", ">")
+    .replaceAll("&quot;", '"')
+    .replaceAll("&#x27;", "'")
+    .replaceAll("&#039;", "'");
+}
+
+function extractTitle(html) {
+  const match = html.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i);
+  return match ? decodeHtmlText(match[1].trim()) : null;
+}
+
 function assertRealPrerenderedOutput(route, filePath) {
   const html = fs.readFileSync(filePath, "utf8");
   const canonical =
@@ -90,8 +105,11 @@ function assertRealPrerenderedOutput(route, filePath) {
     );
   }
 
-  if (!html.includes(`<title>${route.title}</title>`)) {
-    throw new Error(`Canonical route title differs from the route contract: ${route.path}`);
+  const actualTitle = extractTitle(html);
+  if (actualTitle !== route.title) {
+    throw new Error(
+      `Canonical route title differs from the route contract: ${route.path} (expected: ${route.title}; actual: ${actualTitle ?? "missing"})`,
+    );
   }
   if (!html.includes(`href="${canonical}"`)) {
     throw new Error(`Canonical link is missing or incorrect for ${route.path}.`);

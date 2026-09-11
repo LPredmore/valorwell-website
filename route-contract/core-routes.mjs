@@ -27,6 +27,15 @@ export const routes = [
     "sitemap": true
   },
   {
+    "path": "/foundation",
+    "title": "ValorWell Foundation | How the Nonprofit Funds Veteran Therapy",
+    "description": "Learn how the ValorWell Foundation, a registered 501(c)(3) nonprofit (EIN 93-3129745), uses donations to fund veteran mental-health therapy, how the Foundation is separate from ValorWell, and how to donate.",
+    "h1": "The ValorWell Foundation turns donations directly into veteran therapy.",
+    "lead": "The ValorWell Foundation is a separate 501(c)(3) nonprofit, EIN 93-3129745. It uses donations to pay qualified community mental-health therapists for treating veterans who have sought care but still cannot reach treatment through the appropriate VA channels.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
     "path": "/impact",
     "title": "ValorWell Foundation Impact | $75 Funds One Therapy Session",
     "description": "See the ValorWell Foundation's therapy impact. $75 funds one completed therapy session, and 100% of Foundation donations go directly to qualified mental-health therapists—not to ValorWell.",

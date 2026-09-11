@@ -27,6 +27,16 @@ const representativeBodyContent = new Map([
     ],
   ],
   [
+    "/foundation",
+    [
+      "The ValorWell Foundation turns donations directly into veteran therapy.",
+      "Employer Identification Number",
+      "93-3129745",
+      "Donor → Foundation → therapist → veteran.",
+      "100% of Foundation donations go directly to qualified mental-health therapists providing veteran treatment. None of those donations go to ValorWell.",
+    ],
+  ],
+  [
     "/resources",
     [
       "Practical guidance for navigating care, coverage, documentation, and family systems.",
@@ -63,6 +73,14 @@ const progressiveEnhancementContent = new Map([
       'href="https://client.valorwell.org"',
       'href="/resources/va-community-care"',
       'href="mailto:info@valorwell.org?subject=TRICARE%20mental%20health%20care%20interest"',
+    ],
+  ],
+  [
+    "/foundation",
+    [
+      'href="https://www.zeffy.com/embed/donation-form/the-valorwell-bridge-fund?modal=true"',
+      "Donate to the Foundation",
+      'href="/impact"',
     ],
   ],
   [

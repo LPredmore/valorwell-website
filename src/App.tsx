@@ -23,6 +23,7 @@ import NetworkPage from "./pages/NetworkPage";
 import MissionPage from "./pages/MissionPage";
 import AboutPage from "./pages/AboutPage";
 import ImpactPage from "./pages/ImpactPage";
+import DonatePage from "./pages/DonatePage";
 import BtyBillingHubPage from "./pages/BtyBillingHubPage";
 import Clinicians from "./pages/Clinicians";
 import GetCareWithSignup from "./pages/GetCareWithSignup";
@@ -134,6 +135,7 @@ const App = () => (
             <Route path="/mission" element={<MissionPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/impact" element={<ImpactPage />} />
+            <Route path="/donate" element={<DonatePage />} />
             <Route path="/beyondtheyellow" element={<LegacyBtyRedirect />} />
             <Route path="/beyond-the-yellow" element={<BtyBillingHubPage />} />
             <Route path="/gallantfew" element={<GallantFewPage />} />

@@ -69,6 +69,18 @@ const faqs = [
       "No. Veteran-serving and military-family organizations are a priority because they are closely connected to ValorWell's mission, but Beyond The Yellow can feature work in other cause areas when the story is strong and the work has real substance.",
   },
   {
+    value: "promotion",
+    question: "Is Beyond The Yellow a way to advertise ValorWell?",
+    answer:
+      "No. Beyond The Yellow is not a promotional vehicle for ValorWell or the ValorWell Foundation. Being featured is not an endorsement of ValorWell, and featured guests are not asked for referrals, partnerships, or testimonials. The series exists because organizations that spend their funding on their mission instead of on advertising tend to go unnoticed, and that should not cost them the attention their work has earned.",
+  },
+  {
+    value: "self-submission",
+    question: "Can an organization submit itself, or does someone else have to nominate it?",
+    answer:
+      "Either works. Organizations and individuals can put their own work forward using the submission form on this page, and anyone can nominate a person or organization they think deserves attention. Submitting yourself carries no disadvantage in how work is considered.",
+  },
+  {
     value: "cost",
     question: "Is there a cost to be considered or featured?",
     answer:
@@ -458,6 +470,57 @@ export default function BeyondTheYellowPage() {
             </div>
           </section>
 
+          <section className="border-b border-[#3B5147]/15 bg-white">
+            <div className="container-wide py-20 md:py-28">
+              <div className="grid gap-12 lg:grid-cols-12 lg:items-start">
+                <div className="lg:col-span-5">
+                  <Eyebrow>Why This Exists</Eyebrow>
+                  <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
+                    Good stewardship looks exactly like obscurity from the outside.
+                  </h2>
+                </div>
+                <div className="space-y-5 text-lg leading-8 text-[#111814]/68 lg:col-span-7">
+                  <p>
+                    An organization that keeps its funding pointed at its mission is an organization that is not buying
+                    ads, not retaining a PR firm, and not spending donated money to be seen. So the work stays quiet.
+                    Not because it isn&apos;t working, but because nobody paid to tell you about it.
+                  </p>
+                  <p>
+                    That is a bad trade for everyone. The groups being the most careful with their money end up
+                    competing for attention against groups that spend money to get it, and losing. Discipline becomes
+                    the reason they go unnoticed.
+                  </p>
+                  <p className="font-bold text-[#111814]">
+                    Nobody should be penalized for refusing to spend their donors&apos; money on advertising.
+                  </p>
+                  <p>
+                    Beyond The Yellow exists to take that penalty off the table. We spend the attention so they
+                    don&apos;t have to.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-12 rounded-3xl border border-[#3B5147]/20 bg-[#F4F1E8] p-8 md:p-10">
+                <h3 className="text-2xl font-bold md:text-3xl">This is not a ValorWell commercial.</h3>
+                <div className="mt-5 grid gap-5 text-lg leading-8 text-[#111814]/68 lg:grid-cols-2">
+                  <p>
+                    Beyond The Yellow is not here to promote ValorWell or the ValorWell Foundation. The people we
+                    feature are not endorsing us, and we are not selling anything through their story. A guest owes
+                    ValorWell nothing afterward: no referral, no partnership, no testimonial, no mention.
+                  </p>
+                  <p>
+                    Nobody pays to be featured, and nobody is featured because they paid. We are not looking for
+                    organizations that will say something nice about us. We are looking for work that deserves more
+                    attention than it is getting.
+                  </p>
+                </div>
+                <p className="mt-6 text-xl font-bold leading-8 text-[#111814]">
+                  If an episode leaves you more interested in the organization we featured than in us, it did its job.
+                </p>
+              </div>
+            </div>
+          </section>
+
           <section id={FORM_ANCHOR} className="scroll-mt-24 border-b border-[#3B5147]/15 bg-white">
             <div className="container-wide py-20 md:py-28">
               <div className="max-w-4xl">
@@ -469,6 +532,11 @@ export default function BeyondTheYellowPage() {
                   <p>Maybe it&apos;s you.</p>
                   <p>Maybe it&apos;s somebody you have watched quietly keep showing up while everyone else talks about the problem.</p>
                   <p className="font-bold text-[#111814]">Tell us who they are.</p>
+                  <p>
+                    Organizations are welcome to put themselves forward. Submitting your own work is not bragging
+                    here, it is how we find out you exist. Use the first option below for your own organization, or
+                    the second to nominate someone else.
+                  </p>
                 </div>
               </div>
 
@@ -485,7 +553,7 @@ export default function BeyondTheYellowPage() {
                   }`}
                 >
                   <Users className="h-4 w-4" aria-hidden="true" />
-                  Tell Us What You&apos;re Building
+                  Submit Your Own Work
                 </button>
                 <button
                   type="button"

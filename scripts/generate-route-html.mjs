@@ -44,6 +44,15 @@ const routes = [
       "The ValorWell Foundation is separate from ValorWell. It pays qualified community mental-health therapists to treat veterans who cannot get seen through the appropriate VA care channels. The Foundation reports completed therapy delivered: 540+ hours, with $75 funding one session.",
   },
   {
+    path: "/donate",
+    title: "Donate | $75 Funds One Therapy Session | ValorWell Foundation",
+    description:
+      "Donate to the ValorWell Foundation, a registered 501(c)(3), EIN 93-3129745. $75 funds one completed therapy session for a veteran, and 100% of every donation pays clinicians providing that care.",
+    h1: "$75 pays for one therapy session for a veteran who cannot get one.",
+    lead:
+      "The ValorWell Foundation is a registered 501(c)(3) nonprofit, EIN 93-3129745. Donations pay qualified mental-health clinicians in the community for treating veterans who cannot get seen through the appropriate VA care channels. 100% of each donation goes to that care, and none of it goes to ValorWell.",
+  },
+  {
     path: "/beyond-the-yellow",
     title: "Beyond The Yellow | Featured Organizations & Conversations",
     description:

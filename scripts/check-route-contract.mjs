@@ -29,11 +29,13 @@ const representativeBodyContent = new Map([
   [
     "/foundation",
     [
-      "The ValorWell Foundation turns donations directly into veteran therapy.",
+      "Every donated dollar becomes care.",
       "Employer Identification Number",
       "93-3129745",
-      "Donor → Foundation → therapist → veteran.",
-      "100% of Foundation donations go directly to qualified mental-health therapists providing veteran treatment. None of those donations go to ValorWell.",
+      "Two organizations. Two jobs. One transparent line between them.",
+      "100% of Foundation donations pay community therapists for treatment.",
+      "$0 of Foundation donations goes to ValorWell",
+      "veterans and their immediate family members",
     ],
   ],
   [

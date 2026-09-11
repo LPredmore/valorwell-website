@@ -10,7 +10,7 @@ import {
 
 const ROOT_DIR = process.cwd();
 const DIST_DIR = path.join(ROOT_DIR, "dist");
-const APP_PATH = path.join(ROOT_DIR, "src", "App.tsx");
+const APP_ROUTES_PATH = path.join(ROOT_DIR, "src", "AppRoutes.tsx");
 const SITEMAP_PATH = path.join(DIST_DIR, "sitemap.xml");
 const WORKER_PATH = path.join(DIST_DIR, "_worker.js");
 
@@ -109,12 +109,12 @@ for (const route of retiredRoutes) {
   }
 }
 
-if (!fs.existsSync(APP_PATH)) {
-  throw new Error(`Expected React route registry at ${APP_PATH}`);
+if (!fs.existsSync(APP_ROUTES_PATH)) {
+  throw new Error(`Expected shared React route registry at ${APP_ROUTES_PATH}`);
 }
 
-const appSource = fs.readFileSync(APP_PATH, "utf8");
-const routeElementBlock = appSource.match(
+const appRoutesSource = fs.readFileSync(APP_ROUTES_PATH, "utf8");
+const routeElementBlock = appRoutesSource.match(
   /const routeElements:[\s\S]*?= \{([\s\S]*?)\n\};/,
 )?.[1];
 if (!routeElementBlock) {
@@ -144,10 +144,10 @@ if (missingReactRoutes.length || unexpectedReactRoutes.length) {
   );
 }
 
-if (!appSource.includes("canonicalRoutes.map((route)")) {
+if (!appRoutesSource.includes("canonicalRoutes.map((route)")) {
   throw new Error("React canonical routes are not sourced from the route contract.");
 }
-if (!appSource.includes("redirects.map((redirect)")) {
+if (!appRoutesSource.includes("redirects.map((redirect)")) {
   throw new Error("React legacy redirects are not sourced from the route contract.");
 }
 

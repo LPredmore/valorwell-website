@@ -87,14 +87,33 @@ function writeProofDocument(expectation, result) {
   return document;
 }
 
+function decodeHtmlText(value) {
+  return value
+    .replaceAll("&amp;", "&")
+    .replaceAll("&lt;", "<")
+    .replaceAll("&gt;", ">")
+    .replaceAll("&quot;", '"')
+    .replaceAll("&#x27;", "'")
+    .replaceAll("&#039;", "'");
+}
+
+function extractTitle(html) {
+  const match = html.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i);
+  return match ? decodeHtmlText(match[1].trim()) : null;
+}
+
 function validateProof(expectation, html) {
   const failures = [];
 
   if (html.length < 5000) {
     failures.push(`proof HTML is unexpectedly small (${html.length} bytes)`);
   }
-  if (!html.includes(expectation.title)) {
-    failures.push("expected page title is missing");
+
+  const actualTitle = extractTitle(html);
+  if (actualTitle !== expectation.title) {
+    failures.push(
+      `expected page title does not match (expected: ${expectation.title}; actual: ${actualTitle ?? "missing"})`,
+    );
   }
   if (!html.includes(`href="${expectation.canonical}"`)) {
     failures.push("expected canonical link is missing");

@@ -1,27 +1,16 @@
 import fs from "node:fs";
 import path from "node:path";
+import {
+  canonicalRoutes,
+  validateRouteContract,
+} from "../site-route-contract.mjs";
 
 const DIST_DIR = path.resolve(process.cwd(), "dist");
-const SITEMAP_PATH = path.join(DIST_DIR, "sitemap.xml");
-const SITE_URL = "https://www.valorwell.org";
 
-if (!fs.existsSync(SITEMAP_PATH)) {
-  throw new Error(`Expected sitemap at ${SITEMAP_PATH}`);
-}
+validateRouteContract();
 
-const sitemap = fs.readFileSync(SITEMAP_PATH, "utf8");
-const routes = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)]
-  .map(([, loc]) => {
-    const url = new URL(loc.trim());
-    if (url.origin !== SITE_URL) {
-      throw new Error(`Unexpected sitemap origin: ${url.origin}`);
-    }
-    return url.pathname || "/";
-  })
-  .filter((route) => route !== "/");
-
-for (const route of routes) {
-  const relativeRoute = route.replace(/^\//, "");
+for (const route of canonicalRoutes.filter((item) => item.path !== "/")) {
+  const relativeRoute = route.path.replace(/^\//, "");
   const sourcePath = path.join(DIST_DIR, relativeRoute, "index.html");
   const destinationPath = path.join(DIST_DIR, `${relativeRoute}.html`);
 
@@ -34,5 +23,5 @@ for (const route of routes) {
 }
 
 console.log(
-  `Preserved directory-index HTML and added extensionless-compatible HTML for ${routes.length} prerendered routes.`,
+  `Preserved directory-index HTML and added extensionless-compatible HTML for ${canonicalRoutes.length - 1} canonical routes.`,
 );

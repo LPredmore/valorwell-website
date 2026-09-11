@@ -249,7 +249,7 @@ export function NonprofitOrganizationSchema() {
     logo: `${SITE_URL}/brand/valorwell-logo.png`,
     taxID: "93-3129745",
     description:
-      "The ValorWell Foundation supports donor-funded mental health therapy for veterans who sought care but still could not reach an available treatment path.",
+      "The ValorWell Foundation funds mental-health therapy for veterans and their immediate family members. 100% of donated funds pay qualified community therapists for treatment, and no Foundation donation dollars are transferred to ValorWell.",
     foundingDate: "2024-05-13",
     areaServed: {
       "@type": "Country",
@@ -257,6 +257,7 @@ export function NonprofitOrganizationSchema() {
     },
     knowsAbout: [
       "Veteran mental health",
+      "Military family mental health",
       "Mental health care access",
       "Donor-funded therapy",
     ],
@@ -273,15 +274,15 @@ export function DonateActionSchema() {
   const schema = {
     "@context": "https://schema.org",
     "@type": "DonateAction",
-    name: "Support Donor-Funded Mental Health Therapy for Veterans",
+    name: "Support Therapy for Veterans and Immediate Families",
     description:
-      "Donations to the ValorWell Foundation help fund direct mental health therapy for veterans who sought care but still could not reach an available treatment path.",
+      "100% of donations to the ValorWell Foundation are used to pay qualified community mental-health therapists for treatment provided to veterans and their immediate family members.",
     recipient: {
       "@type": "NGO",
       name: "ValorWell Foundation",
       url: `${SITE_URL}/foundation`,
       description:
-        "A nonprofit organization supporting donor-funded mental health therapy for veterans.",
+        "A nonprofit organization using 100% of donated funds to pay community therapists for mental-health treatment for veterans and their immediate family members.",
       areaServed: {
         "@type": "Country",
         name: "United States",

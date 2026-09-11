@@ -15,7 +15,7 @@ export default function VeteranMentalHealthCare() {
       subhead="ValorWell provides telehealth mental health care for veterans when coverage or authorization, clinician licensure, availability, capacity, and clinical fit align."
       heroCTAs={[
         { label: "Find Care", to: "/get-care" },
-        { label: "Support ValorWell", to: "/support", variant: "secondary" },
+        { label: "Support ValorWell", to: "/impact", variant: "secondary" },
       ]}
       sections={[
         {

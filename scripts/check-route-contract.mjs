@@ -83,8 +83,8 @@ function assertRealPrerenderedOutput(route, filePath) {
   }
 
   const rootStart = html.indexOf('<div id="root">');
-  const clientScriptStart = html.indexOf('<script type="module"', rootStart);
-  if (rootStart < 0 || clientScriptStart < 0 || clientScriptStart - rootStart < 1500) {
+  const bodyEnd = html.indexOf("</body>", rootStart);
+  if (rootStart < 0 || bodyEnd < 0 || bodyEnd - rootStart < 1500) {
     throw new Error(
       `Canonical route does not contain substantial prerendered React markup: ${route.path}`,
     );

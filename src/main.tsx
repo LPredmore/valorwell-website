@@ -1,4 +1,4 @@
-import { createRoot } from "react-dom/client";
+import { createRoot, hydrateRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 
@@ -8,11 +8,15 @@ if (!root) {
   throw new Error("ValorWell root element was not found.");
 }
 
-// Production builds include a small route-specific HTML shell so crawlers and
-// no-JavaScript clients receive useful page metadata and content immediately.
-// React owns the full interactive experience once the bundle loads.
-if (root.querySelector("[data-prerender-shell]")) {
-  root.replaceChildren();
-}
+const app = <App />;
 
-createRoot(root).render(<App />);
+// Production canonical routes are prerendered from the real React tree at
+// build time. Hydrate that markup in place so crawlers, no-JavaScript clients,
+// and interactive browsers all receive the same initial page content. Local
+// development still starts from Vite's empty #root and uses a normal client
+// render.
+if (root.hasChildNodes()) {
+  hydrateRoot(root, app);
+} else {
+  createRoot(root).render(app);
+}

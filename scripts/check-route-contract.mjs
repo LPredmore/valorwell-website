@@ -11,10 +11,47 @@ import {
 const ROOT_DIR = process.cwd();
 const DIST_DIR = path.join(ROOT_DIR, "dist");
 const APP_ROUTES_PATH = path.join(ROOT_DIR, "src", "AppRoutes.tsx");
+const MAIN_ENTRY_PATH = path.join(ROOT_DIR, "src", "main.tsx");
 const SITEMAP_PATH = path.join(DIST_DIR, "sitemap.xml");
 const WORKER_PATH = path.join(DIST_DIR, "_worker.js");
 const ASSETS_IGNORE_PATH = path.join(DIST_DIR, ".assetsignore");
 const WRANGLER_PATH = path.join(ROOT_DIR, "wrangler.jsonc");
+
+const representativeBodyContent = new Map([
+  [
+    "/",
+    [
+      "Mental health care and support for veterans and military families.",
+      "Foundation-funded therapy",
+      "See Foundation Impact",
+    ],
+  ],
+  [
+    "/resources",
+    [
+      "Practical guidance for navigating care, coverage, documentation, and family systems.",
+      "Clinical Documentation",
+      "Veteran Mental Health",
+      "Family Systems",
+    ],
+  ],
+  [
+    "/clinicians",
+    [
+      "You handle the therapy. We handle almost everything else.",
+      "The ValorWell Fit Check",
+      "We Trust the License",
+    ],
+  ],
+  [
+    "/get-care",
+    [
+      "Start with who needs care. We will help with the path.",
+      "Who needs care?",
+      "Outpatient mental health care for real life, not just one diagnosis.",
+    ],
+  ],
+]);
 
 validateRouteContract();
 
@@ -32,14 +69,83 @@ function routeExtensionlessPath(route) {
     : path.join(DIST_DIR, `${route.replace(/^\//, "")}.html`);
 }
 
+function decodeHtmlText(value) {
+  return value
+    .replaceAll("&amp;", "&")
+    .replaceAll("&lt;", "<")
+    .replaceAll("&gt;", ">")
+    .replaceAll("&quot;", '"')
+    .replaceAll("&#x27;", "'")
+    .replaceAll("&#039;", "'");
+}
+
+function extractTitle(html) {
+  const match = html.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i);
+  return match ? decodeHtmlText(match[1].trim()) : null;
+}
+
+function assertRealPrerenderedOutput(route, filePath) {
+  const html = fs.readFileSync(filePath, "utf8");
+  const canonical =
+    route.path === "/" ? `${SITE_URL}/` : `${SITE_URL}${route.path}`;
+  const expectedRobots = route.indexable ? "index,follow" : "noindex,follow";
+
+  if (html.includes("data-prerender-shell")) {
+    throw new Error(`Legacy prerender shell remains in ${filePath}.`);
+  }
+  if (html.includes("JavaScript is required")) {
+    throw new Error(`JavaScript-required fallback remains in ${filePath}.`);
+  }
+
+  const rootStart = html.indexOf('<div id="root">');
+  const bodyEnd = html.indexOf("</body>", rootStart);
+  if (rootStart < 0 || bodyEnd < 0 || bodyEnd - rootStart < 1500) {
+    throw new Error(
+      `Canonical route does not contain substantial prerendered React markup: ${route.path}`,
+    );
+  }
+
+  const actualTitle = extractTitle(html);
+  if (actualTitle !== route.title) {
+    throw new Error(
+      `Canonical route title differs from the route contract: ${route.path} (expected: ${route.title}; actual: ${actualTitle ?? "missing"})`,
+    );
+  }
+  if (!html.includes(`href="${canonical}"`)) {
+    throw new Error(`Canonical link is missing or incorrect for ${route.path}.`);
+  }
+  if (!html.includes(`name="robots" content="${expectedRobots}"`)) {
+    throw new Error(`Robots metadata differs from the route contract for ${route.path}.`);
+  }
+
+  const expectedBody = representativeBodyContent.get(route.path);
+  if (expectedBody) {
+    for (const text of expectedBody) {
+      if (!html.includes(text)) {
+        throw new Error(
+          `Representative real page content is missing from ${route.path}: ${text}`,
+        );
+      }
+    }
+    if (!html.includes('type="application/ld+json"')) {
+      throw new Error(`Structured data is missing from representative route ${route.path}.`);
+    }
+  }
+}
+
 for (const route of canonicalRoutes) {
   const indexPath = routeIndexPath(route.path);
   if (!fs.existsSync(indexPath)) {
     throw new Error(`Canonical route is missing directory-index output: ${route.path}`);
   }
+  assertRealPrerenderedOutput(route, indexPath);
 
-  if (route.path !== "/" && !fs.existsSync(routeExtensionlessPath(route.path))) {
-    throw new Error(`Canonical route is missing extensionless-compatible output: ${route.path}`);
+  if (route.path !== "/") {
+    const extensionlessPath = routeExtensionlessPath(route.path);
+    if (!fs.existsSync(extensionlessPath)) {
+      throw new Error(`Canonical route is missing extensionless-compatible output: ${route.path}`);
+    }
+    assertRealPrerenderedOutput(route, extensionlessPath);
   }
 }
 
@@ -184,6 +290,17 @@ if (!appRoutesSource.includes("redirects.map((redirect)")) {
   throw new Error("React legacy redirects are not sourced from the route contract.");
 }
 
+if (!fs.existsSync(MAIN_ENTRY_PATH)) {
+  throw new Error(`Expected browser entry at ${MAIN_ENTRY_PATH}`);
+}
+const mainEntrySource = fs.readFileSync(MAIN_ENTRY_PATH, "utf8");
+if (!mainEntrySource.includes("hydrateRoot(root, app)")) {
+  throw new Error("Browser entry must hydrate prerendered production markup.");
+}
+if (mainEntrySource.includes("replaceChildren")) {
+  throw new Error("Browser entry must not discard prerendered production markup.");
+}
+
 const donateIsCanonical = canonicalPathSet.has("/donate");
 const donateRedirect = redirects.some((redirect) => redirect.from === "/donate");
 if (!donateIsCanonical || donateRedirect) {
@@ -196,5 +313,5 @@ if (!supportRedirect || supportRedirect.to !== "/impact") {
 }
 
 console.log(
-  `Route contract passed: ${canonicalRoutes.length} canonical routes, ${redirects.length} redirects, ${retiredRoutes.length} fully retired route(s), Cloudflare Worker deployment configured.`,
+  `Route contract passed: ${canonicalRoutes.length} real-prerendered canonical routes, ${redirects.length} redirects, ${retiredRoutes.length} fully retired route(s), hydration enabled, Cloudflare Worker deployment configured.`,
 );

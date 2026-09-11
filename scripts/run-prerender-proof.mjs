@@ -1,13 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
-import { pathToFileURL } from "node:url";
-import { build } from "vite";
+import { loadPrerenderRenderer } from "./load-prerender-renderer.mjs";
 
 const ROOT = process.cwd();
 const PROOF_ROOT = path.join(ROOT, ".prerender-proof");
-const SERVER_DIR = path.join(PROOF_ROOT, "server");
 const PAGES_DIR = path.join(PROOF_ROOT, "pages");
-const SERVER_ENTRY = path.join(SERVER_DIR, "entry-server.js");
 
 const expectations = [
   {
@@ -140,53 +137,30 @@ function validateProof(expectation, html) {
 
 fs.rmSync(PROOF_ROOT, { recursive: true, force: true });
 
-await build({
-  configFile: path.join(ROOT, "vite.config.ts"),
-  ssr: {
-    // react-helmet-async ships CommonJS in this dependency version. Bundle it
-    // into the ESM proof output so Node does not attempt unsupported named
-    // imports from an externalized CommonJS module.
-    noExternal: ["react-helmet-async"],
-  },
-  build: {
-    ssr: path.join(ROOT, "src", "entry-server.tsx"),
-    outDir: SERVER_DIR,
-    emptyOutDir: true,
-    rollupOptions: {
-      output: {
-        entryFileNames: "entry-server.js",
-      },
-    },
-  },
-});
-
-if (!fs.existsSync(SERVER_ENTRY)) {
-  throw new Error(`Expected proof server bundle at ${SERVER_ENTRY}.`);
-}
-
-const { render } = await import(
-  `${pathToFileURL(SERVER_ENTRY).href}?proof=${Date.now()}`
-);
-
+const server = await loadPrerenderRenderer("proof");
 const allFailures = [];
 
-for (const expectation of expectations) {
-  const result = render(expectation.path);
-  if (
-    !result ||
-    typeof result.html !== "string" ||
-    typeof result.head !== "string"
-  ) {
-    allFailures.push(
-      `${expectation.path}: server renderer returned an invalid result`,
-    );
-    continue;
-  }
+try {
+  for (const expectation of expectations) {
+    const result = server.render(expectation.path);
+    if (
+      !result ||
+      typeof result.html !== "string" ||
+      typeof result.head !== "string"
+    ) {
+      allFailures.push(
+        `${expectation.path}: server renderer returned an invalid result`,
+      );
+      continue;
+    }
 
-  const document = writeProofDocument(expectation, result);
-  for (const failure of validateProof(expectation, document)) {
-    allFailures.push(`${expectation.path}: ${failure}`);
+    const document = writeProofDocument(expectation, result);
+    for (const failure of validateProof(expectation, document)) {
+      allFailures.push(`${expectation.path}: ${failure}`);
+    }
   }
+} finally {
+  server.cleanup();
 }
 
 if (allFailures.length > 0) {

@@ -123,6 +123,12 @@ fs.rmSync(PROOF_ROOT, { recursive: true, force: true });
 
 await build({
   configFile: path.join(ROOT, "vite.config.ts"),
+  ssr: {
+    // react-helmet-async ships CommonJS in this dependency version. Bundle it
+    // into the ESM proof output so Node does not attempt unsupported named
+    // imports from an externalized CommonJS module.
+    noExternal: ["react-helmet-async"],
+  },
   build: {
     ssr: path.join(ROOT, "src", "entry-server.tsx"),
     outDir: SERVER_DIR,

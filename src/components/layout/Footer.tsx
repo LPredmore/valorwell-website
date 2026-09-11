@@ -30,7 +30,7 @@ const groups: { title: string; links: { name: string; href: string }[] }[] = [
   {
     title: "Get Involved",
     links: [
-      { name: "Support the Foundation", href: "/impact" },
+      { name: "Support the Foundation", href: "/foundation" },
       { name: "Partner With ValorWell", href: "/partner" },
       { name: "Contact", href: "/contact" },
     ],

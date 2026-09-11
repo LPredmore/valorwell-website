@@ -1,9 +1,7 @@
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
 import { renderToString } from "react-dom/server";
-import { HelmetProvider } from "react-helmet-async";
 import { StaticRouter } from "react-router-dom/server";
-import { AppRoutes } from "./AppRoutes";
+import { AppProviders, AppRouterContent } from "./App";
 
 type HelmetPart = {
   toString: () => string;
@@ -28,9 +26,7 @@ export type ServerRenderResult = {
 };
 
 export function render(url: string): ServerRenderResult {
-  // react-helmet-async populates this object during render. Keep the provider
-  // context unopinionated here, then narrow only when reading the server state.
-  const helmetContext = {};
+  const helmetContext: Record<string, unknown> = {};
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -40,15 +36,11 @@ export function render(url: string): ServerRenderResult {
   });
 
   const html = renderToString(
-    <HelmetProvider context={helmetContext}>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <StaticRouter location={url}>
-            <AppRoutes />
-          </StaticRouter>
-        </TooltipProvider>
-      </QueryClientProvider>
-    </HelmetProvider>,
+    <AppProviders queryClient={queryClient} helmetContext={helmetContext}>
+      <StaticRouter location={url}>
+        <AppRouterContent />
+      </StaticRouter>
+    </AppProviders>,
   );
 
   const helmet = (helmetContext as { helmet?: ServerHelmet }).helmet;

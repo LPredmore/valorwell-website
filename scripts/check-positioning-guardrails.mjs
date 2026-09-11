@@ -19,6 +19,7 @@ const TEXT_EXTENSIONS = new Set([
 ]);
 
 const RETIRED_ROUTE = "/becomeapatient";
+const LEGACY_SUPPORT_ROUTE = "/support";
 const PROHIBITED_POSITIONING =
   "helps veterans with gaining the va ratings that they deserve";
 
@@ -58,6 +59,12 @@ for (const searchRoot of SEARCH_ROOTS) {
       violations.push(`${relativePath}: contains retired route ${RETIRED_ROUTE}`);
     }
 
+    if (searchRoot !== "dist" && normalized.includes(LEGACY_SUPPORT_ROUTE)) {
+      violations.push(
+        `${relativePath}: contains legacy internal route ${LEGACY_SUPPORT_ROUTE}`,
+      );
+    }
+
     if (normalized.includes(PROHIBITED_POSITIONING)) {
       violations.push(
         `${relativePath}: contains prohibited VA disability-rating positioning`,
@@ -75,5 +82,5 @@ if (violations.length > 0) {
 }
 
 console.log(
-  "ValorWell positioning guardrails passed: retired patient route and prohibited VA-rating claim are absent.",
+  "ValorWell positioning guardrails passed: retired patient route, legacy internal support route, and prohibited VA-rating claim are absent from user-facing source.",
 );

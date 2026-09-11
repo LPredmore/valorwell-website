@@ -28,7 +28,9 @@ export type ServerRenderResult = {
 };
 
 export function render(url: string): ServerRenderResult {
-  const helmetContext: { helmet?: ServerHelmet } = {};
+  // react-helmet-async populates this object during render. Keep the provider
+  // context unopinionated here, then narrow only when reading the server state.
+  const helmetContext = {};
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -49,7 +51,7 @@ export function render(url: string): ServerRenderResult {
     </HelmetProvider>,
   );
 
-  const helmet = helmetContext.helmet;
+  const helmet = (helmetContext as { helmet?: ServerHelmet }).helmet;
   const head = [
     helmet?.title?.toString(),
     helmet?.meta?.toString(),

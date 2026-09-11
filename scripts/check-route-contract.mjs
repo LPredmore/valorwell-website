@@ -13,6 +13,8 @@ const DIST_DIR = path.join(ROOT_DIR, "dist");
 const APP_ROUTES_PATH = path.join(ROOT_DIR, "src", "AppRoutes.tsx");
 const SITEMAP_PATH = path.join(DIST_DIR, "sitemap.xml");
 const WORKER_PATH = path.join(DIST_DIR, "_worker.js");
+const ASSETS_IGNORE_PATH = path.join(DIST_DIR, ".assetsignore");
+const WRANGLER_PATH = path.join(ROOT_DIR, "wrangler.jsonc");
 
 validateRouteContract();
 
@@ -79,6 +81,37 @@ if (
 
 if (!fs.existsSync(WORKER_PATH)) {
   throw new Error(`Expected generated Cloudflare worker at ${WORKER_PATH}`);
+}
+
+if (!fs.existsSync(ASSETS_IGNORE_PATH)) {
+  throw new Error(`Expected generated Cloudflare asset ignore file at ${ASSETS_IGNORE_PATH}`);
+}
+
+const assetIgnoreRules = fs
+  .readFileSync(ASSETS_IGNORE_PATH, "utf8")
+  .split(/\r?\n/)
+  .map((line) => line.trim())
+  .filter((line) => line && !line.startsWith("#"));
+if (!assetIgnoreRules.includes("_worker.js")) {
+  throw new Error("Cloudflare .assetsignore must exclude _worker.js from static asset upload.");
+}
+
+if (!fs.existsSync(WRANGLER_PATH)) {
+  throw new Error(`Expected Cloudflare Wrangler configuration at ${WRANGLER_PATH}`);
+}
+
+const wrangler = JSON.parse(fs.readFileSync(WRANGLER_PATH, "utf8"));
+if (wrangler.main !== "./dist/_worker.js") {
+  throw new Error("Wrangler main must point to ./dist/_worker.js.");
+}
+if (wrangler.assets?.directory !== "./dist") {
+  throw new Error("Wrangler assets.directory must remain ./dist.");
+}
+if (wrangler.assets?.binding !== "ASSETS") {
+  throw new Error("Wrangler must expose the static asset binding as ASSETS.");
+}
+if (wrangler.assets?.run_worker_first !== true) {
+  throw new Error("Wrangler must run the route Worker before static asset handling.");
 }
 
 const worker = fs.readFileSync(WORKER_PATH, "utf8");
@@ -163,5 +196,5 @@ if (!supportRedirect || supportRedirect.to !== "/impact") {
 }
 
 console.log(
-  `Route contract passed: ${canonicalRoutes.length} canonical routes, ${redirects.length} redirects, ${retiredRoutes.length} fully retired route(s).`,
+  `Route contract passed: ${canonicalRoutes.length} canonical routes, ${redirects.length} redirects, ${retiredRoutes.length} fully retired route(s), Cloudflare Worker deployment configured.`,
 );

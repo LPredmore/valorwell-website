@@ -10,6 +10,7 @@ import {
 const DIST_DIR = path.resolve(process.cwd(), "dist");
 const SITEMAP_PATH = path.join(DIST_DIR, "sitemap.xml");
 const WORKER_PATH = path.join(DIST_DIR, "_worker.js");
+const ASSETS_IGNORE_PATH = path.join(DIST_DIR, ".assetsignore");
 
 function renderSitemap() {
   const urls = canonicalRoutes
@@ -109,7 +110,8 @@ validateRouteContract();
 
 fs.writeFileSync(SITEMAP_PATH, renderSitemap(), "utf8");
 fs.writeFileSync(WORKER_PATH, renderWorker(), "utf8");
+fs.writeFileSync(ASSETS_IGNORE_PATH, "_worker.js\n", "utf8");
 
 console.log(
-  `Generated sitemap and Cloudflare worker from the route contract (${canonicalRoutes.length} canonical routes, ${redirects.length} redirects).`,
+  `Generated sitemap, Cloudflare worker, and asset ignore rules from the route contract (${canonicalRoutes.length} canonical routes, ${redirects.length} redirects).`,
 );

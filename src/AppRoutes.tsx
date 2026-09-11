@@ -13,6 +13,7 @@ import WatchPage from "./pages/WatchPage";
 import NetworkPage from "./pages/NetworkPage";
 import MissionPage from "./pages/MissionPage";
 import AboutPage from "./pages/AboutPage";
+import FoundationPage from "./pages/FoundationPage";
 import ImpactPage from "./pages/ImpactPage";
 import DonatePage from "./pages/DonatePage";
 import BtyBillingHubPage from "./pages/BtyBillingHubPage";
@@ -58,6 +59,7 @@ const routeElements: Record<string, ReactNode> = {
   "/": <HomePage />,
   "/mission": <MissionPage />,
   "/about": <AboutPage />,
+  "/foundation": <FoundationPage />,
   "/impact": <ImpactPage />,
   "/donate": <DonatePage />,
   "/beyond-the-yellow": <BtyBillingHubPage />,

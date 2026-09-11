@@ -84,6 +84,27 @@ const progressiveEnhancementContent = new Map([
     ],
   ],
   [
+    "/impact",
+    [
+      "How a Donation Becomes Therapy",
+      "Donor → Foundation → therapist → veteran.",
+      "Real Veterans. Real Impact.",
+      "For years, I was just a name on a VA waiting list.",
+      'href="https://www.zeffy.com/embed/donation-form/the-valorwell-bridge-fund?modal=true"',
+    ],
+  ],
+  [
+    "/beyond-the-yellow",
+    [
+      "The Question We Should All Ask",
+      "Meet the Doers",
+      "The Beyond The Yellow Test",
+      "Good stewardship looks exactly like obscurity from the outside.",
+      "American Corporate Partners",
+      'href="/network"',
+    ],
+  ],
+  [
     "/donate",
     [
       'href="https://www.zeffy.com/embed/donation-form/the-valorwell-bridge-fund?modal=true"',

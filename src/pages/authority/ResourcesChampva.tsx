@@ -72,7 +72,7 @@ export default function ResourcesChampva() {
       ]}
       finalCTAs={[
         { label: "Find Care", to: "/get-care" },
-        { label: "Support ValorWell", to: "/support", variant: "secondary" },
+        { label: "Support ValorWell", to: "/impact", variant: "secondary" },
       ]}
     />
   );

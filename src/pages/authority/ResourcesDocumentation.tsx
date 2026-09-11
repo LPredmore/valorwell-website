@@ -42,7 +42,7 @@ export default function ResourcesDocumentation() {
       ]}
       finalCTAs={[
         { label: "Find Care", to: "/get-care" },
-        { label: "Support ValorWell", to: "/support", variant: "secondary" },
+        { label: "Support ValorWell", to: "/impact", variant: "secondary" },
       ]}
       finalNote="The content of an individual treatment record is determined by the care provided, applicable requirements, and the treating clinician's professional judgment."
     />

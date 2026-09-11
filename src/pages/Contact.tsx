@@ -61,7 +61,7 @@ const routes: RouteCard[] = [
   {
     title: "I want to support ValorWell financially",
     copy: "See how the ValorWell Foundation's donor-funded therapy program works and review the current impact snapshot.",
-    to: "/support",
+    to: "/impact",
     event: "contact_route_support",
     Icon: HeartHandshake,
   },

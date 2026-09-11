@@ -243,9 +243,9 @@ export function NonprofitOrganizationSchema() {
   const schema = {
     "@context": "https://schema.org",
     "@type": "NGO",
-    "@id": `${SITE_URL}/support#foundation`,
+    "@id": `${SITE_URL}/impact#foundation`,
     name: "ValorWell Foundation",
-    url: `${SITE_URL}/support`,
+    url: `${SITE_URL}/impact`,
     logo: `${SITE_URL}/brand/valorwell-logo.png`,
     description:
       "The ValorWell Foundation supports donor-funded mental health therapy for veterans who sought care but still could not reach an available treatment path.",
@@ -278,7 +278,7 @@ export function DonateActionSchema() {
     recipient: {
       "@type": "NGO",
       name: "ValorWell Foundation",
-      url: `${SITE_URL}/support`,
+      url: `${SITE_URL}/impact`,
       description:
         "A nonprofit organization supporting donor-funded mental health therapy for veterans.",
       areaServed: {

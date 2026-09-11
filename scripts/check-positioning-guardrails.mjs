@@ -19,6 +19,10 @@ const TEXT_EXTENSIONS = new Set([
 ]);
 
 const RETIRED_ROUTE = "/becomeapatient";
+const LEGACY_SUPPORT_ROUTE = "/support";
+const LEGACY_SUPPORT_ROUTE_LITERAL = /(["'`])\/support(?:[?#][^"'`]*)?\1/i;
+const LEGACY_SUPPORT_SITE_URL = /https:\/\/valorwell\.org\/support(?:[?#][^"'`\s<]*)?/i;
+const LEGACY_SUPPORT_TEMPLATE_URL = /\$\{SITE_URL\}\/support(?:[#?][^`}]*)?/i;
 const PROHIBITED_POSITIONING =
   "helps veterans with gaining the va ratings that they deserve";
 
@@ -44,6 +48,18 @@ function collectTextFiles(directory) {
   return files;
 }
 
+function containsLegacySupportReference(content, searchRoot, filePath) {
+  if (searchRoot === "dist" && path.extname(filePath).toLowerCase() !== ".html") {
+    return false;
+  }
+
+  return (
+    LEGACY_SUPPORT_ROUTE_LITERAL.test(content) ||
+    LEGACY_SUPPORT_SITE_URL.test(content) ||
+    LEGACY_SUPPORT_TEMPLATE_URL.test(content)
+  );
+}
+
 const violations = [];
 
 for (const searchRoot of SEARCH_ROOTS) {
@@ -56,6 +72,12 @@ for (const searchRoot of SEARCH_ROOTS) {
 
     if (normalized.includes(RETIRED_ROUTE)) {
       violations.push(`${relativePath}: contains retired route ${RETIRED_ROUTE}`);
+    }
+
+    if (containsLegacySupportReference(content, searchRoot, filePath)) {
+      violations.push(
+        `${relativePath}: contains legacy internal route or URL ${LEGACY_SUPPORT_ROUTE}`,
+      );
     }
 
     if (normalized.includes(PROHIBITED_POSITIONING)) {
@@ -75,5 +97,5 @@ if (violations.length > 0) {
 }
 
 console.log(
-  "ValorWell positioning guardrails passed: retired patient route and prohibited VA-rating claim are absent.",
+  "ValorWell positioning guardrails passed: retired patient route, legacy internal support route, and prohibited VA-rating claim are absent from user-facing source/output.",
 );

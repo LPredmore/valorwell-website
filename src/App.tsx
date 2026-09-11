@@ -14,6 +14,8 @@ import {
   useLocation,
 } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
+import type { ReactNode } from "react";
+import { canonicalRoutes, redirects } from "../site-route-contract.mjs";
 
 // Preserved functional (non-shell) routes
 import NotFound from "./pages/NotFound";
@@ -50,13 +52,13 @@ import AuthorityResourcesVeteranMentalHealth from "./pages/authority/ResourcesVe
 
 const queryClient = new QueryClient();
 
-function LegacyBtyRedirect() {
+function LegacyRedirect({ to }: { to: string }) {
   const location = useLocation();
 
   return (
     <Navigate
       to={{
-        pathname: "/beyond-the-yellow",
+        pathname: to,
         search: location.search,
         hash: location.hash,
       }}
@@ -65,56 +67,42 @@ function LegacyBtyRedirect() {
   );
 }
 
-// Legacy path aliases → current approved destinations.
-const legacyRedirects: { from: string; to: string }[] = [
-  { from: "/therapy", to: "/get-care" },
-  { from: "/get-started", to: "/get-care" },
-  { from: "/how-it-works", to: "/get-care" },
-  { from: "/partners", to: "/partner" },
-  { from: "/support", to: "/impact" },
-  { from: "/donate", to: "/impact" },
-  { from: "/fund-access-to-care", to: "/impact" },
-  { from: "/sponsors", to: "/impact" },
-  { from: "/sponsor-care", to: "/impact" },
-  { from: "/monthly-supporters", to: "/impact" },
-  { from: "/funders", to: "/impact" },
-  { from: "/referral-partners", to: "/partner" },
-  { from: "/mission-one-pager", to: "/partner" },
-  { from: "/faq", to: "/contact" },
-  { from: "/urgent-help", to: "/get-care" },
-  { from: "/influencer", to: "/beyond-the-yellow" },
-  { from: "/authority/resources", to: "/resources" },
-  { from: "/authority/resources/champva", to: "/resources/champva" },
-  {
-    from: "/authority/resources/documentation",
-    to: "/resources/documentation",
-  },
-  {
-    from: "/authority/resources/family-systems",
-    to: "/resources/family-systems",
-  },
-  {
-    from: "/authority/resources/va-community-care",
-    to: "/resources/va-community-care",
-  },
-  {
-    from: "/authority/resources/veteran-mental-health",
-    to: "/resources/veteran-mental-health",
-  },
-  {
-    from: "/authority/veteran-mental-health-care",
-    to: "/veteran-mental-health-care",
-  },
-  {
-    from: "/authority/va-community-care-mental-health",
-    to: "/va-community-care-mental-health",
-  },
-  {
-    from: "/authority/military-family-therapy",
-    to: "/military-family-therapy",
-  },
-  { from: "/authority/family-systems", to: "/family-systems" },
-];
+const routeElements: Record<string, ReactNode> = {
+  "/": <HomePage />,
+  "/mission": <MissionPage />,
+  "/about": <AboutPage />,
+  "/impact": <ImpactPage />,
+  "/donate": <DonatePage />,
+  "/beyond-the-yellow": <BtyBillingHubPage />,
+  "/watch": <WatchPage />,
+  "/network": <NetworkPage />,
+  "/get-care": <GetCareWithSignup />,
+  "/clinicians": <Clinicians />,
+  "/veteran-mental-health-care": <AuthorityVeteranMentalHealthCare />,
+  "/va-community-care-mental-health": <AuthorityVACommunityCareMentalHealth />,
+  "/military-family-therapy": <AuthorityMilitaryFamilyTherapy />,
+  "/family-systems": <AuthorityFamilySystems />,
+  "/resources": <AuthorityResources />,
+  "/resources/champva": <AuthorityResourcesChampva />,
+  "/resources/va-community-care": <AuthorityResourcesVACommunityCare />,
+  "/resources/documentation": <AuthorityResourcesDocumentation />,
+  "/resources/veteran-mental-health": <AuthorityResourcesVeteranMentalHealth />,
+  "/resources/family-systems": <AuthorityResourcesFamilySystems />,
+  "/partner": <Partner />,
+  "/contact": <Contact />,
+  "/gallantfew": <GallantFewPage />,
+  "/VOW": <VeteransOutreachWisconsinPage />,
+  "/vets2industry": <Vets2IndustryPage />,
+  "/mmia": <MilitaryMissionsInActionPage />,
+  "/veteransbreakfastclub": <VeteransBreakfastClubPage />,
+  "/privacy": <Privacy />,
+  "/americancorporatepartners": (
+    <div className="acp-page">
+      <AmericanCorporatePartnersPage />
+    </div>
+  ),
+  "/pendulo": <Pendulo />,
+};
 
 const App = () => (
   <HelmetProvider>
@@ -128,78 +116,19 @@ const App = () => (
           <DonationAttributionManager />
           <RouteScrollManager />
           <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/watch" element={<WatchPage />} />
-            <Route path="/network" element={<NetworkPage />} />
-            <Route path="/videos" element={<Navigate to="/watch" replace />} />
-            <Route path="/mission" element={<MissionPage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/impact" element={<ImpactPage />} />
-            <Route path="/donate" element={<DonatePage />} />
-            <Route path="/beyondtheyellow" element={<LegacyBtyRedirect />} />
-            <Route path="/beyond-the-yellow" element={<BtyBillingHubPage />} />
-            <Route path="/gallantfew" element={<GallantFewPage />} />
-            <Route path="/VOW" element={<VeteransOutreachWisconsinPage />} />
-            <Route path="/vets2industry" element={<Vets2IndustryPage />} />
-            <Route path="/mmia" element={<MilitaryMissionsInActionPage />} />
-            <Route path="/veteransbreakfastclub" element={<VeteransBreakfastClubPage />} />
-            <Route
-              path="/americancorporatepartners"
-              element={
-                <div className="acp-page">
-                  <AmericanCorporatePartnersPage />
-                </div>
-              }
-            />
-            <Route path="/clinicians" element={<Clinicians />} />
-            <Route
-              path="/therapists"
-              element={<Navigate to="/clinicians" replace />}
-            />
-            <Route path="/get-care" element={<GetCareWithSignup />} />
-            <Route path="/partner" element={<Partner />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/pendulo" element={<Pendulo />} />
+            {canonicalRoutes.map((route) => (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={routeElements[route.path]}
+              />
+            ))}
 
-            <Route path="/resources" element={<AuthorityResources />} />
-            <Route path="/resources/champva" element={<AuthorityResourcesChampva />} />
-            <Route
-              path="/resources/documentation"
-              element={<AuthorityResourcesDocumentation />}
-            />
-            <Route
-              path="/resources/family-systems"
-              element={<AuthorityResourcesFamilySystems />}
-            />
-            <Route
-              path="/resources/va-community-care"
-              element={<AuthorityResourcesVACommunityCare />}
-            />
-            <Route
-              path="/resources/veteran-mental-health"
-              element={<AuthorityResourcesVeteranMentalHealth />}
-            />
-
-            <Route path="/family-systems" element={<AuthorityFamilySystems />} />
-            <Route
-              path="/military-family-therapy"
-              element={<AuthorityMilitaryFamilyTherapy />}
-            />
-            <Route
-              path="/veteran-mental-health-care"
-              element={<AuthorityVeteranMentalHealthCare />}
-            />
-            <Route
-              path="/va-community-care-mental-health"
-              element={<AuthorityVACommunityCareMentalHealth />}
-            />
-
-            {legacyRedirects.map((redirect) => (
+            {redirects.map((redirect) => (
               <Route
                 key={redirect.from}
                 path={redirect.from}
-                element={<Navigate to={redirect.to} replace />}
+                element={<LegacyRedirect to={redirect.to} />}
               />
             ))}
 

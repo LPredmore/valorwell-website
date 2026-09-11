@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { MouseEvent } from "react";
 import { Heart } from "lucide-react";
 import {
   Dialog,
@@ -32,9 +33,9 @@ interface DonateButtonProps {
 /**
  * Single source of truth for donation CTAs.
  *
- * Donation CTAs open the ValorWell Foundation's Bridge Fund in a controlled
- * on-site modal. The Zeffy campaign stays inside an iframe so clicking a CTA
- * never navigates the visitor away from the current ValorWell route.
+ * With JavaScript available, donation CTAs open the ValorWell Foundation's
+ * Bridge Fund in a controlled on-site modal. The trigger remains a real link
+ * so visitors without JavaScript can still continue directly to the Zeffy form.
  */
 export function DonateButton({
   source,
@@ -50,13 +51,15 @@ export function DonateButton({
   const [handoffId] = useState(() => crypto.randomUUID());
   const [open, setOpen] = useState(false);
 
-  const handleClick = () => {
+  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
     trackDonationCheckoutStart(handoffId, {
       source,
       medium: utmMedium,
       campaign: utmCampaign,
       content: utmContent,
     });
+    setOpen(true);
   };
 
   const sizeCls =
@@ -79,8 +82,8 @@ export function DonateButton({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button
-          type="button"
+        <a
+          href={ZEFFY_DONATION_FORM_URL}
           data-donate-source={source}
           data-donate-medium={utmMedium}
           data-donate-campaign={utmCampaign}
@@ -90,7 +93,7 @@ export function DonateButton({
         >
           {withIcon && <Heart className="h-4 w-4" aria-hidden />}
           {children}
-        </button>
+        </a>
       </DialogTrigger>
 
       <DialogContent className="flex h-[calc(100dvh-1rem)] w-[calc(100vw-1rem)] max-w-3xl flex-col gap-0 overflow-hidden border-0 bg-white p-0 sm:h-[min(90dvh,900px)]">

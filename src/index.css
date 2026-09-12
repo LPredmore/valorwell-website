@@ -264,3 +264,17 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Foundation: force the transparency comparison section to use its dedicated
+   two-organizations artwork instead of the donation-flow asset. */
+.foundation-theme div:has(> img[alt="Graphic comparing ValorWell, the for-profit mental-health clinic, with the separate nonprofit ValorWell Foundation"]) {
+  aspect-ratio: 16 / 9;
+  background-image: url("./assets/foundation-two-organizations.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.foundation-theme div:has(> img[alt="Graphic comparing ValorWell, the for-profit mental-health clinic, with the separate nonprofit ValorWell Foundation"]) > img {
+  display: none;
+}

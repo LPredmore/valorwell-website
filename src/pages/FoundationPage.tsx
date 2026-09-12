@@ -31,7 +31,7 @@ const IMPACT_SNAPSHOT = "September 5, 2026";
 function Eyebrow({ children, light = false }: { children: ReactNode; light?: boolean }) {
   return (
     <p
-      className={`text-xs font-bold uppercase tracking-[0.2em] ${
+      className={`text-xs font-bold uppercase tracking-[0.22em] ${
         light ? "text-[#D7A92E]" : "text-[#3B5147]"
       }`}
     >
@@ -40,11 +40,48 @@ function Eyebrow({ children, light = false }: { children: ReactNode; light?: boo
   );
 }
 
-function FlowArrow() {
+function GraphicFrame({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return (
-    <div className="hidden items-center justify-center lg:flex" aria-hidden="true">
-      <div className="h-px w-8 bg-[#3B5147]/25" />
-      <ArrowRight className="-ml-1 h-5 w-5 text-[#3B5147]/55" />
+    <div
+      className={`relative overflow-hidden rounded-[2rem] border border-[#D7A92E]/30 bg-[#101713] shadow-[0_24px_70px_rgba(17,24,20,0.28)] ${className}`}
+    >
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_82%_10%,rgba(215,169,46,0.22),transparent_28%),radial-gradient(circle_at_15%_80%,rgba(59,81,71,0.55),transparent_36%)]"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute -left-20 top-16 h-32 w-[70%] -rotate-6 rounded-[100%] border-t border-[#D7A92E]/30"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute -right-28 bottom-10 h-28 w-[65%] rotate-6 rounded-[100%] border-t border-[#3B5147]/80"
+        aria-hidden="true"
+      />
+      <div className="relative">{children}</div>
+    </div>
+  );
+}
+
+function ShieldMark() {
+  return (
+    <div className="relative flex h-24 w-20 items-center justify-center" aria-hidden="true">
+      <div className="absolute inset-0 rounded-t-[2.5rem] rounded-b-[1.25rem] border-2 border-[#D7A92E]/70 bg-[#D7A92E]/5 [clip-path:polygon(50%_0,100%_18%,90%_75%,50%_100%,10%_75%,0_18%)]" />
+      <HeartHandshake className="relative h-9 w-9 text-[#D7A92E]" />
+    </div>
+  );
+}
+
+function StepConnector() {
+  return (
+    <div className="hidden items-center lg:flex" aria-hidden="true">
+      <div className="h-px flex-1 bg-gradient-to-r from-[#D7A92E]/40 via-[#D7A92E] to-[#D7A92E]/40" />
+      <ArrowRight className="-ml-1 h-5 w-5 text-[#D7A92E]" />
     </div>
   );
 }
@@ -80,19 +117,27 @@ export default function FoundationPage() {
           .foundation-theme h3,
           .foundation-theme h4 {
             font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-            letter-spacing: -0.025em;
+            letter-spacing: -0.03em;
           }
         `}</style>
 
-        <section className="relative overflow-hidden bg-[#111814] text-white">
-          <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-            <div className="absolute -left-24 -top-24 h-80 w-80 rounded-full bg-[#3B5147]/40 blur-3xl" />
-            <div className="absolute bottom-0 right-1/3 h-72 w-72 rounded-full bg-[#D7A92E]/10 blur-3xl" />
-          </div>
+        <section className="relative overflow-hidden bg-[#101713] text-white">
+          <div
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_25%,rgba(215,169,46,0.15),transparent_30%),radial-gradient(circle_at_12%_15%,rgba(59,81,71,0.6),transparent_34%)]"
+            aria-hidden="true"
+          />
+          <div
+            className="pointer-events-none absolute -left-20 top-[42%] h-36 w-[72%] -rotate-6 rounded-[100%] border-t border-[#D7A92E]/30"
+            aria-hidden="true"
+          />
+          <div
+            className="pointer-events-none absolute -right-24 top-[48%] h-28 w-[64%] rotate-6 rounded-[100%] border-t border-[#3B5147]"
+            aria-hidden="true"
+          />
 
-          <div className="container-wide relative grid gap-10 py-14 md:py-20 lg:grid-cols-12 lg:items-center lg:py-24">
-            <div className="lg:col-span-7">
-              <div className="inline-flex flex-wrap items-center gap-x-3 gap-y-2 rounded-full border border-white/12 bg-white/[0.06] px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-white/70">
+          <div className="container-wide relative grid gap-12 py-14 md:py-20 lg:grid-cols-12 lg:items-center lg:py-24">
+            <div className="lg:col-span-6 xl:col-span-5">
+              <div className="inline-flex flex-wrap items-center gap-x-3 gap-y-2 rounded-full border border-white/12 bg-white/[0.06] px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-white/72">
                 <span>ValorWell Foundation</span>
                 <span className="h-1 w-1 rounded-full bg-[#D7A92E]" aria-hidden="true" />
                 <span>{FOUNDATION_STATUS}</span>
@@ -100,37 +145,17 @@ export default function FoundationPage() {
                 <span>EIN {FOUNDATION_EIN}</span>
               </div>
 
-              <h1 className="mt-7 max-w-5xl text-5xl font-bold leading-[0.98] sm:text-6xl lg:text-7xl xl:text-[5.25rem]">
+              <h1 className="mt-7 max-w-4xl text-5xl font-bold leading-[0.96] sm:text-6xl lg:text-7xl">
                 Every donated dollar becomes care.
               </h1>
 
-              <p className="mt-7 max-w-3xl text-lg leading-8 text-white/72 md:text-xl">
+              <p className="mt-7 max-w-2xl text-lg leading-8 text-white/72 md:text-xl">
                 The ValorWell Foundation is a separate nonprofit created to fund mental-health treatment for veterans and their immediate family members when care would otherwise remain out of reach.
               </p>
-              <p className="mt-5 max-w-3xl text-xl font-bold leading-8 text-white md:text-2xl">
-                Because the entire team matters.
-              </p>
 
-              <div className="mt-8 grid max-w-3xl gap-3 sm:grid-cols-3">
-                <div className="rounded-2xl border border-[#D7A92E]/35 bg-[#D7A92E]/10 p-5">
-                  <p className="text-4xl font-bold text-[#D7A92E]">100%</p>
-                  <p className="mt-2 text-sm font-bold leading-6 text-white/78">
-                    of donated funds pay community therapists for treatment
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-white/12 bg-white/[0.05] p-5">
-                  <p className="text-4xl font-bold">$0</p>
-                  <p className="mt-2 text-sm font-bold leading-6 text-white/68">
-                    of Foundation donations goes to ValorWell
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-white/12 bg-white/[0.05] p-5">
-                  <p className="text-4xl font-bold">$0</p>
-                  <p className="mt-2 text-sm font-bold leading-6 text-white/68">
-                    of donated funds pays board members
-                  </p>
-                </div>
-              </div>
+              <p className="mt-5 text-xl font-bold text-[#D7A92E] md:text-2xl">
+                Healing strengthens what serves.
+              </p>
 
               <div className="mt-9 flex flex-wrap gap-3">
                 <DonateButton size="lg" source="foundation_hero" withIcon>
@@ -146,35 +171,33 @@ export default function FoundationPage() {
               </div>
             </div>
 
-            <div className="lg:col-span-5">
-              <div className="relative mx-auto max-w-xl lg:max-w-none">
-                <div className="absolute -inset-3 rounded-[2rem] border border-[#D7A92E]/25" aria-hidden="true" />
-                <div className="relative overflow-hidden rounded-[1.75rem] bg-[#3B5147] shadow-2xl">
+            <div className="lg:col-span-6 xl:col-span-7">
+              <div className="relative mx-auto max-w-3xl">
+                <div className="absolute -inset-3 rounded-[2rem] border border-[#D7A92E]/28" aria-hidden="true" />
+                <div className="relative overflow-hidden rounded-[1.8rem] bg-[#18241e] shadow-2xl">
                   <img
                     src={heroFamily}
                     alt="Military family spending time together"
-                    className="aspect-[4/5] h-full w-full object-cover object-center"
+                    className="aspect-[16/10] w-full object-cover object-center"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#111814] via-[#111814]/10 to-transparent" aria-hidden="true" />
-                  <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
-                    <div className="inline-flex items-center gap-2 rounded-full bg-[#D7A92E] px-3 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-[#111814]">
-                      <Users className="h-4 w-4" aria-hidden="true" />
-                      Veterans + immediate family
-                    </div>
-                    <p className="mt-4 max-w-md text-2xl font-bold leading-tight text-white sm:text-3xl">
-                      Mental health affects the whole team. Care should be able to reach the whole team too.
-                    </p>
+                  <div
+                    className="absolute inset-0 bg-gradient-to-r from-[#101713]/95 via-[#101713]/28 to-transparent"
+                    aria-hidden="true"
+                  />
+                  <div
+                    className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-[#101713] via-[#101713]/30 to-transparent"
+                    aria-hidden="true"
+                  />
+                  <div className="absolute left-6 top-6 hidden sm:block">
+                    <ShieldMark />
                   </div>
-                </div>
-
-                <div className="relative -mt-5 ml-5 mr-5 rounded-2xl border border-[#D7A92E]/30 bg-[#F4F1E8] p-5 text-[#111814] shadow-xl sm:ml-10 sm:mr-10">
-                  <div className="flex items-start gap-4">
-                    <BadgeCheck className="mt-1 h-6 w-6 shrink-0 text-[#3B5147]" aria-hidden="true" />
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3B5147]">Public nonprofit identity</p>
-                      <p className="mt-1 text-xl font-bold">EIN {FOUNDATION_EIN}</p>
-                      <p className="mt-1 text-sm leading-6 text-[#111814]/62">
-                        Use this EIN to verify the ValorWell Foundation in public nonprofit and tax records.
+                  <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
+                    <div className="max-w-xl rounded-2xl border border-white/12 bg-[#101713]/80 p-5 backdrop-blur-sm">
+                      <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D7A92E]">
+                        Veterans + immediate family
+                      </p>
+                      <p className="mt-3 text-2xl font-bold leading-tight text-white sm:text-3xl">
+                        Mental health affects the whole team. Care should be able to reach the whole team too.
                       </p>
                     </div>
                   </div>
@@ -184,22 +207,54 @@ export default function FoundationPage() {
           </div>
         </section>
 
-        <section className="border-b border-[#3B5147]/15 bg-[#D7A92E] text-[#111814]">
-          <div className="container-wide grid gap-0 py-2 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              ["100%", "Donated funds go to therapist payment"],
-              ["$0", "Foundation donations go to ValorWell"],
-              ["$0", "Donated funds go to board compensation"],
-              [FOUNDATION_EIN, "EIN for public nonprofit lookup"],
-            ].map(([value, label], index) => (
-              <div
-                key={label}
-                className={`px-5 py-6 ${index > 0 ? "border-t border-[#111814]/15 sm:border-t-0 sm:border-l" : ""}`}
-              >
-                <p className="text-3xl font-bold">{value}</p>
-                <p className="mt-1 text-sm font-bold leading-6 text-[#111814]/70">{label}</p>
+        <section className="border-b border-[#3B5147]/15 bg-[#F4F1E8]">
+          <div className="container-wide py-16 md:py-24">
+            <GraphicFrame>
+              <div className="p-6 sm:p-9 lg:p-12">
+                <div className="mx-auto max-w-4xl text-center">
+                  <Eyebrow light>How Your Donation Is Protected</Eyebrow>
+                  <h2 className="mt-4 text-4xl font-bold leading-tight text-white md:text-6xl">
+                    The promise is simple enough to see at a glance.
+                  </h2>
+                </div>
+
+                <div className="mx-auto mt-10 grid max-w-6xl gap-5 md:grid-cols-3">
+                  <article className="rounded-3xl border border-[#D7A92E]/45 bg-[#17231d]/90 p-7 text-center text-white shadow-xl">
+                    <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full border-2 border-[#D7A92E] bg-[#101713]">
+                      <Users className="h-9 w-9 text-[#D7A92E]" aria-hidden="true" />
+                    </div>
+                    <p className="mt-6 text-6xl font-bold text-[#D7A92E]">100%</p>
+                    <p className="mx-auto mt-3 max-w-xs text-lg font-bold leading-7 text-white/85">
+                      of donated funds pay for treatment
+                    </p>
+                  </article>
+
+                  <article className="rounded-3xl border border-white/15 bg-[#17231d]/90 p-7 text-center text-white shadow-xl">
+                    <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full border-2 border-[#D7A92E] bg-[#101713]">
+                      <Stethoscope className="h-9 w-9 text-[#D7A92E]" aria-hidden="true" />
+                    </div>
+                    <p className="mt-6 text-6xl font-bold text-white">$0</p>
+                    <p className="mx-auto mt-3 max-w-xs text-lg font-bold leading-7 text-white/75">
+                      to ValorWell clinic operations
+                    </p>
+                  </article>
+
+                  <article className="rounded-3xl border border-white/15 bg-[#17231d]/90 p-7 text-center text-white shadow-xl">
+                    <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full border-2 border-[#D7A92E] bg-[#101713]">
+                      <BadgeCheck className="h-9 w-9 text-[#D7A92E]" aria-hidden="true" />
+                    </div>
+                    <p className="mt-6 text-6xl font-bold text-white">$0</p>
+                    <p className="mx-auto mt-3 max-w-xs text-lg font-bold leading-7 text-white/75">
+                      board compensation from donated funds
+                    </p>
+                  </article>
+                </div>
+
+                <p className="mx-auto mt-9 max-w-3xl text-center text-lg font-bold italic leading-8 text-white/82">
+                  The Foundation pays community therapists directly for care.
+                </p>
               </div>
-            ))}
+            </GraphicFrame>
           </div>
         </section>
 
@@ -235,165 +290,134 @@ export default function FoundationPage() {
           </div>
         </section>
 
-        <section className="relative overflow-hidden bg-[#111814] text-white">
-          <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-            <div className="absolute left-1/2 top-0 h-96 w-96 -translate-x-1/2 rounded-full bg-[#D7A92E]/10 blur-3xl" />
-          </div>
-          <div className="container-wide relative py-20 md:py-28">
-            <div className="mx-auto max-w-5xl text-center">
-              <Eyebrow light>Built for Transparency</Eyebrow>
-              <h2 className="mt-4 text-4xl font-bold leading-tight md:text-6xl">
-                Two organizations. Two jobs. One transparent line between them.
-              </h2>
-              <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-white/68">
-                ValorWell and the ValorWell Foundation share a commitment to better mental-health access, but they do different work and the money stays clearly separated.
-              </p>
-            </div>
-
-            <div className="mx-auto mt-14 grid max-w-6xl gap-5 lg:grid-cols-[1fr_220px_1fr] lg:items-stretch">
-              <article className="rounded-3xl border border-white/12 bg-white/[0.05] p-8 md:p-9">
-                <Stethoscope className="h-9 w-9 text-white/70" aria-hidden="true" />
-                <p className="mt-6 text-xs font-bold uppercase tracking-[0.18em] text-white/50">ValorWell</p>
-                <h3 className="mt-3 text-3xl font-bold">Builds and operates the care infrastructure.</h3>
-                <p className="mt-5 leading-7 text-white/65">
-                  ValorWell manages the clinical, technology, scheduling, billing, resource, and partnership infrastructure surrounding its care pathways for veterans and military families.
-                </p>
-                <div className="mt-7 border-t border-white/12 pt-6">
-                  <p className="text-sm font-bold uppercase tracking-[0.14em] text-white/45">Foundation donation revenue received</p>
-                  <p className="mt-2 text-5xl font-bold text-white">$0</p>
+        <section className="border-b border-[#3B5147]/15 bg-[#101713] text-white">
+          <div className="container-wide py-20 md:py-28">
+            <GraphicFrame>
+              <div className="p-6 sm:p-9 lg:p-12">
+                <div className="mx-auto max-w-5xl text-center">
+                  <Eyebrow light>Built for Transparency</Eyebrow>
+                  <h2 className="mt-4 text-4xl font-bold leading-tight md:text-6xl">
+                    Two organizations. Two jobs. One transparent line between them.
+                  </h2>
+                  <p className="mx-auto mt-5 max-w-3xl text-lg leading-8 text-white/68">
+                    Different structures. One mission: faster access to care.
+                  </p>
                 </div>
-              </article>
 
-              <div className="flex flex-col items-center justify-center rounded-3xl border border-[#D7A92E]/35 bg-[#D7A92E]/10 p-6 text-center">
-                <div className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-[#D7A92E] bg-[#111814]">
-                  <span className="text-4xl font-bold text-[#D7A92E]">$0</span>
+                <div className="mx-auto mt-12 grid max-w-6xl gap-6 lg:grid-cols-2">
+                  <article className="rounded-3xl border border-white/15 bg-[#17231d]/90 p-8 md:p-10">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-full border-2 border-[#D7A92E] bg-[#101713]">
+                      <Stethoscope className="h-9 w-9 text-[#D7A92E]" aria-hidden="true" />
+                    </div>
+                    <p className="mt-6 text-xs font-bold uppercase tracking-[0.18em] text-white/50">For-profit clinic</p>
+                    <h3 className="mt-2 text-4xl font-bold">ValorWell</h3>
+                    <div className="mt-7 space-y-4 border-t border-white/12 pt-6 text-lg leading-7 text-white/78">
+                      <p className="flex gap-3"><CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-[#D7A92E]" aria-hidden="true" /> Provides mental health care</p>
+                      <p className="flex gap-3"><CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-[#D7A92E]" aria-hidden="true" /> Accepts VACCN and CHAMPVA</p>
+                    </div>
+                    <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.04] p-5">
+                      <p className="text-sm font-bold uppercase tracking-[0.14em] text-white/45">Foundation donation revenue received</p>
+                      <p className="mt-2 text-5xl font-bold">$0</p>
+                    </div>
+                  </article>
+
+                  <article className="rounded-3xl border border-[#D7A92E]/45 bg-[#D7A92E]/10 p-8 md:p-10">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-full border-2 border-[#D7A92E] bg-[#101713]">
+                      <HeartHandshake className="h-9 w-9 text-[#D7A92E]" aria-hidden="true" />
+                    </div>
+                    <p className="mt-6 text-xs font-bold uppercase tracking-[0.18em] text-[#D7A92E]">Nonprofit foundation</p>
+                    <h3 className="mt-2 text-4xl font-bold">ValorWell Foundation</h3>
+                    <div className="mt-7 space-y-4 border-t border-[#D7A92E]/25 pt-6 text-lg leading-7 text-white/82">
+                      <p className="flex gap-3"><CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-[#D7A92E]" aria-hidden="true" /> Pays community therapists when coverage is delayed or denied</p>
+                      <p className="flex gap-3"><CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-[#D7A92E]" aria-hidden="true" /> Supports veterans and immediate family members</p>
+                    </div>
+                    <div className="mt-8 rounded-2xl border border-[#D7A92E]/25 bg-[#101713]/65 p-5">
+                      <p className="text-sm font-bold uppercase tracking-[0.14em] text-[#D7A92E]">Donated funds committed to therapist payment</p>
+                      <p className="mt-2 text-5xl font-bold text-[#D7A92E]">100%</p>
+                    </div>
+                  </article>
                 </div>
-                <p className="mt-5 text-sm font-bold uppercase tracking-[0.15em] text-[#D7A92E]">crosses this line</p>
-                <p className="mt-3 text-sm leading-6 text-white/68">
+
+                <p className="mx-auto mt-8 max-w-4xl text-center text-lg font-bold leading-8 text-white">
                   No Foundation donation dollars are transferred to ValorWell.
                 </p>
               </div>
-
-              <article className="rounded-3xl border border-[#D7A92E]/45 bg-[#D7A92E]/10 p-8 md:p-9">
-                <HeartHandshake className="h-9 w-9 text-[#D7A92E]" aria-hidden="true" />
-                <p className="mt-6 text-xs font-bold uppercase tracking-[0.18em] text-[#D7A92E]">ValorWell Foundation</p>
-                <h3 className="mt-3 text-3xl font-bold">Receives donations and funds treatment.</h3>
-                <p className="mt-5 leading-7 text-white/68">
-                  The Foundation receives charitable gifts and uses 100% of those donated funds to pay qualified community mental-health therapists for treatment provided to veterans and their immediate family members.
-                </p>
-                <div className="mt-7 border-t border-[#D7A92E]/25 pt-6">
-                  <p className="text-sm font-bold uppercase tracking-[0.14em] text-[#D7A92E]">Donated funds committed to therapist payment</p>
-                  <p className="mt-2 text-5xl font-bold text-[#D7A92E]">100%</p>
-                </div>
-              </article>
-            </div>
-
-            <div className="mx-auto mt-8 max-w-4xl rounded-2xl border border-white/10 bg-white/[0.04] px-6 py-5 text-center">
-              <p className="text-lg font-bold leading-8 text-white">
-                This separation is not fine print. It is a Foundation policy we are proud to make easy to see.
-              </p>
-            </div>
+            </GraphicFrame>
           </div>
         </section>
 
         <section className="border-b border-[#3B5147]/15 bg-[#F4F1E8]">
           <div className="container-wide py-20 md:py-28">
-            <div className="mx-auto max-w-4xl text-center">
-              <Eyebrow>Follow a Donated Dollar</Eyebrow>
-              <h2 className="mt-4 text-4xl font-bold leading-tight md:text-5xl">
-                Donor → Foundation → community therapist → veteran or immediate family member.
-              </h2>
-              <p className="mx-auto mt-5 max-w-3xl text-lg leading-8 text-[#111814]/65">
-                That is the entire path. There is no operating percentage carved out for ValorWell and no board compensation taken from donated funds.
-              </p>
-            </div>
-
-            <div className="mx-auto mt-12 grid max-w-7xl gap-4 lg:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] lg:items-stretch">
-              <article className="rounded-3xl border border-[#3B5147]/15 bg-white p-7">
-                <HeartHandshake className="h-8 w-8 text-[#3B5147]" aria-hidden="true" />
-                <p className="mt-5 text-xs font-bold uppercase tracking-[0.16em] text-[#3B5147]">01 · Donor</p>
-                <h3 className="mt-3 text-2xl font-bold">A gift is made to the Foundation.</h3>
-                <p className="mt-3 leading-7 text-[#111814]/62">
-                  The donation is made to the nonprofit ValorWell Foundation, not to ValorWell.
-                </p>
-              </article>
-
-              <FlowArrow />
-
-              <article className="rounded-3xl border border-[#D7A92E]/40 bg-[#F8F3E4] p-7">
-                <BadgeCheck className="h-8 w-8 text-[#8A6814]" aria-hidden="true" />
-                <p className="mt-5 text-xs font-bold uppercase tracking-[0.16em] text-[#8A6814]">02 · Foundation</p>
-                <h3 className="mt-3 text-2xl font-bold">The Foundation holds the charitable funds.</h3>
-                <p className="mt-3 leading-7 text-[#111814]/62">
-                  It does not pass a percentage to ValorWell and does not use donated funds to compensate board members.
-                </p>
-              </article>
-
-              <FlowArrow />
-
-              <article className="rounded-3xl bg-[#111814] p-7 text-white">
-                <Stethoscope className="h-8 w-8 text-[#D7A92E]" aria-hidden="true" />
-                <p className="mt-5 text-xs font-bold uppercase tracking-[0.16em] text-[#D7A92E]">03 · Therapist</p>
-                <h3 className="mt-3 text-2xl font-bold">A community therapist is paid for treatment.</h3>
-                <p className="mt-3 leading-7 text-white/62">
-                  Donated funds are used to pay qualified mental-health therapists for completed care.
-                </p>
-              </article>
-
-              <FlowArrow />
-
-              <article className="rounded-3xl border border-[#3B5147]/20 bg-[#3B5147] p-7 text-white">
-                <Users className="h-8 w-8 text-[#D7A92E]" aria-hidden="true" />
-                <p className="mt-5 text-xs font-bold uppercase tracking-[0.16em] text-[#D7A92E]">04 · Care</p>
-                <h3 className="mt-3 text-2xl font-bold">A veteran or immediate family member receives therapy.</h3>
-                <p className="mt-3 leading-7 text-white/68">
-                  Completed treatment becomes part of the Foundation&apos;s public impact reporting.
-                </p>
-              </article>
-            </div>
-          </div>
-        </section>
-
-        <section className="border-b border-white/10 bg-[#3B5147] text-white">
-          <div className="container-wide grid gap-12 py-20 md:py-28 lg:grid-cols-12 lg:items-center">
-            <div className="lg:col-span-5">
-              <Eyebrow light>Our Donation Policy</Eyebrow>
-              <p className="mt-5 text-[6rem] font-bold leading-none text-[#D7A92E] sm:text-[8rem]">100%</p>
-              <h2 className="mt-3 text-3xl font-bold leading-tight md:text-5xl">
-                of Foundation donations pay community therapists for treatment.
-              </h2>
-            </div>
-
-            <div className="lg:col-span-7">
-              <p className="text-xl font-bold leading-8 text-white">
-                This is Foundation policy—not a temporary campaign promise.
-              </p>
-              <p className="mt-4 text-lg leading-8 text-white/72">
-                No donated dollars are used for ValorWell administration, technology, marketing, staffing, or operating costs. No donated dollars compensate Foundation board members. The donated funds are reserved for paying qualified community therapists for treatment provided to veterans and their immediate family members.
-              </p>
-
-              <div className="mt-9 grid gap-4 sm:grid-cols-3">
-                <div className="rounded-2xl border border-white/12 bg-white/[0.06] p-5">
-                  <p className="text-4xl font-bold">$0</p>
-                  <p className="mt-2 text-sm font-bold leading-6 text-white/65">ValorWell operations</p>
+            <GraphicFrame>
+              <div className="p-6 sm:p-9 lg:p-12">
+                <div className="mx-auto max-w-4xl text-center">
+                  <Eyebrow light>How Support Becomes Care</Eyebrow>
+                  <h2 className="mt-4 text-4xl font-bold leading-tight text-white md:text-6xl">
+                    Follow one donated dollar all the way to treatment.
+                  </h2>
+                  <p className="mx-auto mt-5 max-w-3xl text-lg leading-8 text-white/68">
+                    Donor → Foundation → community therapist → veteran or immediate family member.
+                  </p>
                 </div>
-                <div className="rounded-2xl border border-white/12 bg-white/[0.06] p-5">
-                  <p className="text-4xl font-bold">$0</p>
-                  <p className="mt-2 text-sm font-bold leading-6 text-white/65">Board compensation from donations</p>
+
+                <div className="mx-auto mt-12 grid max-w-7xl gap-4 lg:grid-cols-[1fr_70px_1fr_70px_1fr_70px_1fr] lg:items-start">
+                  {[
+                    {
+                      step: "1",
+                      label: "Donor",
+                      detail: "Gives hope. Changes lives.",
+                      icon: <HeartHandshake className="h-10 w-10 text-[#D7A92E]" aria-hidden="true" />,
+                    },
+                    {
+                      step: "2",
+                      label: "ValorWell Foundation",
+                      detail: "Turns generosity into access.",
+                      icon: <BadgeCheck className="h-10 w-10 text-[#D7A92E]" aria-hidden="true" />,
+                    },
+                    {
+                      step: "3",
+                      label: "Community Therapist",
+                      detail: "Provides compassionate, expert care.",
+                      icon: <Stethoscope className="h-10 w-10 text-[#D7A92E]" aria-hidden="true" />,
+                    },
+                    {
+                      step: "4",
+                      label: "Veteran or Immediate Family",
+                      detail: "Gets the support they deserve.",
+                      icon: <Users className="h-10 w-10 text-[#D7A92E]" aria-hidden="true" />,
+                    },
+                  ].map((item, index) => (
+                    <div key={item.step} className="contents">
+                      <article className="text-center text-white">
+                        <div className="relative mx-auto flex h-32 w-32 items-center justify-center rounded-full border-2 border-[#D7A92E] bg-[#17231d] shadow-xl">
+                          <span className="absolute -top-4 flex h-9 w-9 items-center justify-center rounded-full border border-[#D7A92E] bg-[#101713] text-lg font-bold text-[#D7A92E]">
+                            {item.step}
+                          </span>
+                          {item.icon}
+                        </div>
+                        <h3 className="mx-auto mt-6 max-w-[13rem] text-2xl font-bold leading-tight">{item.label}</h3>
+                        <div className="mx-auto mt-4 h-px w-10 bg-[#D7A92E]" aria-hidden="true" />
+                        <p className="mx-auto mt-4 max-w-[14rem] text-xs font-bold uppercase tracking-[0.16em] leading-6 text-white/55">
+                          {item.detail}
+                        </p>
+                      </article>
+                      {index < 3 ? <StepConnector /> : null}
+                    </div>
+                  ))}
                 </div>
-                <div className="rounded-2xl border border-[#D7A92E]/35 bg-[#D7A92E]/10 p-5">
-                  <p className="text-4xl font-bold text-[#D7A92E]">100%</p>
-                  <p className="mt-2 text-sm font-bold leading-6 text-white/75">Community therapist payment</p>
-                </div>
+
+                <p className="mx-auto mt-12 max-w-4xl text-center text-2xl font-bold italic leading-9 text-white">
+                  <span className="text-[#D7A92E]">100%</span> of donated funds go to treatment.
+                </p>
               </div>
-            </div>
+            </GraphicFrame>
           </div>
         </section>
 
         <section className="border-b border-[#3B5147]/15 bg-white">
           <div className="container-wide py-20 md:py-28">
             <div className="grid gap-12 lg:grid-cols-12 lg:items-end">
-              <div className="lg:col-span-6">
+              <div className="lg:col-span-7">
                 <Eyebrow>What That Looks Like in Care</Eyebrow>
                 <h2 className="mt-4 text-4xl font-bold leading-tight md:text-5xl">
                   Simple donor math. Measurable treatment.
@@ -402,7 +426,7 @@ export default function FoundationPage() {
                   The Foundation reports completed therapy delivered—not vague awareness metrics or money passed between organizations.
                 </p>
               </div>
-              <div className="lg:col-span-6 lg:text-right">
+              <div className="lg:col-span-5 lg:text-right">
                 <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#3B5147]">Impact snapshot</p>
                 <p className="mt-2 text-sm text-[#111814]/55">As of {IMPACT_SNAPSHOT}</p>
               </div>
@@ -494,7 +518,7 @@ export default function FoundationPage() {
               {SESSION_COST} can put a therapist in someone&apos;s corner.
             </h2>
             <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-white/72">
-              100% of your donation to the ValorWell Foundation is used to pay qualified community mental-health therapists for treatment for veterans and their immediate family members.
+              The Foundation receives charitable gifts and uses 100% of those donated funds to pay qualified community mental-health therapists for treatment provided to veterans and their immediate family members.
             </p>
             <div className="mt-9 flex flex-wrap justify-center gap-3">
               <DonateButton size="lg" source="foundation_footer" withIcon>

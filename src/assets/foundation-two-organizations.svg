@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Two organizations. Two jobs.</title>
+  <desc id="desc">A side-by-side comparison of ValorWell, the for-profit clinic, and the separate nonprofit ValorWell Foundation.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0B1411"/><stop offset="0.56" stop-color="#13231C"/><stop offset="1" stop-color="#09100D"/></linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F0C861"/><stop offset="1" stop-color="#B9861F"/></linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#183126" stop-opacity="0.97"/><stop offset="1" stop-color="#0E1D17" stop-opacity="0.98"/></linearGradient>
+    <linearGradient id="mountain" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#23382E"/><stop offset="1" stop-color="#C19A4B"/></linearGradient>
+    <radialGradient id="sun" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFE4A3" stop-opacity="0.95"/><stop offset="1" stop-color="#D7A92E" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <circle cx="1450" cy="105" r="170" fill="url(#sun)" opacity="0.8"/>
+  <path d="M930 270 L1105 120 L1190 205 L1302 82 L1378 170 L1470 92 L1600 210 L1600 330 L930 330 Z" fill="url(#mountain)" opacity="0.30"/>
+  <path d="M990 310 L1120 205 L1175 250 L1270 160 L1345 235 L1430 155 L1512 226 L1600 173 L1600 360 L990 360 Z" fill="#172820" opacity="0.78"/>
+  <path d="M0 585 C180 470 330 525 486 458 C625 399 738 458 845 420 C980 371 1100 410 1210 387 C1365 355 1470 391 1600 336 L1600 900 L0 900 Z" fill="#0A120F" opacity="0.82"/>
+  <path d="M-40 156 C130 330 273 345 436 310" fill="none" stroke="url(#gold)" stroke-width="34" stroke-opacity="0.65"/>
+  <path d="M-60 202 C128 380 300 397 470 347" fill="none" stroke="#405B4C" stroke-width="38" stroke-opacity="0.72"/>
+  <path d="M1300 472 C1425 385 1510 376 1660 360" fill="none" stroke="url(#gold)" stroke-width="34" stroke-opacity="0.65"/>
+  <path d="M1288 530 C1420 443 1525 438 1660 438" fill="none" stroke="#405B4C" stroke-width="38" stroke-opacity="0.72"/>
+  <text x="800" y="118" text-anchor="middle" fill="#F5F0E3" font-family="Georgia, 'Times New Roman', serif" font-size="72" font-weight="700" letter-spacing="-2">Two organizations. <tspan fill="url(#gold)">Two jobs.</tspan></text>
+  <line x1="475" y1="162" x2="725" y2="162" stroke="#D7A92E" stroke-width="2" opacity="0.85"/><line x1="875" y1="162" x2="1125" y2="162" stroke="#D7A92E" stroke-width="2" opacity="0.85"/>
+  <g transform="translate(800 162)"><path d="M0 -26 L22 -17 L20 7 C18 28 0 39 0 39 C0 39 -18 28 -20 7 L-22 -17 Z" fill="none" stroke="#E2B447" stroke-width="4"/><path d="M-8 1 C-8 -7 -2 -12 4 -8 C9 -13 16 -8 16 0 C16 9 4 17 4 17 C4 17 -8 9 -8 1 Z" fill="#E2B447"/></g>
+  <text x="800" y="205" text-anchor="middle" fill="#9DB09E" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="600" letter-spacing="9">DIFFERENT STRUCTURES · SHARED PURPOSE</text>
+  <rect x="150" y="315" width="610" height="420" rx="22" fill="url(#card)" stroke="#CDA74F" stroke-width="1.5"/>
+  <circle cx="455" cy="315" r="66" fill="#153026" stroke="url(#gold)" stroke-width="4"/>
+  <g transform="translate(455 315)" stroke="#E6B84D" fill="none" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><rect x="-35" y="-8" width="70" height="55" rx="4"/><rect x="-58" y="12" width="23" height="35" rx="3"/><rect x="35" y="12" width="23" height="35" rx="3"/><path d="M0 -40 V-10 M-15 -25 H15"/><path d="M-11 47 V24 H11 V47"/></g>
+  <text x="455" y="430" text-anchor="middle" fill="#F7F1E5" font-family="Georgia, 'Times New Roman', serif" font-size="48" font-weight="700">ValorWell</text>
+  <text x="455" y="470" text-anchor="middle" fill="#A8BC9F" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="600" letter-spacing="5">FOR-PROFIT CLINIC</text><line x1="210" y1="492" x2="700" y2="492" stroke="#CDA74F" stroke-width="1.4" opacity="0.65"/>
+  <circle cx="260" cy="566" r="43" fill="#203C30" stroke="#D6AB46" stroke-width="2"/><g transform="translate(260 566)" fill="none" stroke="#E3B64C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M-12 16 C-26 9 -27 -13 -13 -23 C1 -33 21 -25 24 -8 C26 5 18 15 7 18 L7 28 L-4 28 L-4 19 Z"/><path d="M0 -8 C0 -16 10 -18 14 -11 C18 -18 28 -16 28 -8 C28 1 14 10 14 10 C14 10 0 1 0 -8 Z" transform="translate(-13 -2) scale(.62)" fill="#E3B64C" stroke="none"/></g>
+  <text x="350" y="558" fill="#FFFFFF" font-family="Arial, Helvetica, sans-serif" font-size="29">Provides mental</text><text x="350" y="596" fill="#FFFFFF" font-family="Arial, Helvetica, sans-serif" font-size="29">health care</text>
+  <circle cx="260" cy="662" r="43" fill="#203C30" stroke="#D6AB46" stroke-width="2"/><g transform="translate(260 662)" fill="none" stroke="#E3B64C" stroke-width="4"><rect x="-22" y="-28" width="44" height="56" rx="2"/><line x1="-12" y1="-12" x2="12" y2="-12"/><line x1="-12" y1="0" x2="12" y2="0"/><line x1="-12" y1="12" x2="6" y2="12"/></g>
+  <text x="350" y="654" fill="#FFFFFF" font-family="Arial, Helvetica, sans-serif" font-size="29">Accepts VACCN</text><text x="350" y="692" fill="#FFFFFF" font-family="Arial, Helvetica, sans-serif" font-size="29">and CHAMPVA</text>
+  <rect x="840" y="315" width="610" height="420" rx="22" fill="url(#card)" stroke="#CDA74F" stroke-width="1.5"/>
+  <circle cx="1145" cy="315" r="66" fill="#153026" stroke="url(#gold)" stroke-width="4"/>
+  <g transform="translate(1145 315)" fill="#E6B84D"><path d="M0 -18 C-7 -35 -32 -35 -39 -16 C-46 4 -25 21 0 40 C25 21 46 4 39 -16 C32 -35 7 -35 0 -18 Z"/><path d="M-24 53 C-36 41 -45 27 -43 12 C-42 2 -32 0 -28 10 L-19 30 L-9 21 C-4 17 4 21 1 28 L-7 45 L-7 60 L-26 60 Z"/><path d="M24 53 C36 41 45 27 43 12 C42 2 32 0 28 10 L19 30 L9 21 C4 17 -4 21 -1 28 L7 45 L7 60 L26 60 Z"/></g>
+  <text x="1145" y="430" text-anchor="middle" fill="#F7F1E5" font-family="Georgia, 'Times New Roman', serif" font-size="45" font-weight="700">ValorWell Foundation</text>
+  <text x="1145" y="470" text-anchor="middle" fill="#A8BC9F" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="600" letter-spacing="5">NONPROFIT FOUNDATION</text><line x1="900" y1="492" x2="1390" y2="492" stroke="#CDA74F" stroke-width="1.4" opacity="0.65"/>
+  <circle cx="950" cy="566" r="43" fill="#203C30" stroke="#D6AB46" stroke-width="2"/><g transform="translate(950 566)" fill="#E3B64C"><circle cx="-15" cy="-12" r="10"/><circle cx="15" cy="-12" r="10"/><circle cx="0" cy="-22" r="11"/><path d="M-37 22 C-36 1 -27 -3 -15 -3 C-4 -3 2 3 4 14 L4 25 L-37 25 Z"/><path d="M-4 25 L-4 10 C-4 -5 5 -10 15 -10 C28 -10 37 0 38 22 L38 25 Z"/></g>
+  <text x="1040" y="550" fill="#FFFFFF" font-family="Arial, Helvetica, sans-serif" font-size="26">Pays community therapists</text><text x="1040" y="584" fill="#FFFFFF" font-family="Arial, Helvetica, sans-serif" font-size="26">when coverage is delayed</text><text x="1040" y="618" fill="#FFFFFF" font-family="Arial, Helvetica, sans-serif" font-size="26">or denied</text>
+  <circle cx="950" cy="670" r="43" fill="#203C30" stroke="#D6AB46" stroke-width="2"/><path d="M950 631 L961 657 L990 659 L968 677 L975 705 L950 690 L925 705 L932 677 L910 659 L939 657 Z" fill="#E3B64C"/>
+  <text x="1040" y="660" fill="#FFFFFF" font-family="Arial, Helvetica, sans-serif" font-size="26">Supports veterans and</text><text x="1040" y="696" fill="#FFFFFF" font-family="Arial, Helvetica, sans-serif" font-size="26">immediate family members</text>
+  <line x1="130" y1="817" x2="330" y2="817" stroke="#D7A92E" stroke-width="2"/><line x1="1270" y1="817" x2="1470" y2="817" stroke="#D7A92E" stroke-width="2"/>
+  <text x="800" y="831" text-anchor="middle" fill="#F3EEE2" font-family="Georgia, 'Times New Roman', serif" font-size="38">Separate structures. <tspan fill="#E3B64C">One mission: faster access to care.</tspan></text>
+</svg>

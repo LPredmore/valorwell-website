@@ -15,6 +15,7 @@ import {
   LabelList,
   ResponsiveContainer,
   Tooltip,
+  type TooltipProps,
   XAxis,
   YAxis,
 } from "recharts";
@@ -22,6 +23,7 @@ import heroFamily from "@/assets/hero-family.jpg";
 import { Layout } from "@/components/layout/Layout";
 import { OrganizationSchema, SEO } from "@/components/SEO";
 import { billingHubSupabase } from "@/integrations/supabase/client";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { trackHomeEvent } from "@/lib/tracking";
 import {
   formatExactImpactValue,
@@ -101,9 +103,40 @@ function TrackedLink({
   );
 }
 
+function formatCompactImpactMonth(month: string) {
+  const match = /^(\d{4})-(\d{2})-\d{2}$/.exec(month);
+  if (!match) return month;
+
+  const year = Number(match[1]);
+  const monthIndex = Number(match[2]) - 1;
+  const monthName = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    timeZone: "UTC",
+  }).format(new Date(Date.UTC(year, monthIndex, 1)));
+
+  return `${monthName} ’${String(year).slice(-2)}`;
+}
+
+function ImpactChartTooltip({ active, payload, label }: TooltipProps<number, string>) {
+  if (!active || !payload?.length) return null;
+
+  const value = Number(payload[0]?.value);
+  if (!Number.isFinite(value)) return null;
+
+  return (
+    <div className="rounded-md border border-white/20 bg-[#111814] px-3 py-2 shadow-lg">
+      <p className="text-xs text-white/65">{formatCompactImpactMonth(String(label))}</p>
+      <p className="mt-0.5 text-sm font-bold text-[#D7A92E]">
+        {formatExactImpactValue(value)} <span className="font-normal text-white">displayed total</span>
+      </p>
+    </div>
+  );
+}
+
 function FoundationImpactChart() {
   const [impactData, setImpactData] = useState<HomepageImpactPoint[]>([]);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     let active = true;
@@ -146,7 +179,7 @@ function FoundationImpactChart() {
   ) + 8;
 
   return (
-    <figure className="rounded-3xl border border-white/15 bg-white/[0.06] p-6 md:p-8">
+    <figure className="min-w-0 max-w-full overflow-hidden rounded-3xl border border-white/15 bg-white/[0.06] p-4 sm:p-6 md:p-8">
       <figcaption>
         <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D7A92E]">
           Live care activity
@@ -174,18 +207,21 @@ function FoundationImpactChart() {
 
       {status === "ready" && (
         <>
-          <div className="mt-5 overflow-x-auto pb-2" aria-hidden="true">
-            <div className="h-80 min-w-[1100px]">
+          <div className="mt-5 min-w-0 max-w-full overflow-hidden" aria-hidden="true">
+            <div className="h-[280px] w-full min-w-0 sm:h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={impactData} margin={{ top: 30, right: 12, left: -12, bottom: 8 }}>
+                <BarChart
+                  data={impactData}
+                  margin={{ top: isMobile ? 12 : 30, right: 4, left: isMobile ? -18 : -10, bottom: 0 }}
+                >
                   <CartesianGrid stroke="rgba(255,255,255,0.12)" vertical={false} />
                   <XAxis
-                    dataKey="monthLabel"
-                    interval={0}
-                    angle={-45}
-                    textAnchor="end"
-                    height={70}
-                    tick={{ fill: "rgba(255,255,255,0.68)", fontSize: 12 }}
+                    dataKey="month"
+                    interval="preserveStartEnd"
+                    minTickGap={isMobile ? 22 : 14}
+                    tickFormatter={formatCompactImpactMonth}
+                    height={36}
+                    tick={{ fill: "rgba(255,255,255,0.68)", fontSize: isMobile ? 10 : 11 }}
                     axisLine={false}
                     tickLine={false}
                   />
@@ -193,13 +229,15 @@ function FoundationImpactChart() {
                     domain={[0, yMax]}
                     allowDecimals={false}
                     tickFormatter={(value: number) => formatExactImpactValue(value)}
-                    tick={{ fill: "rgba(255,255,255,0.55)", fontSize: 12 }}
+                    width={42}
+                    tickCount={5}
+                    tick={{ fill: "rgba(255,255,255,0.55)", fontSize: isMobile ? 10 : 11 }}
                     axisLine={false}
                     tickLine={false}
                   />
                   <Tooltip
                     cursor={{ fill: "rgba(255,255,255,0.05)" }}
-                    formatter={(value: number) => [formatExactImpactValue(value), "Displayed total"]}
+                    content={<ImpactChartTooltip />}
                   />
                   <Bar
                     dataKey="displayedValue"
@@ -208,13 +246,15 @@ function FoundationImpactChart() {
                     radius={[5, 5, 0, 0]}
                     maxBarSize={48}
                   >
-                    <LabelList
-                      dataKey="displayedValue"
-                      position="top"
-                      fill="rgba(255,255,255,0.88)"
-                      fontSize={11}
-                      formatter={(value: number) => formatExactImpactValue(value)}
-                    />
+                    {!isMobile && (
+                      <LabelList
+                        dataKey="displayedValue"
+                        position="top"
+                        fill="rgba(255,255,255,0.88)"
+                        fontSize={11}
+                        formatter={(value: number) => formatExactImpactValue(value)}
+                      />
+                    )}
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
@@ -347,7 +387,7 @@ export default function HomePage() {
 
         <section className="border-b border-white/10 bg-[#111814] text-white">
           <div className="container-wide grid gap-12 py-16 md:py-24 lg:grid-cols-12 lg:items-center">
-            <div className="lg:col-span-6">
+            <div className="min-w-0 max-w-full lg:col-span-6">
               <Eyebrow light>Foundation Impact</Eyebrow>
               <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
                 The Foundation isn&apos;t a fund sitting in an account. It&apos;s therapy happening right now.

@@ -361,33 +361,22 @@ export default function HomePage() {
         </section>
 
         <section className="border-b border-[#3B5147]/15 bg-white">
-          <div className="container-wide py-16 md:py-24">
-            <div className="mx-auto max-w-4xl text-center">
-              <Eyebrow>The Model</Eyebrow>
-              <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                We didn&apos;t set out to build three programs. The first one wasn&apos;t enough.
-              </h2>
-            </div>
-            <div className="relative mt-12 grid gap-5 lg:grid-cols-3">
-              {[
-                ["01 — CHAMPVA", "We started by getting our own family seen — then built a network of therapists who actually accept CHAMPVA.", "→ It worked. But CHAMPVA wasn't the only coverage nobody could use."],
-                ["02 — VA Community Care (VACCN)", "Hundreds of veterans had \"access\" to VA-authorized community care and still couldn't get an appointment, on either side of the paperwork.", "→ It worked. But some of the system can't be fixed from outside it."],
-                ["03 — The ValorWell Foundation", "When someone is entitled to coverage but genuinely can't reach it, the Foundation pays a qualified therapist directly. 100% of Foundation donations go directly to therapists providing treatment.", "→ This is the stopgap — while we work to fix the rest."],
-              ].map(([title, body, progression]) => (
-                <article key={title} className="relative rounded-2xl border border-[#3B5147]/15 bg-[#F4F1E8] p-7 md:p-8">
-                  <h3 className="text-xl font-bold text-[#3B5147]">{title}</h3>
-                  <p className="mt-5 leading-7 text-[#111814]/70">{body}</p>
-                  <p className="mt-6 border-t border-[#3B5147]/15 pt-5 text-sm font-bold leading-6 text-[#111814]">{progression}</p>
-                </article>
-              ))}
-            </div>
-            <div className="mt-10 text-center">
+          <div className="container-wide py-12 text-center md:py-20 lg:py-24">
+            <img
+              src="/valorwell-model.webp"
+              alt="ValorWell model: VA coverage is made usable, the Foundation bridges structural gaps, and lessons from those gaps feed back into system change"
+              className="mx-auto h-auto w-full max-w-[900px]"
+              width="900"
+              height="986"
+              loading="lazy"
+            />
+            <div className="mt-8 text-center">
               <TrackedLink
                 to="/how-it-works"
                 event="homepage_model_how_it_works"
-                className="inline-flex min-h-12 items-center rounded-md bg-[#3B5147] px-6 py-3 text-sm font-bold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2"
+                className="inline-flex min-h-12 items-center gap-2 rounded-md bg-[#3B5147] px-6 py-3 text-sm font-bold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2"
               >
-                See How the Whole Model Fits Together →
+                Learn more about our model <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </TrackedLink>
             </div>
           </div>

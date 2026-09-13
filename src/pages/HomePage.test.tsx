@@ -1,7 +1,8 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
-import HomePage, { foundationImpactData } from "./HomePage";
+import HomePage from "./HomePage";
+import { foundationImpactData } from "./homePageData";
 
 class ResizeObserverMock {
   observe() {}

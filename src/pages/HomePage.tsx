@@ -13,20 +13,12 @@ import heroFamily from "@/assets/hero-family.jpg";
 import { Layout } from "@/components/layout/Layout";
 import { OrganizationSchema, SEO } from "@/components/SEO";
 import { trackHomeEvent } from "@/lib/tracking";
+import { foundationImpactData } from "./homePageData";
 
 const CURRENT_BTY_VIDEO_ID = "JHuLEqw2yG8";
 const CURRENT_BTY_VIDEO_URL = `https://www.youtube.com/watch?v=${CURRENT_BTY_VIDEO_ID}`;
 const CURRENT_BTY_THUMBNAIL = `https://i.ytimg.com/vi/${CURRENT_BTY_VIDEO_ID}/maxresdefault.jpg`;
 const CURRENT_BTY_THUMBNAIL_FALLBACK = `https://i.ytimg.com/vi/${CURRENT_BTY_VIDEO_ID}/hqdefault.jpg`;
-
-export const foundationImpactData = [
-  {
-    date: "2026-09-05",
-    dateLabel: "Sep 5, 2026",
-    therapyHours: 540,
-    displayValue: "540+",
-  },
-];
 
 const involvementRoutes = [
   {

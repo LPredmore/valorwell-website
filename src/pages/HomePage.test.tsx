@@ -95,26 +95,25 @@ describe("ValorWell homepage", () => {
     ).toBeInTheDocument();
   });
 
-  it("loads exact monthly documented-care values from the database aggregate", async () => {
+  it("loads exact monthly impact values from the database snapshot", async () => {
     const { container } = renderHome();
 
     expect(rpcMock).toHaveBeenCalledWith("get_homepage_documented_monthly_impact");
     expect(
-      await screen.findByText(
-        "Sep 2025: 45 (21 documented appointments × 2.13, rounded).",
-      ),
+      await screen.findByText("Sep 2025: 45."),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        /Each value is calculated from appointments marked documented for that month × 2\.13, rounded to the nearest whole number\./,
+        "Each month's impact is calculated from the actual live numbers in our database. The chart refreshes at the beginning of each month.",
       ),
     ).toBeInTheDocument();
+    expect(container.textContent).not.toContain("2.13");
     expect(container.textContent).not.toContain("$75");
     expect(container.textContent).not.toMatch(/\[\[[\s\S]*?\]\]/);
     expect(screen.queryByText(/45\+/)).not.toBeInTheDocument();
   });
 
-  it("does not substitute static chart data when the live aggregate is unavailable", async () => {
+  it("does not substitute static chart data when the database snapshot is unavailable", async () => {
     rpcMock.mockResolvedValueOnce({
       data: null,
       error: { message: "unavailable" },
@@ -123,11 +122,9 @@ describe("ValorWell homepage", () => {
     renderHome();
 
     expect(
-      await screen.findByText("Live monthly chart data is temporarily unavailable."),
+      await screen.findByText("Monthly chart data is temporarily unavailable."),
     ).toBeInTheDocument();
-    expect(
-      screen.queryByText(/documented appointments × 2\.13, rounded\./),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Sep 2025: 45.")).not.toBeInTheDocument();
   });
 
   it("features the current American Corporate Partners episode", () => {

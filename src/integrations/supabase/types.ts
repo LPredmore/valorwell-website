@@ -26555,6 +26555,14 @@ export type Database = {
               scheduling_branch: string
             }[]
           }
+      get_homepage_documented_monthly_impact: {
+        Args: never
+        Returns: {
+          displayed_value: number
+          documented_appointments: number
+          month: string
+        }[]
+      }
       get_legacy_financial_reconciliation_v1: {
         Args: { p_status?: string }
         Returns: {

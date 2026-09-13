@@ -9,6 +9,7 @@ import { canonicalRoutes, redirects } from "../site-route-contract.mjs";
 
 import NotFound from "./pages/NotFound";
 import HomePage from "./pages/HomePage";
+import HowItWorksPage from "./pages/HowItWorksPage";
 import WatchPage from "./pages/WatchPage";
 import NetworkPage from "./pages/NetworkPage";
 import MissionPage from "./pages/MissionPage";
@@ -57,6 +58,7 @@ function LegacyRedirect({ to }: { to: string }) {
 
 const routeElements: Record<string, ReactNode> = {
   "/": <HomePage />,
+  "/how-it-works": <HowItWorksPage />,
   "/mission": <MissionPage />,
   "/about": <AboutPage />,
   "/foundation": <FoundationPage />,

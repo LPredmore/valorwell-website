@@ -27,7 +27,7 @@ export const foundationImpactData = [
     therapyHours: 540,
     displayValue: "540+",
   },
-] as const;
+];
 
 const involvementRoutes = [
   {

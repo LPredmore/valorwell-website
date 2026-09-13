@@ -337,14 +337,26 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="border-b border-white/10 bg-[#3B5147] text-white">
-          <div className="container-wide py-16 text-center md:py-24">
-            <h2 className="mx-auto max-w-5xl text-3xl font-bold leading-tight md:text-5xl">
+        <section className="border-b border-[#3B5147]/15 bg-[#F4F1E8]">
+          <div className="container-wide py-12 text-center md:py-18 lg:py-20">
+            <img
+              src="/valorwell-system.webp"
+              alt="ValorWell's three-part system: working inside VA coverage programs, funding therapy when coverage fails, and changing the system so the backup is needed less over time"
+              className="mx-auto h-auto w-full max-w-7xl"
+              width="1672"
+              height="941"
+              loading="eager"
+            />
+            <h2 className="mx-auto mt-8 max-w-5xl text-3xl font-bold leading-tight text-[#111814] md:text-5xl">
               No one else is fixing this from both sides — inside the VA&apos;s own coverage programs, and outside them when the system still fails.
             </h2>
-            <p className="mx-auto mt-6 max-w-3xl text-base leading-7 text-white/72 md:text-lg">
-              ValorWell runs the care. The Foundation covers the gap. Neither existed before this.
-            </p>
+            <TrackedLink
+              to="/about"
+              event="homepage_system_about"
+              className="mt-8 inline-flex min-h-12 items-center gap-2 rounded-md bg-[#3B5147] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#31443B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2"
+            >
+              Learn more about ValorWell&apos;s system <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </TrackedLink>
           </div>
         </section>
 

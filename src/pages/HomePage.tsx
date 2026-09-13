@@ -8,12 +8,28 @@ import {
   Stethoscope,
   Users,
 } from "lucide-react";
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  LabelList,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import heroFamily from "@/assets/hero-family.jpg";
 import { Layout } from "@/components/layout/Layout";
 import { OrganizationSchema, SEO } from "@/components/SEO";
+import { billingHubSupabase } from "@/integrations/supabase/client";
 import { trackHomeEvent } from "@/lib/tracking";
-import { foundationImpactData } from "./homePageData";
+import {
+  formatExactImpactValue,
+  HOMEPAGE_IMPACT_MULTIPLIER,
+  normalizeHomepageImpactRows,
+  type HomepageImpactPoint,
+  type HomepageImpactRpcRow,
+} from "./homePageData";
 
 const CURRENT_BTY_VIDEO_ID = "JHuLEqw2yG8";
 const CURRENT_BTY_VIDEO_URL = `https://www.youtube.com/watch?v=${CURRENT_BTY_VIDEO_ID}`;
@@ -86,32 +102,133 @@ function TrackedLink({
 }
 
 function FoundationImpactChart() {
-  const snapshot = foundationImpactData[foundationImpactData.length - 1];
+  const [impactData, setImpactData] = useState<HomepageImpactPoint[]>([]);
+  const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+
+  useEffect(() => {
+    let active = true;
+
+    const loadImpactData = async () => {
+      try {
+        const { data, error } = await billingHubSupabase.rpc(
+          "get_homepage_documented_monthly_impact",
+        );
+        if (!active) return;
+        if (error) {
+          setStatus("error");
+          return;
+        }
+
+        const normalized = normalizeHomepageImpactRows(
+          data as HomepageImpactRpcRow[] | null,
+        );
+        if (normalized.length === 0) {
+          setStatus("error");
+          return;
+        }
+
+        setImpactData(normalized);
+        setStatus("ready");
+      } catch {
+        if (active) setStatus("error");
+      }
+    };
+
+    void loadImpactData();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const yMax = Math.max(
+    10,
+    ...impactData.map((point) => point.displayedValue),
+  ) + 8;
 
   return (
     <figure className="rounded-3xl border border-white/15 bg-white/[0.06] p-6 md:p-8">
       <figcaption>
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D7A92E]">Current verified snapshot</p>
-        <p className="mt-2 text-sm text-white/65">Snapshot through September 5, 2026.</p>
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D7A92E]">
+          Live care activity
+        </p>
+        <p className="mt-2 text-lg font-bold text-white">Monthly documented-care total</p>
+        <p className="mt-2 text-sm leading-6 text-white/65">
+          Each value is calculated from appointments marked documented for that month × {HOMEPAGE_IMPACT_MULTIPLIER}, rounded to the nearest whole number.
+        </p>
+        <p className="mt-2 text-xs text-white/50">
+          Current-month totals update as additional appointments are documented.
+        </p>
       </figcaption>
-      <div className="mt-5 h-64 w-full" aria-hidden="true">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={foundationImpactData} margin={{ top: 24, right: 8, left: -14, bottom: 0 }}>
-            <CartesianGrid stroke="rgba(255,255,255,0.12)" vertical={false} />
-            <XAxis dataKey="dateLabel" tick={{ fill: "rgba(255,255,255,0.68)", fontSize: 12 }} axisLine={false} tickLine={false} />
-            <YAxis domain={[0, 600]} tick={{ fill: "rgba(255,255,255,0.55)", fontSize: 12 }} axisLine={false} tickLine={false} />
-            <Tooltip
-              cursor={{ fill: "rgba(255,255,255,0.05)" }}
-              formatter={(value: number) => [`${value}+`, "Therapy hours funded"]}
-              labelFormatter={() => "Through September 5, 2026"}
-            />
-            <Bar dataKey="therapyHours" name="Therapy hours funded" fill="#D7A92E" radius={[5, 5, 0, 0]} maxBarSize={120} />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-      <p className="sr-only">
-        Current verified impact: {snapshot.displayValue} hours of therapy funded through September 5, 2026.
-      </p>
+
+      {status === "loading" && (
+        <div className="mt-6 flex h-72 items-center justify-center rounded-xl border border-white/10 bg-black/10 text-sm text-white/60" role="status">
+          Loading live monthly data…
+        </div>
+      )}
+
+      {status === "error" && (
+        <div className="mt-6 flex h-72 items-center justify-center rounded-xl border border-white/10 bg-black/10 px-6 text-center text-sm text-white/60" role="status">
+          Live monthly chart data is temporarily unavailable.
+        </div>
+      )}
+
+      {status === "ready" && (
+        <>
+          <div className="mt-5 overflow-x-auto pb-2" aria-hidden="true">
+            <div className="h-80 min-w-[1100px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={impactData} margin={{ top: 30, right: 12, left: -12, bottom: 8 }}>
+                  <CartesianGrid stroke="rgba(255,255,255,0.12)" vertical={false} />
+                  <XAxis
+                    dataKey="monthLabel"
+                    interval={0}
+                    angle={-45}
+                    textAnchor="end"
+                    height={70}
+                    tick={{ fill: "rgba(255,255,255,0.68)", fontSize: 12 }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    domain={[0, yMax]}
+                    allowDecimals={false}
+                    tickFormatter={(value: number) => formatExactImpactValue(value)}
+                    tick={{ fill: "rgba(255,255,255,0.55)", fontSize: 12 }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <Tooltip
+                    cursor={{ fill: "rgba(255,255,255,0.05)" }}
+                    formatter={(value: number) => [formatExactImpactValue(value), "Displayed total"]}
+                  />
+                  <Bar
+                    dataKey="displayedValue"
+                    name="Displayed total"
+                    fill="#D7A92E"
+                    radius={[5, 5, 0, 0]}
+                    maxBarSize={48}
+                  >
+                    <LabelList
+                      dataKey="displayedValue"
+                      position="top"
+                      fill="rgba(255,255,255,0.88)"
+                      fontSize={11}
+                      formatter={(value: number) => formatExactImpactValue(value)}
+                    />
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+          <ul className="sr-only">
+            {impactData.map((point) => (
+              <li key={point.month}>
+                {point.monthLabel}: {formatExactImpactValue(point.displayedValue)} ({formatExactImpactValue(point.documentedAppointments)} documented appointments × {HOMEPAGE_IMPACT_MULTIPLIER}, rounded).
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
     </figure>
   );
 }

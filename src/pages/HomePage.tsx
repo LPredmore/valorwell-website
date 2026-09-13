@@ -181,11 +181,11 @@ function FoundationImpactChart() {
     <figure className="min-w-0 max-w-full overflow-hidden rounded-3xl border border-white/15 bg-white/[0.06] p-4 sm:p-6 md:p-8">
       <figcaption>
         <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D7A92E]">
-          Live care activity
+          Care impact
         </p>
         <p className="mt-2 text-lg font-bold text-white">Monthly documented-care total</p>
-        <p className="mt-2 text-xs text-white/50">
-          Snapshot refreshes weekly on Sundays at 12:00 AM Central.
+        <p className="mt-2 text-xs leading-5 text-white/50">
+          Each month&apos;s impact is calculated from the actual live numbers in our database. The chart refreshes at the beginning of each month.
         </p>
       </figcaption>
 

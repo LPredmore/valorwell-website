@@ -32,10 +32,6 @@ export const redirects = [
     "to": "/get-care"
   },
   {
-    "from": "/how-it-works",
-    "to": "/get-care"
-  },
-  {
     "from": "/partners",
     "to": "/partner"
   },

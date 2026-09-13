@@ -1,10 +1,19 @@
 export const routes = [
   {
     "path": "/",
-    "title": "ValorWell | Mental Health Care for Veterans & Military Families",
-    "description": "ValorWell is a nationwide mental-health care platform for veterans and military families. The separate ValorWell Foundation pays qualified community therapists when veterans cannot reach treatment through appropriate VA channels.",
-    "h1": "Mental health care and support for veterans and military families.",
-    "lead": "ValorWell provides nationwide mental-health care pathways for veterans and military families. The ValorWell Foundation is a separate organization: $75 funds one therapy session, and 100% of Foundation donations go directly to therapists providing veteran treatment—not to ValorWell.",
+    "title": "ValorWell | Turning VA Coverage Into Mental Health Care",
+    "description": "Born from one military family's struggle to use CHAMPVA, ValorWell builds care pathways and Foundation support when coverage still does not produce treatment.",
+    "h1": "The VA said our kids were covered. No one would take the coverage.",
+    "lead": "We had CHAMPVA coverage through the VA and still couldn't find a therapist who would take it. So we built ValorWell to fix that.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/how-it-works",
+    "title": "How ValorWell Works | Three Paths to Mental Health Care",
+    "description": "See how ValorWell addresses mental-health access through CHAMPVA care, VA Community Care, and separate Foundation funding when coverage still does not produce treatment.",
+    "h1": "One access problem. Three ways we learned to attack it.",
+    "lead": "ValorWell evolved in sequence because each care pathway solved part of the access problem and revealed the next gap.",
     "indexable": true,
     "sitemap": true
   },

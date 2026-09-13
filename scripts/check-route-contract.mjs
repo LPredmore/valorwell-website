@@ -21,9 +21,18 @@ const representativeBodyContent = new Map([
   [
     "/",
     [
-      "Mental health care and support for veterans and military families.",
-      "Foundation-funded therapy",
-      "See Foundation Impact",
+      "The VA said our kids were covered. No one would take the coverage.",
+      "No one else is fixing this from both sides",
+      "American Corporate Partners",
+    ],
+  ],
+  [
+    "/how-it-works",
+    [
+      "One access problem. Three ways we learned to attack it.",
+      "01 — CHAMPVA",
+      "02 — VA Community Care (VACCN)",
+      "03 — ValorWell Foundation",
     ],
   ],
   [
@@ -66,6 +75,28 @@ const representativeBodyContent = new Map([
 ]);
 
 const progressiveEnhancementContent = new Map([
+  [
+    "/",
+    [
+      'href="/about"',
+      'href="/get-care"',
+      'href="/how-it-works"',
+      'href="/impact"',
+      'href="/beyond-the-yellow"',
+      'href="/foundation"',
+      'href="/partner"',
+      'href="/clinicians"',
+      "JHuLEqw2yG8",
+    ],
+  ],
+  [
+    "/how-it-works",
+    [
+      'href="/get-care"',
+      'href="/impact"',
+      "100% of Foundation donations go directly to qualified mental-health therapists",
+    ],
+  ],
   [
     "/get-care",
     [
@@ -174,6 +205,12 @@ function assertRealPrerenderedOutput(route, filePath) {
   }
   if (html.includes("JavaScript is required")) {
     throw new Error(`JavaScript-required fallback remains in ${filePath}.`);
+  }
+  if (route.path === "/" && html.includes("$75")) {
+    throw new Error("Homepage must not contain the $75 treatment amount.");
+  }
+  if (route.path === "/" && /\[\[[\s\S]*?\]\]/.test(html)) {
+    throw new Error("Homepage contains an unresolved [[...]] placeholder token.");
   }
 
   const rootStart = html.indexOf('<div id="root">');

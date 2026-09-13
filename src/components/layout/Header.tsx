@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 const primary = [
   { name: "About", href: "/about" },
-  { name: "Impact", href: "/impact" },
+  { name: "How It Works", href: "/how-it-works" },
   { name: "Beyond The Yellow", href: "/beyond-the-yellow" },
   { name: "Resources", href: "/resources" },
 ];

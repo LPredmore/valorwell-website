@@ -3,6 +3,14 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import HomePage, { foundationImpactData } from "./HomePage";
 
+class ResizeObserverMock {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
+vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+
 vi.mock("@/components/layout/Layout", () => ({
   Layout: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));

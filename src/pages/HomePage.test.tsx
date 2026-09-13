@@ -1,8 +1,11 @@
 import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import HomePage from "./HomePage";
-import { foundationImpactData } from "./homePageData";
+
+const { rpcMock } = vi.hoisted(() => ({
+  rpcMock: vi.fn(),
+}));
 
 class ResizeObserverMock {
   observe() {}
@@ -21,6 +24,12 @@ vi.mock("@/components/SEO", () => ({
   OrganizationSchema: () => null,
 }));
 
+vi.mock("@/integrations/supabase/client", () => ({
+  billingHubSupabase: {
+    rpc: rpcMock,
+  },
+}));
+
 vi.mock("@/lib/tracking", () => ({
   trackHomeEvent: vi.fn(),
 }));
@@ -34,6 +43,30 @@ function renderHome() {
 }
 
 describe("ValorWell homepage", () => {
+  beforeEach(() => {
+    rpcMock.mockReset();
+    rpcMock.mockResolvedValue({
+      data: [
+        {
+          month: "2025-09-01",
+          documented_appointments: 21,
+          displayed_value: 45,
+        },
+        {
+          month: "2025-10-01",
+          documented_appointments: 21,
+          displayed_value: 45,
+        },
+        {
+          month: "2026-09-01",
+          documented_appointments: 5,
+          displayed_value: 11,
+        },
+      ],
+      error: null,
+    });
+  });
+
   afterEach(cleanup);
 
   it("renders the approved origin story and exact differentiation claim", () => {
@@ -52,20 +85,39 @@ describe("ValorWell homepage", () => {
     ).toBeInTheDocument();
   });
 
-  it("uses only the verified Foundation snapshot and excludes prohibited homepage copy", () => {
+  it("loads exact monthly documented-care values from the database aggregate", async () => {
     const { container } = renderHome();
 
-    expect(foundationImpactData).toEqual([
-      {
-        date: "2026-09-05",
-        dateLabel: "Sep 5, 2026",
-        therapyHours: 540,
-        displayValue: "540+",
-      },
-    ]);
+    expect(rpcMock).toHaveBeenCalledWith("get_homepage_documented_monthly_impact");
+    expect(
+      await screen.findByText(
+        "Sep 2025: 45 (21 documented appointments × 2.13, rounded).",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /Each value is calculated from appointments marked documented for that month × 2\.13, rounded to the nearest whole number\./,
+      ),
+    ).toBeInTheDocument();
     expect(container.textContent).not.toContain("$75");
     expect(container.textContent).not.toMatch(/\[\[[\s\S]*?\]\]/);
     expect(screen.queryByText(/45\+/)).not.toBeInTheDocument();
+  });
+
+  it("does not substitute static chart data when the live aggregate is unavailable", async () => {
+    rpcMock.mockResolvedValueOnce({
+      data: null,
+      error: { message: "unavailable" },
+    });
+
+    renderHome();
+
+    expect(
+      await screen.findByText("Live monthly chart data is temporarily unavailable."),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/documented appointments × 2\.13, rounded\./),
+    ).not.toBeInTheDocument();
   });
 
   it("features the current American Corporate Partners episode", () => {

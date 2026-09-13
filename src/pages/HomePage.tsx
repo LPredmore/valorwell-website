@@ -1,37 +1,76 @@
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
-  BookOpen,
   Building2,
   HeartHandshake,
-  Network,
   PlayCircle,
   Stethoscope,
   Users,
 } from "lucide-react";
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import heroFamily from "@/assets/hero-family.jpg";
+import { DonateButton } from "@/components/DonateButton";
 import { Layout } from "@/components/layout/Layout";
-import { SEO, OrganizationSchema } from "@/components/SEO";
+import { OrganizationSchema, SEO } from "@/components/SEO";
 import { trackHomeEvent } from "@/lib/tracking";
 
-const LATEST_BTY_VIDEO_URL = "https://www.youtube.com/watch?v=A4CUe3c8rJE";
-const LATEST_BTY_THUMBNAIL = "https://i.ytimg.com/vi/A4CUe3c8rJE/maxresdefault.jpg";
+const CURRENT_BTY_VIDEO_ID = "JHuLEqw2yG8";
+const CURRENT_BTY_VIDEO_URL = `https://www.youtube.com/watch?v=${CURRENT_BTY_VIDEO_ID}`;
+const CURRENT_BTY_THUMBNAIL = `https://i.ytimg.com/vi/${CURRENT_BTY_VIDEO_ID}/maxresdefault.jpg`;
+const CURRENT_BTY_THUMBNAIL_FALLBACK = `https://i.ytimg.com/vi/${CURRENT_BTY_VIDEO_ID}/hqdefault.jpg`;
 
-const featuredOrganizations = [
-  ["Veterans Breakfast Club", "/veteransbreakfastclub"],
-  ["GallantFew", "/gallantfew"],
-  ["VETS2INDUSTRY", "/vets2industry"],
-  ["Veterans Outreach of Wisconsin", "/VOW"],
-  ["Military Missions in Action", "/mmia"],
+export const foundationImpactData = [
+  {
+    date: "2026-09-05",
+    dateLabel: "Sep 5, 2026",
+    therapyHours: 540,
+    displayValue: "540+",
+  },
+] as const;
+
+const involvementRoutes = [
+  {
+    audience: "Veterans & Families",
+    title: "Need Care",
+    description: "Find the coverage pathway that applies to you.",
+    cta: "Find Care →",
+    to: "/get-care",
+    event: "homepage_route_care",
+    icon: Stethoscope,
+  },
+  {
+    audience: "Donors",
+    title: "Fund a Session",
+    description: "100% of donations go directly to therapists providing treatment.",
+    cta: "Support the Foundation →",
+    to: "/foundation",
+    event: "homepage_route_foundation",
+    icon: HeartHandshake,
+  },
+  {
+    audience: "Organizations & Media",
+    title: "Partner or Feature",
+    description: "Referral relationships, community collaboration, or a Beyond The Yellow feature.",
+    cta: "Partner With ValorWell →",
+    to: "/partner",
+    event: "homepage_route_partner",
+    icon: Building2,
+  },
+  {
+    audience: "Clinicians",
+    title: "Join the Network",
+    description: "Provide care to veterans and military families through ValorWell.",
+    cta: "Clinician Opportunities →",
+    to: "/clinicians",
+    event: "homepage_route_clinicians",
+    icon: Users,
+  },
 ] as const;
 
 function Eyebrow({ children, light = false }: { children: ReactNode; light?: boolean }) {
   return (
-    <p
-      className={`text-xs font-bold uppercase tracking-[0.2em] ${
-        light ? "text-[#D7A92E]" : "text-[#3B5147]"
-      }`}
-    >
+    <p className={`text-xs font-bold uppercase tracking-[0.2em] ${light ? "text-[#D7A92E]" : "text-[#3B5147]"}`}>
       {children}
     </p>
   );
@@ -55,7 +94,40 @@ function TrackedLink({
   );
 }
 
+function FoundationImpactChart() {
+  const snapshot = foundationImpactData[foundationImpactData.length - 1];
+
+  return (
+    <figure className="rounded-3xl border border-white/15 bg-white/[0.06] p-6 md:p-8">
+      <figcaption>
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D7A92E]">Current verified snapshot</p>
+        <p className="mt-2 text-sm text-white/65">Snapshot through September 5, 2026.</p>
+      </figcaption>
+      <div className="mt-5 h-64 w-full" aria-hidden="true">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={foundationImpactData} margin={{ top: 24, right: 8, left: -14, bottom: 0 }}>
+            <CartesianGrid stroke="rgba(255,255,255,0.12)" vertical={false} />
+            <XAxis dataKey="dateLabel" tick={{ fill: "rgba(255,255,255,0.68)", fontSize: 12 }} axisLine={false} tickLine={false} />
+            <YAxis domain={[0, 600]} tick={{ fill: "rgba(255,255,255,0.55)", fontSize: 12 }} axisLine={false} tickLine={false} />
+            <Tooltip
+              cursor={{ fill: "rgba(255,255,255,0.05)" }}
+              formatter={(value: number) => [`${value}+`, "Therapy hours funded"]}
+              labelFormatter={() => "Through September 5, 2026"}
+            />
+            <Bar dataKey="therapyHours" name="Therapy hours funded" fill="#D7A92E" radius={[5, 5, 0, 0]} maxBarSize={120} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+      <p className="sr-only">
+        Current verified impact: {snapshot.displayValue} hours of therapy funded through September 5, 2026.
+      </p>
+    </figure>
+  );
+}
+
 export default function HomePage() {
+  const [thumbnailFallbackUsed, setThumbnailFallbackUsed] = useState(false);
+
   useEffect(() => {
     trackHomeEvent("homepage_view");
   }, []);
@@ -63,365 +135,219 @@ export default function HomePage() {
   return (
     <Layout>
       <SEO
-        title="ValorWell | Mental Health Care for Veterans & Military Families"
-        description="ValorWell is a nationwide mental-health care platform for veterans and military families. The separate ValorWell Foundation pays qualified community therapists for veteran treatment when appropriate VA care channels do not produce access."
+        title="ValorWell | Turning VA Coverage Into Mental Health Care"
+        description="Born from one military family's struggle to use CHAMPVA, ValorWell builds care pathways and Foundation support when coverage still does not produce treatment."
         canonical="/"
       />
       <OrganizationSchema />
 
       <div className="home-theme bg-[#F4F1E8] text-[#111814]">
         <style>{`
-          .home-theme {
-            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-          }
+          .home-theme,
           .home-theme h1,
           .home-theme h2,
-          .home-theme h3,
-          .home-theme h4 {
+          .home-theme h3 {
             font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-            letter-spacing: -0.025em;
           }
         `}</style>
 
-        <section className="relative overflow-hidden border-b border-[#3B5147]/15 bg-[#F4F1E8]">
-          <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-            <div className="absolute -left-36 -top-40 h-96 w-96 rounded-full bg-[#3B5147]/[0.07] blur-3xl" />
-            <div className="absolute -right-32 bottom-0 h-80 w-80 rounded-full bg-[#D7A92E]/[0.08] blur-3xl" />
-          </div>
-
-          <div className="container-wide relative grid items-center gap-12 py-16 md:py-24 lg:grid-cols-12 lg:py-28">
-            <div className="lg:col-span-7">
-              <Eyebrow>ValorWell</Eyebrow>
-              <h1 className="mt-6 max-w-4xl text-4xl font-bold leading-[1.03] text-[#111814] sm:text-5xl md:text-6xl lg:text-7xl">
-                Mental health care and support for veterans and military families.
+        <section className="border-b border-[#3B5147]/15 bg-[#F4F1E8]">
+          <div className="container-wide grid items-center gap-10 py-12 md:py-16 lg:grid-cols-12 lg:gap-14 lg:py-20">
+            <div className="order-2 lg:order-1 lg:col-span-7">
+              <Eyebrow>Founded by a military family who couldn&apos;t get their own kids seen</Eyebrow>
+              <h1 className="mt-5 max-w-4xl text-4xl font-bold leading-[1.04] sm:text-5xl md:text-6xl">
+                The VA said our kids were covered. No one would take the coverage.
               </h1>
-              <p className="mt-7 max-w-2xl text-lg leading-8 text-[#111814]/70 md:text-xl">
-                ValorWell is a nationwide platform for providing mental-health therapy to veterans and their families. The ValorWell Foundation is a separate organization that pays qualified community therapists when veterans cannot get seen through the appropriate VA care channels.
+              <p className="mt-6 max-w-3xl text-lg leading-8 text-[#111814]/72">
+                We had CHAMPVA coverage through the VA and still couldn&apos;t find a therapist who would take it. So we built ValorWell to fix that. Then we found veterans facing the same wall in VA Community Care. When coverage still doesn&apos;t produce care, the ValorWell Foundation pays therapists directly.
               </p>
-              <p className="mt-5 max-w-2xl text-base font-bold leading-7 text-[#3B5147]">
-                100% of donations to the ValorWell Foundation go directly to therapists providing treatment. None of those donations go to ValorWell.
-              </p>
-
-              <div className="mt-9 flex flex-wrap items-center gap-3">
+              <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+                <TrackedLink
+                  to="/about"
+                  event="homepage_hero_story"
+                  className="inline-flex min-h-12 items-center gap-2 rounded-md bg-[#3B5147] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#31443B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2"
+                >
+                  Read the Full Story <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </TrackedLink>
                 <TrackedLink
                   to="/get-care"
                   event="homepage_hero_care"
-                  className="inline-flex min-h-12 items-center gap-2 rounded-md bg-[#3B5147] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#31443B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2"
+                  className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#3B5147] underline decoration-[#3B5147]/35 underline-offset-4 hover:decoration-[#3B5147] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2"
                 >
-                  Find Care
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </TrackedLink>
-                <TrackedLink
-                  to="/about"
-                  event="homepage_hero_about"
-                  className="inline-flex min-h-12 items-center gap-2 rounded-md border border-[#3B5147]/35 px-6 py-3 text-sm font-bold text-[#3B5147] transition hover:bg-white/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2"
-                >
-                  Explore ValorWell
+                  Find Care <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </TrackedLink>
               </div>
             </div>
-
-            <aside className="lg:col-span-5">
-              <div className="rounded-3xl bg-[#111814] p-8 text-white shadow-xl md:p-9">
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D7A92E]">
-                  Foundation-funded therapy
-                </p>
-                <div className="mt-7 grid gap-6 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-                  <div>
-                    <p className="text-5xl font-bold text-[#D7A92E]">540+</p>
-                    <p className="mt-2 text-sm leading-6 text-white/65">hours of direct therapy paid for</p>
-                  </div>
-                  <div className="border-t border-white/12 pt-6 sm:border-l sm:border-t-0 sm:pl-6 sm:pt-0 lg:border-l-0 lg:border-t lg:pl-0 lg:pt-6 xl:border-l xl:border-t-0 xl:pl-6 xl:pt-0">
-                    <p className="text-5xl font-bold">$75</p>
-                    <p className="mt-2 text-sm leading-6 text-white/65">funds one completed therapy session</p>
-                  </div>
-                </div>
-                <p className="mt-7 border-t border-white/12 pt-5 text-sm leading-6 text-white/55">
-                  Snapshot through September 5, 2026. Foundation impact is reported as completed therapy delivered rather than total dollars raised or spent.
-                </p>
-                <TrackedLink
-                  to="/impact"
-                  event="homepage_hero_impact_methodology"
-                  className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-white"
-                >
-                  See Foundation Impact
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </TrackedLink>
+            <div className="order-1 lg:order-2 lg:col-span-5">
+              <div className="aspect-[4/3] overflow-hidden rounded-3xl border border-[#3B5147]/15 bg-white shadow-lg">
+                <img
+                  src={heroFamily}
+                  alt="The ValorWell founding family together outdoors"
+                  className="h-full w-full object-cover"
+                  width="1536"
+                  height="1024"
+                  loading="eager"
+                  fetchPriority="high"
+                />
               </div>
-            </aside>
+            </div>
           </div>
         </section>
 
         <section className="border-b border-white/10 bg-[#3B5147] text-white">
-          <div className="container-wide grid gap-8 py-10 md:py-12 lg:grid-cols-12 lg:items-center">
-            <div className="lg:col-span-5">
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/65">
-                Looking for care?
-              </p>
-              <h2 className="mt-3 text-2xl font-bold md:text-3xl">
-                Start with the coverage and care pathway that applies to you.
-              </h2>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2 lg:col-span-5">
-              <div className="rounded-xl border border-white/15 bg-white/[0.07] p-4">
-                <p className="text-sm font-bold">CHAMPVA</p>
-                <p className="mt-1 text-xs leading-5 text-white/65">
-                  Telehealth care is available subject to clinician availability and fit.
-                </p>
-              </div>
-              <div className="rounded-xl border border-white/15 bg-white/[0.07] p-4">
-                <p className="text-sm font-bold">VA Community Care</p>
-                <p className="mt-1 text-xs leading-5 text-white/65">
-                  Availability depends on authorization, clinician network status, and region.
-                </p>
-              </div>
-            </div>
-            <div className="lg:col-span-2 lg:text-right">
-              <TrackedLink
-                to="/get-care"
-                event="homepage_care_options"
-                className="inline-flex min-h-11 items-center gap-2 rounded-md bg-white px-4 py-3 text-sm font-bold text-[#3B5147] transition hover:bg-[#F4F1E8]"
-              >
-                See Care Options
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </TrackedLink>
-            </div>
+          <div className="container-wide py-16 text-center md:py-24">
+            <h2 className="mx-auto max-w-5xl text-3xl font-bold leading-tight md:text-5xl">
+              No one else is fixing this from both sides — inside the VA&apos;s own coverage programs, and outside them when the system still fails.
+            </h2>
+            <p className="mx-auto mt-6 max-w-3xl text-base leading-7 text-white/72 md:text-lg">
+              ValorWell runs the care. The Foundation covers the gap. Neither existed before this.
+            </p>
           </div>
         </section>
 
         <section className="border-b border-[#3B5147]/15 bg-white">
-          <div className="container-wide py-20 md:py-28">
-            <div className="max-w-3xl">
-              <Eyebrow>How the Work Fits Together</Eyebrow>
+          <div className="container-wide py-16 md:py-24">
+            <div className="mx-auto max-w-4xl text-center">
+              <Eyebrow>The Model</Eyebrow>
               <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                ValorWell provides care. The separate Foundation funds therapy when VA access fails.
+                We didn&apos;t set out to build three programs. The first one wasn&apos;t enough.
               </h2>
             </div>
-
-            <div className="mt-12 grid gap-5 lg:grid-cols-3">
-              <article className="rounded-3xl border border-[#3B5147]/15 bg-[#F4F1E8] p-8">
-                <Stethoscope className="h-8 w-8 text-[#3B5147]" aria-hidden="true" />
-                <p className="mt-7 text-xs font-bold uppercase tracking-[0.18em] text-[#3B5147]">ValorWell Care</p>
-                <h3 className="mt-3 text-2xl font-bold">Mental-health care and access pathways.</h3>
-                <p className="mt-4 leading-7 text-[#111814]/65">
-                  Nationwide telehealth treatment, clinician infrastructure, coverage pathways, and the operational systems that support care for veterans and military families.
-                </p>
-                <TrackedLink to="/get-care" event="homepage_model_care" className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#3B5147]">
-                  Find Care <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </TrackedLink>
-              </article>
-
-              <article className="rounded-3xl bg-[#111814] p-8 text-white">
-                <HeartHandshake className="h-8 w-8 text-[#D7A92E]" aria-hidden="true" />
-                <p className="mt-7 text-xs font-bold uppercase tracking-[0.18em] text-[#D7A92E]">ValorWell Foundation</p>
-                <h3 className="mt-3 text-2xl font-bold">Direct payment for veteran therapy.</h3>
-                <p className="mt-4 leading-7 text-white/65">
-                  The Foundation is separate from ValorWell. It pays qualified community therapists for veteran treatment when the appropriate VA care channels do not produce access. $75 funds one completed session.
-                </p>
-                <p className="mt-4 text-sm font-bold leading-6 text-white">
-                  100% of Foundation donations go to therapists. None goes to ValorWell.
-                </p>
-                <TrackedLink to="/impact" event="homepage_model_impact" className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-white">
-                  See Foundation Impact <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </TrackedLink>
-              </article>
-
-              <article className="rounded-3xl border border-[#D7A92E]/35 bg-[#F8F3E4] p-8">
-                <Network className="h-8 w-8 text-[#8A6814]" aria-hidden="true" />
-                <p className="mt-7 text-xs font-bold uppercase tracking-[0.18em] text-[#8A6814]">Community</p>
-                <h3 className="mt-3 text-2xl font-bold">Published conversations and featured organizations.</h3>
-                <p className="mt-4 leading-7 text-[#111814]/65">
-                  Beyond The Yellow gives visitors actual conversations and organization pages to watch, evaluate, and explore.
-                </p>
-                <TrackedLink to="/beyond-the-yellow" event="homepage_model_bty" className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#3B5147]">
-                  Explore Beyond The Yellow <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </TrackedLink>
-              </article>
+            <div className="relative mt-12 grid gap-5 lg:grid-cols-3">
+              {[
+                ["01 — CHAMPVA", "We started by getting our own family seen — then built a network of therapists who actually accept CHAMPVA.", "→ It worked. But CHAMPVA wasn't the only coverage nobody could use."],
+                ["02 — VA Community Care (VACCN)", "Hundreds of veterans had \"access\" to VA-authorized community care and still couldn't get an appointment, on either side of the paperwork.", "→ It worked. But some of the system can't be fixed from outside it."],
+                ["03 — The ValorWell Foundation", "When someone is entitled to coverage but genuinely can't reach it, the Foundation pays a qualified therapist directly. 100% of Foundation donations go directly to therapists providing treatment.", "→ This is the stopgap — while we work to fix the rest."],
+              ].map(([title, body, progression]) => (
+                <article key={title} className="relative rounded-2xl border border-[#3B5147]/15 bg-[#F4F1E8] p-7 md:p-8">
+                  <h3 className="text-xl font-bold text-[#3B5147]">{title}</h3>
+                  <p className="mt-5 leading-7 text-[#111814]/70">{body}</p>
+                  <p className="mt-6 border-t border-[#3B5147]/15 pt-5 text-sm font-bold leading-6 text-[#111814]">{progression}</p>
+                </article>
+              ))}
+            </div>
+            <div className="mt-10 text-center">
+              <TrackedLink
+                to="/how-it-works"
+                event="homepage_model_how_it_works"
+                className="inline-flex min-h-12 items-center rounded-md bg-[#3B5147] px-6 py-3 text-sm font-bold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2"
+              >
+                See How the Whole Model Fits Together →
+              </TrackedLink>
             </div>
           </div>
         </section>
 
         <section className="border-b border-white/10 bg-[#111814] text-white">
-          <div className="container-wide py-20 md:py-28">
-            <div className="grid gap-12 lg:grid-cols-12 lg:items-end">
-              <div className="lg:col-span-7">
-                <Eyebrow light>Foundation Impact</Eyebrow>
-                <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                  540+ hours of therapy. $75 funds one session.
-                </h2>
-                <p className="mt-6 max-w-3xl text-lg leading-8 text-white/68">
-                  These figures count completed therapy paid for by the ValorWell Foundation. The Foundation reports treatment delivered rather than total dollars raised or spent.
-                </p>
-              </div>
-              <div className="lg:col-span-5 lg:text-right">
+          <div className="container-wide grid gap-12 py-16 md:py-24 lg:grid-cols-12 lg:items-center">
+            <div className="lg:col-span-6">
+              <Eyebrow light>Foundation Impact</Eyebrow>
+              <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
+                The Foundation isn&apos;t a fund sitting in an account. It&apos;s therapy happening right now.
+              </h2>
+              <p className="mt-6 text-lg leading-8 text-white/72">
+                540+ hours of therapy funded. 100% of donations to the ValorWell Foundation go directly to therapists providing treatment; none of those donations go to ValorWell.
+              </p>
+              <p className="mt-4 text-sm font-bold text-[#D7A92E]">Snapshot through September 5, 2026.</p>
+              <div className="mt-8 flex flex-wrap gap-3">
                 <TrackedLink
                   to="/impact"
                   event="homepage_impact_detail"
-                  className="inline-flex min-h-12 items-center gap-2 rounded-md border border-white/30 px-6 py-3 text-sm font-bold text-white transition hover:bg-white/10"
+                  className="inline-flex min-h-12 items-center rounded-md border border-white/35 px-5 py-3 text-sm font-bold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D7A92E]"
                 >
-                  View Foundation Impact
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  See Full Foundation Impact →
                 </TrackedLink>
+                <DonateButton
+                  source="homepage-foundation-impact"
+                  size="lg"
+                  utmContent="fund-veteran-therapy"
+                  className="min-h-12 bg-[#D7A92E] text-[#111814] hover:bg-[#e2b943]"
+                >
+                  Fund Veteran Therapy
+                </DonateButton>
               </div>
+            </div>
+            <div className="lg:col-span-6">
+              <FoundationImpactChart />
             </div>
           </div>
         </section>
 
         <section className="border-b border-[#3B5147]/15 bg-[#F4F1E8]">
-          <div className="container-wide grid items-center gap-14 py-20 md:py-28 lg:grid-cols-12">
+          <div className="container-wide grid items-center gap-12 py-16 md:py-24 lg:grid-cols-12">
             <div className="lg:col-span-6">
               <a
-                href={LATEST_BTY_VIDEO_URL}
+                href={CURRENT_BTY_VIDEO_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => trackHomeEvent("homepage_bty_latest_video")}
-                className="group block overflow-hidden rounded-3xl border border-[#D7A92E]/30 bg-[#111814] shadow-lg"
+                onClick={() => trackHomeEvent("homepage_bty_current_episode", { organization: "American Corporate Partners", video_id: CURRENT_BTY_VIDEO_ID })}
+                className="group block overflow-hidden rounded-3xl border border-[#D7A92E]/30 bg-[#111814] shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2"
               >
                 <div className="relative aspect-video overflow-hidden">
                   <img
-                    src={LATEST_BTY_THUMBNAIL}
-                    alt="Veterans Breakfast Club Beyond The Yellow conversation"
+                    src={thumbnailFallbackUsed ? CURRENT_BTY_THUMBNAIL_FALLBACK : CURRENT_BTY_THUMBNAIL}
+                    onError={() => setThumbnailFallbackUsed(true)}
+                    alt="American Corporate Partners Beyond The Yellow conversation"
                     className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transform-none motion-reduce:transition-none"
                     loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" aria-hidden="true" />
-                  <PlayCircle className="absolute left-5 top-5 h-10 w-10 text-white drop-shadow" aria-hidden="true" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" aria-hidden="true" />
+                  <PlayCircle className="absolute left-5 top-5 h-11 w-11 text-white drop-shadow" aria-hidden="true" />
                   <div className="absolute bottom-5 left-5 right-5 text-white">
-                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#D7A92E]">Latest conversation</p>
-                    <p className="mt-2 text-2xl font-bold">Veterans Breakfast Club</p>
+                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#D7A92E]">Current episode</p>
+                    <p className="mt-2 text-2xl font-bold">American Corporate Partners</p>
                   </div>
                 </div>
               </a>
             </div>
-
             <div className="lg:col-span-6">
               <Eyebrow>Beyond The Yellow</Eyebrow>
               <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                Explore the work through published conversations and organization pages.
+                Conversations with the people and organizations doing this work.
               </h2>
-              <p className="mt-6 text-lg leading-8 text-[#111814]/68">
-                Beyond The Yellow features organizations, founders, volunteers, and community leaders whose work gives people something concrete to participate in, support, or learn from.
+              <p className="mt-6 text-lg leading-8 text-[#111814]/70">
+                Beyond The Yellow features real conversations with founders, veterans, and organizations worth knowing about — not polished PR, just people explaining what they actually do.
               </p>
-
-              <div className="mt-7 border-y border-[#3B5147]/15 py-5">
-                <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3B5147]">Featured organizations</p>
-                <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold text-[#111814]/70">
-                  {featuredOrganizations.map(([name, route]) => (
-                    <Link key={name} to={route} className="min-h-11 py-3 hover:text-[#3B5147]">
-                      {name}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-8 flex flex-wrap gap-3">
-                <TrackedLink
-                  to="/beyond-the-yellow"
-                  event="homepage_bty_explore"
-                  className="inline-flex min-h-11 items-center gap-2 rounded-md bg-[#3B5147] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#31443B]"
-                >
-                  Explore Beyond The Yellow
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </TrackedLink>
-                <TrackedLink
-                  to="/network"
-                  event="homepage_bty_network"
-                  className="inline-flex min-h-11 items-center gap-2 rounded-md border border-[#3B5147]/30 px-5 py-3 text-sm font-bold text-[#3B5147] transition hover:bg-white/60"
-                >
-                  Featured Organizations
-                </TrackedLink>
-              </div>
+              <TrackedLink
+                to="/beyond-the-yellow"
+                event="homepage_bty_explore"
+                className="mt-8 inline-flex min-h-12 items-center rounded-md bg-[#3B5147] px-6 py-3 text-sm font-bold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2"
+              >
+                Explore Beyond The Yellow →
+              </TrackedLink>
             </div>
           </div>
         </section>
 
-        <section className="border-b border-[#3B5147]/15 bg-white">
-          <div className="container-wide py-20 md:py-28">
-            <div className="grid gap-10 lg:grid-cols-12 lg:items-end">
-              <div className="lg:col-span-8">
-                <Eyebrow>Learn & Navigate</Eyebrow>
-                <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                  Understand the systems around care before you have to navigate them alone.
-                </h2>
-                <p className="mt-5 max-w-3xl text-lg leading-8 text-[#111814]/65">
-                  ValorWell resources cover CHAMPVA, VA Community Care, veteran mental health, military-family care, documentation, and related topics.
-                </p>
-              </div>
-              <div className="lg:col-span-4 lg:text-right">
-                <TrackedLink
-                  to="/resources"
-                  event="homepage_resources"
-                  className="inline-flex min-h-11 items-center gap-2 rounded-md border border-[#3B5147]/30 px-5 py-3 text-sm font-bold text-[#3B5147]"
-                >
-                  <BookOpen className="h-4 w-4" aria-hidden="true" />
-                  Browse Resources
-                </TrackedLink>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="border-b border-[#3B5147]/15 bg-[#F4F1E8]">
-          <div className="container-wide py-20 md:py-28">
-            <div className="max-w-3xl">
+        <section className="bg-white">
+          <div className="container-wide py-16 md:py-24">
+            <div className="max-w-4xl">
               <Eyebrow>Get Involved</Eyebrow>
               <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                Choose the role that matches what you can contribute.
+                However you can help, there&apos;s a specific way to start.
               </h2>
             </div>
-
-            <div className="mt-12 grid gap-5 lg:grid-cols-3">
-              <article className="rounded-3xl border border-[#3B5147]/15 bg-white p-8">
-                <Users className="h-8 w-8 text-[#3B5147]" aria-hidden="true" />
-                <h3 className="mt-6 text-2xl font-bold">Clinicians</h3>
-                <p className="mt-4 leading-7 text-[#111814]/64">
-                  Join ValorWell&apos;s telehealth clinician network and provide care to veterans and military families.
-                </p>
-                <TrackedLink to="/clinicians" event="homepage_clinicians" className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#3B5147]">
-                  Clinician Opportunities <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </TrackedLink>
-              </article>
-
-              <article className="rounded-3xl border border-[#3B5147]/15 bg-white p-8">
-                <Building2 className="h-8 w-8 text-[#3B5147]" aria-hidden="true" />
-                <h3 className="mt-6 text-2xl font-bold">Organizations</h3>
-                <p className="mt-4 leading-7 text-[#111814]/64">
-                  Build referral, community, service, or mission-aligned partnerships with ValorWell.
-                </p>
-                <TrackedLink to="/partner" event="homepage_partner" className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#3B5147]">
-                  Partner With ValorWell <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </TrackedLink>
-              </article>
-
-              <article className="rounded-3xl border border-[#D7A92E]/35 bg-[#F8F3E4] p-8">
-                <HeartHandshake className="h-8 w-8 text-[#8A6814]" aria-hidden="true" />
-                <h3 className="mt-6 text-2xl font-bold">Foundation Supporters</h3>
-                <p className="mt-4 leading-7 text-[#111814]/64">
-                  $75 funds one completed therapy session for a veteran who could not reach care through the appropriate VA channels. 100% of Foundation donations go directly to therapists.
-                </p>
-                <TrackedLink to="/impact" event="homepage_support" className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#3B5147]">
-                  Support the Foundation <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </TrackedLink>
-              </article>
-            </div>
-          </div>
-        </section>
-
-        <section className="bg-[#111814] text-white">
-          <div className="container-wide grid gap-10 py-16 md:py-20 lg:grid-cols-12 lg:items-center">
-            <div className="lg:col-span-8">
-              <Eyebrow light>Start Here</Eyebrow>
-              <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                Need care, want to understand the work, or looking for a way to participate?
-              </h2>
-            </div>
-            <div className="flex flex-wrap gap-3 lg:col-span-4 lg:justify-end">
-              <TrackedLink to="/get-care" event="homepage_final_care" className="inline-flex min-h-12 items-center rounded-md bg-white px-6 py-3 text-sm font-bold text-[#111814]">
-                Find Care
-              </TrackedLink>
-              <TrackedLink to="/about" event="homepage_final_about" className="inline-flex min-h-12 items-center rounded-md border border-white/30 px-6 py-3 text-sm font-bold text-white">
-                About ValorWell
-              </TrackedLink>
+            <div className="mt-12 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+              {involvementRoutes.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.title}
+                    to={item.to}
+                    onClick={() => trackHomeEvent(item.event)}
+                    className="group flex min-h-64 flex-col rounded-2xl border border-[#3B5147]/15 bg-[#F4F1E8] p-7 transition hover:-translate-y-1 hover:border-[#3B5147]/35 hover:shadow-lg motion-reduce:transform-none motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2"
+                    aria-label={`${item.title}: ${item.cta.replace(" →", "")}`}
+                  >
+                    <Icon className="h-8 w-8 text-[#3B5147]" aria-hidden="true" />
+                    <p className="mt-6 text-xs font-bold uppercase tracking-[0.16em] text-[#3B5147]">{item.audience}</p>
+                    <h3 className="mt-2 text-2xl font-bold">{item.title}</h3>
+                    <p className="mt-4 flex-1 leading-7 text-[#111814]/68">{item.description}</p>
+                    <span className="mt-6 text-sm font-bold text-[#3B5147] underline decoration-transparent underline-offset-4 group-hover:decoration-[#3B5147]">
+                      {item.cta}
+                    </span>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </section>

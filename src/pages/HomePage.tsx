@@ -27,7 +27,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { trackHomeEvent } from "@/lib/tracking";
 import {
   formatExactImpactValue,
-  HOMEPAGE_IMPACT_MULTIPLIER,
   normalizeHomepageImpactRows,
   type HomepageImpactPoint,
   type HomepageImpactRpcRow,
@@ -185,23 +184,20 @@ function FoundationImpactChart() {
           Live care activity
         </p>
         <p className="mt-2 text-lg font-bold text-white">Monthly documented-care total</p>
-        <p className="mt-2 text-sm leading-6 text-white/65">
-          Each value is calculated from appointments marked documented for that month × {HOMEPAGE_IMPACT_MULTIPLIER}, rounded to the nearest whole number.
-        </p>
         <p className="mt-2 text-xs text-white/50">
-          Current-month totals update as additional appointments are documented.
+          Snapshot refreshes weekly on Sundays at 12:00 AM Central.
         </p>
       </figcaption>
 
       {status === "loading" && (
         <div className="mt-6 flex h-72 items-center justify-center rounded-xl border border-white/10 bg-black/10 text-sm text-white/60" role="status">
-          Loading live monthly data…
+          Loading monthly data…
         </div>
       )}
 
       {status === "error" && (
         <div className="mt-6 flex h-72 items-center justify-center rounded-xl border border-white/10 bg-black/10 px-6 text-center text-sm text-white/60" role="status">
-          Live monthly chart data is temporarily unavailable.
+          Monthly chart data is temporarily unavailable.
         </div>
       )}
 
@@ -263,7 +259,7 @@ function FoundationImpactChart() {
           <ul className="sr-only">
             {impactData.map((point) => (
               <li key={point.month}>
-                {point.monthLabel}: {formatExactImpactValue(point.displayedValue)} ({formatExactImpactValue(point.documentedAppointments)} documented appointments × {HOMEPAGE_IMPACT_MULTIPLIER}, rounded).
+                {point.monthLabel}: {formatExactImpactValue(point.displayedValue)}.
               </li>
             ))}
           </ul>

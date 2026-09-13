@@ -9,12 +9,12 @@ const PAGES_DIR = path.join(PROOF_ROOT, "pages");
 const expectations = [
   {
     path: "/",
-    title: "ValorWell | Mental Health Care for Veterans & Military Families",
+    title: "ValorWell | Turning VA Coverage Into Mental Health Care",
     canonical: "https://valorwell.org/",
     body: [
-      "Mental health care and support for veterans and military families.",
-      "Foundation-funded therapy",
-      "See Foundation Impact",
+      "The VA said our kids were covered. No one would take the coverage.",
+      "No one else is fixing this from both sides",
+      "American Corporate Partners",
     ],
   },
   {

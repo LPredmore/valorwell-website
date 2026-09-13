@@ -27,67 +27,79 @@ function renderAbout() {
 describe("About ValorWell page", () => {
   afterEach(cleanup);
 
-  it("explains ValorWell through the Care, Impact, and Community architecture", () => {
+  it("opens with the approved first-person origin story framing", () => {
     renderAbout();
 
     expect(
       screen.getByRole("heading", {
         level: 1,
-        name: /ValorWell provides care\. The ValorWell Foundation separately funds therapy\./i,
-      }),
-    ).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /^ValorWell Care$/i })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /^ValorWell Foundation$/i })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /^Community$/i })).toBeInTheDocument();
-  });
-
-  it("separates operating work from the Foundation and keeps clinical judgment clinician-led", () => {
-    renderAbout();
-
-    expect(screen.getByRole("heading", { name: /Care, charitable funding, and community work have different roles/i })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /Nationwide mental-health care platform/i })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /Direct payment for veteran therapy/i })).toBeInTheDocument();
-    expect(
-      screen.getByText(/remains clinician-led and subject to professional licensure/i),
-    ).toBeInTheDocument();
-  });
-
-  it("publishes the founder role without assigning clinical authority to the founder", () => {
-    renderAbout();
-
-    expect(
-      screen.getByRole("heading", {
-        name: /Luke Predmore — Founder, ValorWell · Host, Beyond The Yellow/i,
+        name: "We built this because we couldn't get our own kids seen.",
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/clinical care.*remains clinician-led.*professional licensure, scope, and judgment/i),
+      screen.getByText("This is the short version. It's still true in every detail."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/In 2023, my family had CHAMPVA coverage through the VA/i),
     ).toBeInTheDocument();
   });
 
-  it("routes visitors into the current public architecture", () => {
+  it("keeps the specific provider reasons that drove the CHAMPVA access problem", () => {
     renderAbout();
 
-    expect(screen.getAllByRole("link", { name: /Read the Mission/i })[0]).toHaveAttribute(
+    expect(screen.getByText(/too much paperwork/i)).toBeInTheDocument();
+    expect(screen.getByText(/reimbursement rates that were too low/i)).toBeInTheDocument();
+    expect(screen.getByText(/credentialing that moved too slowly/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/coverage that no one will accept isn't coverage\. It's a document\./i),
+    ).toBeInTheDocument();
+  });
+
+  it("shows the verified 2023 and 2024 progression into Community Care and the Foundation", () => {
+    renderAbout();
+
+    expect(screen.getAllByText("2023")).toHaveLength(2);
+    expect(screen.getByText("2024")).toBeInTheDocument();
+    expect(
+      screen.getByText(/In 2024, we started trying to integrate with VA Community Care/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/That is why we started the ValorWell Foundation/i),
+    ).toBeInTheDocument();
+  });
+
+  it("describes the model as working inside coverage and bridging structural gaps", () => {
+    renderAbout();
+
+    expect(
+      screen.getByText(/some gaps are in the design of the system itself/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/ValorWell works inside VA-related coverage systems/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/The Foundation covers therapy when those systems still leave a veteran without treatment/i),
+    ).toBeInTheDocument();
+  });
+
+  it("routes the final handoff to How It Works and does not expose an advocacy link", () => {
+    renderAbout();
+
+    expect(screen.getByRole("link", { name: /See How It Works/i })).toHaveAttribute(
       "href",
-      "/mission",
+      "/how-it-works",
     );
-    expect(screen.getAllByRole("link", { name: /Foundation Impact/i })[0]).toHaveAttribute(
-      "href",
-      "/impact",
-    );
-    expect(screen.getAllByRole("link", { name: /Find Care/i })[0]).toHaveAttribute(
-      "href",
-      "/get-care",
-    );
-    expect(screen.getAllByRole("link", { name: /Support the Foundation/i })[0]).toHaveAttribute(
-      "href",
-      "/impact",
-    );
-    expect(screen.getAllByRole("link", { name: /Beyond The Yellow/i })[0]).toHaveAttribute(
-      "href",
-      "/beyond-the-yellow",
-    );
+
+    const links = screen.getAllByRole("link");
+    expect(links.some((link) => link.getAttribute("href") === "/advocacy")).toBe(false);
+  });
+
+  it("uses no page-level images or leadership section", () => {
+    const { container } = renderAbout();
+
+    expect(container.querySelector("img")).toBeNull();
+    expect(screen.queryByText(/Who's Behind ValorWell/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Luke Predmore — Founder/i)).not.toBeInTheDocument();
   });
 
   it("does not expose Operation Claims Success", () => {

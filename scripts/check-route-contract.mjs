@@ -206,6 +206,12 @@ function assertRealPrerenderedOutput(route, filePath) {
   if (html.includes("JavaScript is required")) {
     throw new Error(`JavaScript-required fallback remains in ${filePath}.`);
   }
+  if (route.path === "/" && html.includes("$75")) {
+    throw new Error("Homepage must not contain the $75 treatment amount.");
+  }
+  if (route.path === "/" && /\[\[[\s\S]*?\]\]/.test(html)) {
+    throw new Error("Homepage contains an unresolved [[...]] placeholder token.");
+  }
 
   const rootStart = html.indexOf('<div id="root">');
   const bodyEnd = html.indexOf("</body>", rootStart);

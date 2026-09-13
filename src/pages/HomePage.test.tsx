@@ -20,12 +20,6 @@ vi.mock("@/components/SEO", () => ({
   OrganizationSchema: () => null,
 }));
 
-vi.mock("@/components/DonateButton", () => ({
-  DonateButton: ({ children }: { children: React.ReactNode }) => (
-    <a href="/donate">{children}</a>
-  ),
-}));
-
 vi.mock("@/lib/tracking", () => ({
   trackHomeEvent: vi.fn(),
 }));

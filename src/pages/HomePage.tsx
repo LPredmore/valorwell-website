@@ -10,7 +10,6 @@ import {
 } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import heroFamily from "@/assets/hero-family.jpg";
-import { DonateButton } from "@/components/DonateButton";
 import { Layout } from "@/components/layout/Layout";
 import { OrganizationSchema, SEO } from "@/components/SEO";
 import { trackHomeEvent } from "@/lib/tracking";
@@ -256,14 +255,13 @@ export default function HomePage() {
                 >
                   See Full Foundation Impact →
                 </TrackedLink>
-                <DonateButton
-                  source="homepage-foundation-impact"
-                  size="lg"
-                  utmContent="fund-veteran-therapy"
-                  className="min-h-12 bg-[#D7A92E] text-[#111814] hover:bg-[#e2b943]"
+                <TrackedLink
+                  to="/donate"
+                  event="homepage_impact_donate"
+                  className="inline-flex min-h-12 items-center rounded-md bg-[#D7A92E] px-6 py-3 text-sm font-bold text-[#111814] hover:bg-[#e2b943] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D7A92E]"
                 >
                   Fund Veteran Therapy
-                </DonateButton>
+                </TrackedLink>
               </div>
             </div>
             <div className="lg:col-span-6">

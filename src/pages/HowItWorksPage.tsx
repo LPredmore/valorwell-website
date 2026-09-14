@@ -1,14 +1,6 @@
 import { useEffect, type ReactNode } from "react";
 import { Link } from "react-router-dom";
-import {
-  ArrowDown,
-  ArrowRight,
-  Building2,
-  FileText,
-  HeartHandshake,
-  Stethoscope,
-  Users,
-} from "lucide-react";
+import { ArrowDown, ArrowRight } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { BreadcrumbSchema, SEO } from "@/components/SEO";
 import { trackHomeEvent } from "@/lib/tracking";
@@ -40,65 +32,6 @@ function TrackedLink({
     >
       {children}
     </Link>
-  );
-}
-
-function AccessWallVisual({ larger = false }: { larger?: boolean }) {
-  return (
-    <div className="rounded-3xl border border-[#3B5147]/15 bg-[#F4F1E8] p-5 sm:p-7" aria-label={larger ? "VA Community Care access diagram" : "CHAMPVA access diagram"}>
-      <div className="grid items-center gap-4 sm:grid-cols-[1fr_auto_1fr]">
-        <div className="rounded-2xl bg-white p-5 text-center shadow-sm">
-          <Users className="mx-auto h-8 w-8 text-[#3B5147]" aria-hidden="true" />
-          <p className="mt-3 text-sm font-bold text-[#111814]">{larger ? "Veteran with authorization" : "Family with coverage"}</p>
-        </div>
-        <div className="flex flex-col items-center gap-2">
-          <div className="rounded-xl border border-[#B24A3A]/25 bg-[#B24A3A]/10 px-4 py-3 text-center">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#8C392E]">The wall</p>
-            <p className="mt-1 text-xs leading-5 text-[#111814]/65">reimbursement · credentialing · paperwork</p>
-          </div>
-          <ArrowDown className="h-5 w-5 text-[#3B5147] sm:hidden" aria-hidden="true" />
-          <ArrowRight className="hidden h-5 w-5 text-[#3B5147] sm:block" aria-hidden="true" />
-        </div>
-        <div className="rounded-2xl bg-[#3B5147] p-5 text-center text-white shadow-sm">
-          <Stethoscope className="mx-auto h-8 w-8 text-[#D7A92E]" aria-hidden="true" />
-          <p className="mt-3 text-sm font-bold">ValorWell removes the operational burden</p>
-          <p className="mt-2 text-xs leading-5 text-white/70">Coverage can turn into an actual appointment.</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function FundingFlowVisual() {
-  const nodes = [
-    ["Donor", HeartHandshake],
-    ["ValorWell Foundation", Building2],
-    ["Therapist", Stethoscope],
-    ["Veteran or family member", Users],
-  ] as const;
-
-  return (
-    <div className="rounded-3xl border border-[#D7A92E]/30 bg-[#111814] p-5 text-white sm:p-7" aria-label="Foundation funding flow from donor to treatment">
-      <div className="grid gap-3 md:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] md:items-center">
-        {nodes.map(([label, Icon], index) => (
-          <div key={label} className="contents">
-            <div className="rounded-2xl border border-white/12 bg-white/[0.06] p-5 text-center">
-              <Icon className="mx-auto h-8 w-8 text-[#D7A92E]" aria-hidden="true" />
-              <p className="mt-3 text-sm font-bold">{label}</p>
-              {label === "ValorWell Foundation" && (
-                <p className="mt-2 text-xs font-bold uppercase tracking-[0.14em] text-[#D7A92E]">0% retained</p>
-              )}
-            </div>
-            {index < nodes.length - 1 && (
-              <div className="flex justify-center text-[#D7A92E]">
-                <ArrowDown className="h-5 w-5 md:hidden" aria-hidden="true" />
-                <ArrowRight className="hidden h-5 w-5 md:block" aria-hidden="true" />
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
   );
 }
 
@@ -154,7 +87,7 @@ export default function HowItWorksPage() {
 
         <section className="border-b border-[#3B5147]/15 bg-white">
           <div className="container-wide grid gap-10 py-16 md:py-24 lg:grid-cols-12 lg:items-center lg:gap-16">
-            <div className="lg:col-span-6">
+            <div className="order-2 lg:order-1 lg:col-span-6">
               <Eyebrow>01 — CHAMPVA Access</Eyebrow>
               <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
                 Coverage existed. Providers who&apos;d take it didn&apos;t.
@@ -168,9 +101,17 @@ export default function HowItWorksPage() {
                 </p>
               </div>
             </div>
-            <div className="lg:col-span-6">
-              <AccessWallVisual />
-            </div>
+            <figure className="order-1 lg:order-2 lg:col-span-6">
+              <img
+                src="/how-it-works-champva.webp"
+                alt="A family with CHAMPVA coverage facing paperwork, reimbursement, and credentialing barriers, with ValorWell creating a path through to therapy."
+                width="600"
+                height="450"
+                loading="lazy"
+                decoding="async"
+                className="w-full rounded-[1.75rem] border border-[#3B5147]/15 shadow-[0_24px_70px_rgba(17,24,20,0.18)]"
+              />
+            </figure>
           </div>
           <div className="container-wide pb-16 md:pb-20">
             <p className="mx-auto max-w-4xl border-l-4 border-[#D7A92E] pl-5 text-xl font-bold leading-8 text-[#3B5147]">
@@ -181,10 +122,18 @@ export default function HowItWorksPage() {
 
         <section className="border-b border-[#3B5147]/15 bg-[#F4F1E8]">
           <div className="container-wide grid gap-10 py-16 md:py-24 lg:grid-cols-12 lg:items-center lg:gap-16">
-            <div className="order-2 lg:order-1 lg:col-span-6">
-              <AccessWallVisual larger />
-            </div>
-            <div className="order-1 lg:order-2 lg:col-span-6">
+            <figure className="order-1 lg:col-span-6">
+              <img
+                src="/how-it-works-vaccn.webp"
+                alt="A veteran holding a VA Community Care authorization facing credentialing, paperwork, and operational barriers, while ValorWell opens the path to an appointment."
+                width="600"
+                height="450"
+                loading="lazy"
+                decoding="async"
+                className="w-full rounded-[1.75rem] border border-[#3B5147]/15 shadow-[0_24px_70px_rgba(17,24,20,0.18)]"
+              />
+            </figure>
+            <div className="order-2 lg:col-span-6">
               <Eyebrow>02 — VA Community Care (VACCN)</Eyebrow>
               <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
                 Authorized for outside care. Still couldn&apos;t get an appointment.
@@ -211,7 +160,7 @@ export default function HowItWorksPage() {
 
         <section className="border-b border-white/10 bg-[#111814] text-white">
           <div className="container-wide grid gap-10 py-16 md:py-24 lg:grid-cols-12 lg:items-center lg:gap-16">
-            <div className="lg:col-span-6">
+            <div className="order-2 lg:order-1 lg:col-span-6">
               <Eyebrow light>03 — The ValorWell Foundation</Eyebrow>
               <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
                 When the fix has to be structural, someone still needs care today.
@@ -228,9 +177,17 @@ export default function HowItWorksPage() {
                 </p>
               </div>
             </div>
-            <div className="lg:col-span-6">
-              <FundingFlowVisual />
-            </div>
+            <figure className="order-1 lg:order-2 lg:col-span-6">
+              <img
+                src="/how-it-works-foundation.webp"
+                alt="A veteran family stranded by a structural system gap, with the ValorWell Foundation bridging the gap so therapy can happen now."
+                width="600"
+                height="450"
+                loading="lazy"
+                decoding="async"
+                className="w-full rounded-[1.75rem] border border-[#D7A92E]/30 shadow-[0_24px_80px_rgba(0,0,0,0.42)]"
+              />
+            </figure>
           </div>
           <div className="container-wide flex flex-wrap gap-3 pb-16 md:pb-20">
             <TrackedLink

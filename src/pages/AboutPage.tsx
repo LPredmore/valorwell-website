@@ -42,13 +42,13 @@ function TrackedLink({
 const timeline = [
   {
     year: "2023",
-    title: "We couldn't get CHAMPVA-covered care for our own family.",
-    body: "The coverage existed, but provider after provider would not take it.",
+    title: "Our kids needed care, and CHAMPVA coverage was not enough to get them seen.",
+    body: "That was the problem that forced us to start looking for a different way.",
   },
   {
     year: "2023",
-    title: "ValorWell started by making that coverage usable.",
-    body: "We built the therapist network and the operational and billing infrastructure around CHAMPVA.",
+    title: "ValorWell launched for every family facing the same wall.",
+    body: "The idea began with our children. The company began with a commitment not to stop with them.",
   },
   {
     year: "2024",
@@ -71,7 +71,7 @@ export default function AboutPage() {
     <Layout>
       <SEO
         title="Our Story | About ValorWell"
-        description="ValorWell began after one military family could not turn CHAMPVA coverage into actual mental-health care. This is how that experience became a care platform and the ValorWell Foundation."
+        description="ValorWell began with a father trying to get his children care and a mother who refused to let the solution stop with their family. From the beginning, ValorWell was built for everyone facing the same VA coverage gap."
         canonical="/about"
       />
       <BreadcrumbSchema
@@ -99,10 +99,10 @@ export default function AboutPage() {
             <div className="max-w-5xl">
               <Eyebrow>Our Story</Eyebrow>
               <h1 className="mt-6 max-w-5xl text-4xl font-bold leading-[1.03] sm:text-5xl md:text-6xl lg:text-7xl">
-                We built this because we couldn&apos;t get our own kids seen.
+                ValorWell started with a father willing to build a company just to get his kids care — and a mother who refused to let it stop with them.
               </h1>
               <p className="mt-7 max-w-3xl text-lg leading-8 text-[#111814]/68 md:text-xl">
-                This is the short version. It&apos;s still true in every detail.
+                The idea began with our family. The company began with a promise that if we found a way through, we would not keep it to ourselves.
               </p>
             </div>
           </div>
@@ -124,19 +124,23 @@ export default function AboutPage() {
               </p>
 
               <p>
-                So I started building what we could not find. In 2023, ValorWell began with a straightforward goal: find therapists willing to take CHAMPVA and build the operational and billing infrastructure that made it workable for both the family and the provider.
+                Eventually, I said what felt like the simplest solution left: I would start a company, learn how to bill CHAMPVA, and hire a therapist so our kids could finally get the care they needed. At that moment, I was trying to solve the problem directly in front of me.
+              </p>
+
+              <p className="border-l-4 border-[#3B5147] bg-[#F4F1E8] px-6 py-5 text-xl font-bold leading-8 text-[#111814] md:text-2xl md:leading-9">
+                My wife asked the question that changed what ValorWell would become: “Who would we be if we just did this for ourselves?”
               </p>
 
               <p>
-                At first, this was a solution to the problem sitting directly in front of us. Then we found out it was not just our family.
+                That was the line between an idea for our family and the company we actually built. ValorWell may have been born because our children needed care, but when we started the company in 2023, it was never meant to belong only to us. From the beginning, the goal was to make the same path available to every family hitting the wall we had just hit.
               </p>
 
               <p>
-                Other CHAMPVA families were hitting the same wall. The problem was not that the benefit did not exist. The problem was that the systems around the benefit made it difficult for providers to participate and difficult for families to turn coverage into an appointment.
+                So we built the therapist network and the operational and billing infrastructure around CHAMPVA with that larger mission already in place. The problem was not that the benefit did not exist. The problem was that the systems around the benefit made it difficult for providers to participate and difficult for families to turn coverage into an appointment.
               </p>
 
               <p>
-                By that point, the story had stopped being only mine. ValorWell had become a team, and the work had become bigger than one family. We had learned how to make one VA-related coverage pathway more usable, so we started asking whether the same approach could help veterans using VA Community Care.
+                As ValorWell grew, the work became bigger than CHAMPVA. We had learned how to make one VA-related coverage pathway more usable, so we started asking whether the same approach could help veterans using VA Community Care.
               </p>
 
               <p>
@@ -160,7 +164,7 @@ export default function AboutPage() {
               </p>
 
               <p className="text-xl font-bold leading-8 text-[#3B5147] md:text-2xl md:leading-9">
-                We started by trying to make VA coverage work. We ended up building a system for what happens when it does — and when it doesn&apos;t.
+                Our children were the reason we started looking for a way through. The decision not to stop with our own family is the reason ValorWell exists.
               </p>
             </article>
           </div>

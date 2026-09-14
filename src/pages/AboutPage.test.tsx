@@ -27,20 +27,26 @@ function renderAbout() {
 describe("About ValorWell page", () => {
   afterEach(cleanup);
 
-  it("opens with the approved first-person origin story framing", () => {
+  it("opens with the family origin and the decision to build for everyone", () => {
     renderAbout();
 
     expect(
       screen.getByRole("heading", {
         level: 1,
-        name: "We built this because we couldn't get our own kids seen.",
+        name: "ValorWell started with a father willing to build a company just to get his kids care — and a mother who refused to let it stop with them.",
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("This is the short version. It's still true in every detail."),
+      screen.getByText(/The idea began with our family\. The company began with a promise/i),
     ).toBeInTheDocument();
     expect(
       screen.getByText(/In 2023, my family had CHAMPVA coverage through the VA/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Who would we be if we just did this for ourselves\?/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/when we started the company in 2023, it was never meant to belong only to us/i),
     ).toBeInTheDocument();
   });
 

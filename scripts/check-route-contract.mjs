@@ -98,7 +98,6 @@ const progressiveEnhancementContent = new Map([
       'href="/foundation"',
       'href="/donate"',
       "100% of every donation goes directly to the treating therapist.",
-      "0% retained",
     ],
   ],
   [
@@ -178,7 +177,7 @@ function routeIndexPath(route) {
 }
 
 function routeExtensionlessPath(route) {
-  return route === "/"
+ return route === "/"
     ? path.join(DIST_DIR, "index.html")
     : path.join(DIST_DIR, `${route.replace(/^\//, "")}.html`);
 }

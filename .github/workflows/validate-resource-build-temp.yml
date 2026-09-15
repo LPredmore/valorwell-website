@@ -49,7 +49,21 @@ jobs:
         run: node scripts/check-positioning-guardrails.mjs
 
       - name: Check route contract
-        run: node scripts/check-route-contract.mjs
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/check-route-contract.mjs 2>&1 | tee route-check.log
 
       - name: Prove real React server prerendering
         run: node scripts/run-prerender-proof.mjs
+
+      - name: Upload route diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: resource-route-diagnostics
+          path: |
+            route-check.log
+            dist/sitemap.xml
+            dist/resources
+          if-no-files-found: warn

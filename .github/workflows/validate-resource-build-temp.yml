@@ -1,0 +1,28 @@
+name: Validate Resource Build
+
+on:
+  push:
+    branches:
+      - feature/supabase-resource-library
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Supabase-backed website
+        run: npm run build
+
+      - name: Prove real React server prerendering
+        run: node scripts/run-prerender-proof.mjs

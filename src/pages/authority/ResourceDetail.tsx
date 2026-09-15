@@ -135,7 +135,7 @@ export default function ResourceDetail({ slug }: ResourceDetailProps) {
 
   return (
     <AuthorityPage
-      title={resource.title}
+      title={`${resource.title} | ValorWell`}
       description={resource.summary}
       canonical={`/resources/${resource.slug}`}
       breadcrumbs={[

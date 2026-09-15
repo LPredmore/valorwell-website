@@ -35,11 +35,8 @@ import AuthorityFamilySystems from "./pages/authority/FamilySystems";
 import AuthorityMilitaryFamilyTherapy from "./pages/authority/MilitaryFamilyTherapy";
 import AuthorityVeteranMentalHealthCare from "./pages/authority/VeteranMentalHealthCare";
 import AuthorityVACommunityCareMentalHealth from "./pages/authority/VACommunityCareMentalHealth";
-import AuthorityResourcesChampva from "./pages/authority/ResourcesChampva";
-import AuthorityResourcesDocumentation from "./pages/authority/ResourcesDocumentation";
-import AuthorityResourcesFamilySystems from "./pages/authority/ResourcesFamilySystems";
-import AuthorityResourcesVACommunityCare from "./pages/authority/ResourcesVACommunityCare";
-import AuthorityResourcesVeteranMentalHealth from "./pages/authority/ResourcesVeteranMentalHealth";
+import AuthorityResourceDetail from "./pages/authority/ResourceDetail";
+import { getPublishedResourceByPath } from "./lib/websiteResources";
 
 function LegacyRedirect({ to }: { to: string }) {
   const location = useLocation();
@@ -74,11 +71,6 @@ const routeElements: Record<string, ReactNode> = {
   "/military-family-therapy": <AuthorityMilitaryFamilyTherapy />,
   "/family-systems": <AuthorityFamilySystems />,
   "/resources": <AuthorityResources />,
-  "/resources/champva": <AuthorityResourcesChampva />,
-  "/resources/va-community-care": <AuthorityResourcesVACommunityCare />,
-  "/resources/documentation": <AuthorityResourcesDocumentation />,
-  "/resources/veteran-mental-health": <AuthorityResourcesVeteranMentalHealth />,
-  "/resources/family-systems": <AuthorityResourcesFamilySystems />,
   "/partner": <Partner />,
   "/contact": <Contact />,
   "/gallantfew": <GallantFewPage />,
@@ -95,6 +87,15 @@ const routeElements: Record<string, ReactNode> = {
   "/pendulo": <Pendulo />,
 };
 
+function resolveRouteElement(path: string): ReactNode {
+  const resource = getPublishedResourceByPath(path);
+  if (resource) {
+    return <AuthorityResourceDetail slug={resource.slug} />;
+  }
+
+  return routeElements[path] ?? <NotFound />;
+}
+
 export function AppRoutes() {
   return (
     <Routes>
@@ -102,7 +103,7 @@ export function AppRoutes() {
         <Route
           key={route.path}
           path={route.path}
-          element={routeElements[route.path]}
+          element={resolveRouteElement(route.path)}
         />
       ))}
 

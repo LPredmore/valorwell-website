@@ -2,6 +2,7 @@ import { useEffect, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
+  BookOpen,
   ClipboardCheck,
   HeartPulse,
   ShieldCheck,
@@ -11,6 +12,7 @@ import {
 } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { SEO, BreadcrumbSchema } from "@/components/SEO";
+import { getPublishedResources } from "@/lib/websiteResources";
 import { trackHomeEvent } from "@/lib/tracking";
 
 type ResourceCategory = {
@@ -20,38 +22,20 @@ type ResourceCategory = {
   Icon: LucideIcon;
 };
 
-const categories: ResourceCategory[] = [
-  {
-    name: "CHAMPVA",
-    href: "/resources/champva",
-    body: "Provider access, telehealth, participation questions, patient responsibility, and information to confirm before relying on a care pathway.",
-    Icon: HeartPulse,
-  },
-  {
-    name: "VA Community Care",
-    href: "/resources/va-community-care",
-    body: "Referrals, authorization, provider pathways, records to keep, and questions to ask when the process stalls.",
-    Icon: ShieldCheck,
-  },
-  {
-    name: "Clinical Documentation",
-    href: "/resources/documentation",
-    body: "Treatment records, functional impact, documentation boundaries, and the role clinical documentation can play across care systems.",
-    Icon: ClipboardCheck,
-  },
-  {
-    name: "Veteran Mental Health",
-    href: "/resources/veteran-mental-health",
-    body: "Therapy access, PTSD-related concerns, family strain, transition stress, telehealth, and deciding what kind of help to seek next.",
-    Icon: Stethoscope,
-  },
-  {
-    name: "Family Systems",
-    href: "/resources/family-systems",
-    body: "Communication, parenting systems, emotional regulation, conflict repair, family meetings, and repeatable household frameworks.",
-    Icon: Users,
-  },
-];
+const iconBySlug: Record<string, LucideIcon> = {
+  champva: HeartPulse,
+  "va-community-care": ShieldCheck,
+  documentation: ClipboardCheck,
+  "veteran-mental-health": Stethoscope,
+  "family-systems": Users,
+};
+
+const categories: ResourceCategory[] = getPublishedResources().map((resource) => ({
+  name: resource.title,
+  href: `/resources/${resource.slug}`,
+  body: resource.summary,
+  Icon: iconBySlug[resource.slug] ?? BookOpen,
+}));
 
 function Eyebrow({ children, light = false }: { children: ReactNode; light?: boolean }) {
   return (
@@ -74,7 +58,7 @@ export default function Resources() {
     <Layout>
       <SEO
         title="Veteran & Family Mental Health Resources | ValorWell"
-        description="Browse ValorWell resources on CHAMPVA, VA Community Care, veteran mental health, clinical documentation, and family systems."
+        description="Browse ValorWell resources on veteran and family mental health, care access, coverage, documentation, and practical family systems."
         canonical="/resources"
       />
       <BreadcrumbSchema
@@ -130,9 +114,9 @@ export default function Resources() {
         <section className="border-b border-[#3B5147]/15 bg-white">
           <div className="container-wide py-20 md:py-28">
             <div className="max-w-3xl">
-              <Eyebrow>Resource Categories</Eyebrow>
+              <Eyebrow>Resource Library</Eyebrow>
               <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                Browse by topic.
+                Browse current guidance.
               </h2>
             </div>
 
@@ -153,7 +137,7 @@ export default function Resources() {
                   <h3 className="mt-6 text-2xl font-bold">{name}</h3>
                   <p className="mt-4 leading-7 text-[#111814]/64">{body}</p>
                   <span className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#3B5147]">
-                    Explore this category
+                    Read this resource
                     <ArrowRight
                       className="h-4 w-4 transition-transform group-hover:translate-x-0.5 motion-reduce:transform-none motion-reduce:transition-none"
                       aria-hidden="true"

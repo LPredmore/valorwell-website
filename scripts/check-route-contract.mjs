@@ -7,6 +7,7 @@ import {
   retiredRoutes,
   validateRouteContract,
 } from "../site-route-contract.mjs";
+import { generatedResourceRoutes } from "../route-contract/generated-resource-routes.mjs";
 
 const ROOT_DIR = process.cwd();
 const DIST_DIR = path.join(ROOT_DIR, "dist");
@@ -97,7 +98,6 @@ const progressiveEnhancementContent = new Map([
       'href="/foundation"',
       'href="/donate"',
       "100% of every donation goes directly to the treating therapist.",
-      "0% retained",
     ],
   ],
   [
@@ -177,7 +177,7 @@ function routeIndexPath(route) {
 }
 
 function routeExtensionlessPath(route) {
-  return route === "/"
+ return route === "/"
     ? path.join(DIST_DIR, "index.html")
     : path.join(DIST_DIR, `${route.replace(/^\//, "")}.html`);
 }
@@ -345,8 +345,48 @@ if (wrangler.assets?.directory !== "./dist") {
 }
 
 const appRoutesSource = fs.readFileSync(APP_ROUTES_PATH, "utf8");
+const generatedResourceRoutePaths = new Set(
+  generatedResourceRoutes.map((route) => route.path),
+);
+
+if (generatedResourceRoutePaths.size !== generatedResourceRoutes.length) {
+  throw new Error("Generated resource routes contain duplicate paths.");
+}
+
+for (const route of generatedResourceRoutes) {
+  if (!route.path.startsWith("/resources/")) {
+    throw new Error(`Generated resource route is outside /resources/: ${route.path}`);
+  }
+  const canonicalRoute = canonicalRoutes.find((candidate) => candidate.path === route.path);
+  if (!canonicalRoute) {
+    throw new Error(`Generated resource route is missing from the canonical contract: ${route.path}`);
+  }
+  if (
+    canonicalRoute.title !== route.title ||
+    canonicalRoute.description !== route.description ||
+    canonicalRoute.h1 !== route.h1 ||
+    canonicalRoute.lead !== route.lead
+  ) {
+    throw new Error(`Generated resource route metadata differs from the canonical contract: ${route.path}`);
+  }
+}
+
+const supportsGeneratedResourceRoutes =
+  appRoutesSource.includes("getPublishedResourceByPath") &&
+  appRoutesSource.includes("AuthorityResourceDetail");
+
 for (const route of canonicalRoutes) {
   if (route.path === "/") continue;
+
+  if (generatedResourceRoutePaths.has(route.path)) {
+    if (!supportsGeneratedResourceRoutes) {
+      throw new Error(
+        `Generated canonical resource routes are not wired through AppRoutes.tsx: ${route.path}`,
+      );
+    }
+    continue;
+  }
+
   if (!appRoutesSource.includes(`"${route.path}"`)) {
     throw new Error(`Canonical route is missing from AppRoutes.tsx: ${route.path}`);
   }

@@ -1,3 +1,5 @@
+import { generatedResourceRoutes } from "./generated-resource-routes.mjs";
+
 export const routes = [
   {
     "path": "/veteran-mental-health-care",
@@ -38,55 +40,11 @@ export const routes = [
   {
     "path": "/resources",
     "title": "Veteran & Family Mental Health Resources | ValorWell",
-    "description": "Browse ValorWell resources on CHAMPVA, VA Community Care, veteran mental health, clinical documentation, and family systems.",
+    "description": "Browse ValorWell resources on veteran and family mental health, care access, coverage, documentation, and practical family systems.",
     "h1": "Practical guidance for navigating care, coverage, documentation, and family systems.",
     "lead": "ValorWell resources explain terminology, common process steps, questions to ask, and when current information should be confirmed with the responsible program or provider.",
     "indexable": true,
     "sitemap": true
   },
-  {
-    "path": "/resources/champva",
-    "title": "CHAMPVA Mental Health Resources | ValorWell",
-    "description": "Plain-language CHAMPVA mental health resources covering provider access, telehealth, participation questions, patient responsibility, and care-pathway basics.",
-    "h1": "CHAMPVA mental health resources.",
-    "lead": "Use these resources to understand common CHAMPVA mental health care questions and what information to confirm before relying on a provider or payment pathway.",
-    "indexable": true,
-    "sitemap": true
-  },
-  {
-    "path": "/resources/va-community-care",
-    "title": "VA Community Care Mental Health Resources | ValorWell",
-    "description": "Plain-language resources for veterans navigating VA Community Care mental health referrals, authorization, access barriers, and documentation to keep.",
-    "h1": "VA Community Care mental health resources.",
-    "lead": "Understand the moving parts around referrals, authorization, provider availability, and community mental health care.",
-    "indexable": true,
-    "sitemap": true
-  },
-  {
-    "path": "/resources/documentation",
-    "title": "Mental Health Documentation Resources | ValorWell",
-    "description": "Understand treatment records, functional impact, documentation boundaries, and the role clinical documentation can play across care systems.",
-    "h1": "Clinical documentation resources.",
-    "lead": "Learn what mental health documentation can record, how treatment records are used, and where clinical documentation has important limits.",
-    "indexable": true,
-    "sitemap": true
-  },
-  {
-    "path": "/resources/veteran-mental-health",
-    "title": "Veteran Mental Health Resources | ValorWell",
-    "description": "Resources on veteran mental health, therapy access, PTSD-related concerns, family strain, transition stress, telehealth, and seeking care.",
-    "h1": "Veteran mental health resources.",
-    "lead": "Use these resources to understand common mental health concerns, care options, and questions that can help identify the next step.",
-    "indexable": true,
-    "sitemap": true
-  },
-  {
-    "path": "/resources/family-systems",
-    "title": "Family Systems Resources | ValorWell",
-    "description": "Resources on communication, parenting systems, emotional regulation, conflict repair, family meetings, and repeatable household frameworks.",
-    "h1": "Family systems resources.",
-    "lead": "Practical family-system resources for communication, routines, conflict repair, parenting, and household structure.",
-    "indexable": true,
-    "sitemap": true
-  }
+  ...generatedResourceRoutes,
 ];

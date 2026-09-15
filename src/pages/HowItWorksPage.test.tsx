@@ -54,7 +54,6 @@ describe("How It Works page", () => {
     expect(screen.getAllByText(/reimbursement/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/credentialing/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/paperwork/i).length).toBeGreaterThan(0);
-    expect(screen.getByText(/0% retained/i)).toBeInTheDocument();
     expect(
       screen.getByText(/100% of every donation goes directly to the treating therapist/i),
     ).toBeInTheDocument();

@@ -21,8 +21,35 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build Supabase-backed website
-        run: npm run build
+      - name: Generate published resources from Billing Hub
+        run: npm run generate:resources
+
+      - name: Compile Vite site
+        run: npx vite build
+
+      - name: Generate route artifacts
+        run: node scripts/generate-route-artifacts.mjs
+
+      - name: Generate prerendered route HTML
+        run: node scripts/generate-route-html.mjs
+
+      - name: Remove retired routes
+        run: node scripts/remove-retired-routes.mjs
+
+      - name: Normalize Cloudflare HTML
+        run: node scripts/normalize-cloudflare-html.mjs
+
+      - name: Normalize production origin
+        run: node scripts/normalize-production-origin.mjs
+
+      - name: Check clinician recruiting HTML
+        run: node scripts/check-clinician-recruiting-html.mjs
+
+      - name: Check positioning guardrails
+        run: node scripts/check-positioning-guardrails.mjs
+
+      - name: Check route contract
+        run: node scripts/check-route-contract.mjs
 
       - name: Prove real React server prerendering
         run: node scripts/run-prerender-proof.mjs

@@ -342,12 +342,13 @@ export default function HomePage() {
         <section className="border-b border-[#3B5147]/15 bg-[#F4F1E8]">
           <div className="container-wide py-12 text-center md:py-18 lg:py-20">
             <img
-              src="/valorwell-system.webp"
+              src={homepageFixingBothSides.url}
               alt="ValorWell's three-part system: working inside VA coverage programs, funding therapy when coverage fails, and changing the system so the backup is needed less over time"
               className="mx-auto h-auto w-full max-w-7xl"
-              width="1672"
-              height="941"
+              width="1536"
+              height="864"
               loading="eager"
+              decoding="async"
             />
             <h2 className="mx-auto mt-8 max-w-5xl text-3xl font-bold leading-tight text-[#111814] md:text-5xl">
               No one else is fixing this from both sides — inside the VA&apos;s own coverage programs, and outside them when the system still fails.

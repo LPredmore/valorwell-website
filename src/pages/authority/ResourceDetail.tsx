@@ -57,7 +57,7 @@ function stripInlineMarkdown(value: string): string {
     .trim();
 }
 
-export function parseResourceMarkdown(markdown: string): AuthoritySection[] {
+function parseResourceMarkdown(markdown: string): AuthoritySection[] {
   const sections: ParsedSection[] = [];
   let current: ParsedSection | null = null;
   let suppressing = false;

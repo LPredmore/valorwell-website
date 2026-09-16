@@ -1,16 +1,18 @@
 import type { ReactNode } from "react";
+import { useParams } from "react-router-dom";
 import {
   AuthorityPage,
   type AuthoritySection,
 } from "@/components/authority/AuthorityPage";
+import { Layout } from "@/components/layout/Layout";
 import NotFound from "@/pages/NotFound";
 import {
-  getPublishedResourceBySlug,
-  getPublishedResources,
+  usePublishedResource,
+  usePublishedResources,
 } from "@/lib/websiteResources";
 
 type ResourceDetailProps = {
-  slug: string;
+  slug?: string;
 };
 
 type ParsedSection = {
@@ -120,11 +122,37 @@ function buildSourceNote(urls: string[]): ReactNode | undefined {
   );
 }
 
-export default function ResourceDetail({ slug }: ResourceDetailProps) {
-  const resource = getPublishedResourceBySlug(slug);
+function ResourceStatus({ message }: { message: string }) {
+  return (
+    <Layout>
+      <div className="bg-[#F4F1E8] text-[#111814]">
+        <div className="container-narrow py-24 md:py-32">
+          <p className="text-lg text-[#111814]/68" role="status" aria-live="polite">
+            {message}
+          </p>
+        </div>
+      </div>
+    </Layout>
+  );
+}
+
+export default function ResourceDetail({ slug: slugProp }: ResourceDetailProps) {
+  const params = useParams<{ slug: string }>();
+  const slug = slugProp ?? params.slug;
+
+  const { data: resource, isPending, isError } = usePublishedResource(slug);
+  const { data: allResources } = usePublishedResources();
+
+  if (!slug) return <NotFound />;
+  if (isPending) return <ResourceStatus message="Loading resource…" />;
+  if (isError) {
+    return (
+      <ResourceStatus message="We could not load this resource right now. Please refresh the page and try again." />
+    );
+  }
   if (!resource) return <NotFound />;
 
-  const related = getPublishedResources()
+  const related = (allResources ?? [])
     .filter((candidate) => candidate.slug !== resource.slug)
     .slice(0, 3)
     .map((candidate) => ({

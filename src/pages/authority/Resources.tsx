@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { SEO, BreadcrumbSchema } from "@/components/SEO";
-import { getPublishedResources } from "@/lib/websiteResources";
+import { usePublishedResources } from "@/lib/websiteResources";
 import { trackHomeEvent } from "@/lib/tracking";
 
 type ResourceCategory = {
@@ -30,12 +30,6 @@ const iconBySlug: Record<string, LucideIcon> = {
   "family-systems": Users,
 };
 
-const categories: ResourceCategory[] = getPublishedResources().map((resource) => ({
-  name: resource.title,
-  href: `/resources/${resource.slug}`,
-  body: resource.summary,
-  Icon: iconBySlug[resource.slug] ?? BookOpen,
-}));
 
 function Eyebrow({ children, light = false }: { children: ReactNode; light?: boolean }) {
   return (

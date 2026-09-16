@@ -124,6 +124,18 @@ export default function Resources() {
               </h2>
             </div>
 
+            {isPending && (
+              <p className="mt-12 text-[#111814]/64" role="status" aria-live="polite">
+                Loading resources…
+              </p>
+            )}
+
+            {isError && (
+              <p className="mt-12 text-[#111814]/64" role="status" aria-live="polite">
+                We could not load the resource library right now. Please refresh the page and try again.
+              </p>
+            )}
+
             <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
               {categories.map(({ name, href, body, Icon }) => (
                 <Link

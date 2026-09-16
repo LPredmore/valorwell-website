@@ -22696,6 +22696,7 @@ export type Database = {
           audience_tags: string[]
           body_markdown: string
           canonical_topic_key: string
+          category_slug: string | null
           coverage_status: string
           created_at: string
           faq: Json
@@ -22704,6 +22705,7 @@ export type Database = {
           live_url: string | null
           primary_question: string
           published_at: string | null
+          resource_kind: string
           slug: string
           source_urls: string[]
           status: string
@@ -22717,6 +22719,7 @@ export type Database = {
           audience_tags?: string[]
           body_markdown: string
           canonical_topic_key: string
+          category_slug?: string | null
           coverage_status?: string
           created_at?: string
           faq?: Json
@@ -22725,6 +22728,7 @@ export type Database = {
           live_url?: string | null
           primary_question: string
           published_at?: string | null
+          resource_kind?: string
           slug: string
           source_urls?: string[]
           status?: string
@@ -22738,6 +22742,7 @@ export type Database = {
           audience_tags?: string[]
           body_markdown?: string
           canonical_topic_key?: string
+          category_slug?: string | null
           coverage_status?: string
           created_at?: string
           faq?: Json
@@ -22746,6 +22751,7 @@ export type Database = {
           live_url?: string | null
           primary_question?: string
           published_at?: string | null
+          resource_kind?: string
           slug?: string
           source_urls?: string[]
           status?: string
@@ -22933,11 +22939,13 @@ export type Database = {
         Row: {
           ambiguous_rows: number | null
           discrepant_rows: number | null
+          dismissed_rows: number | null
           era_paid_total: number | null
           period_month: string | null
           posted_rows: number | null
           report_paid_total: number | null
           tenant_id: string | null
+          total_rows: number | null
           unmatched_rows: number | null
         }
         Relationships: []
@@ -25096,6 +25104,10 @@ export type Database = {
           p_series_id: string
         }
         Returns: Json
+      }
+      canonical_payment_source_system: {
+        Args: { p_value: string }
+        Returns: string
       }
       check_assessments_due:
         | {

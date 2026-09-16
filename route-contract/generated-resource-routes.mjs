@@ -21,6 +21,15 @@ export const generatedResourceRoutes = [
     "sitemap": true
   },
   {
+    "path": "/resources/military-separation-limited-communication",
+    "title": "Coping With Limited or No Contact During a Military Separation | ValorWell",
+    "description": "Practical ways military families can manage uncertainty, routines, communication expectations, and support when contact is limited or unavailable.",
+    "h1": "Coping With Limited or No Contact During a Military Separation",
+    "lead": "Practical ways military families can manage uncertainty, routines, communication expectations, and support when contact is limited or unavailable.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
     "path": "/resources/family-systems",
     "title": "Family Systems Resources | ValorWell",
     "description": "Shared frameworks families can use repeatedly instead of rebuilding the rules in the middle of every conflict.",

@@ -23,12 +23,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          old_ein='93-3129745'
+          old_ein='93-3129''745'
           new_ein='99-2872954'
 
           mapfile -t files < <(git grep -l -F "$old_ein" || true)
           if (( ${#files[@]} == 0 )); then
-            echo "No occurrences of $old_ein remain."
+            echo "No occurrences of the old Foundation EIN remain."
             exit 0
           fi
 

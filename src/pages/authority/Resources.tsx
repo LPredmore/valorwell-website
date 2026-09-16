@@ -48,6 +48,16 @@ export default function Resources() {
     trackHomeEvent("resources_page_view", { page: "resources" });
   }, []);
 
+  const { data, isPending, isError } = usePublishedResources();
+
+  const categories: ResourceCategory[] = (data ?? []).map((resource) => ({
+    name: resource.title,
+    href: `/resources/${resource.slug}`,
+    body: resource.summary,
+    Icon: iconBySlug[resource.slug] ?? BookOpen,
+  }));
+
+
   return (
     <Layout>
       <SEO

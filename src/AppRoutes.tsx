@@ -36,6 +36,7 @@ import AuthorityMilitaryFamilyTherapy from "./pages/authority/MilitaryFamilyTher
 import AuthorityVeteranMentalHealthCare from "./pages/authority/VeteranMentalHealthCare";
 import AuthorityVACommunityCareMentalHealth from "./pages/authority/VACommunityCareMentalHealth";
 import AuthorityResourceDetail from "./pages/authority/ResourceDetail";
+import AuthorityResourceCategory from "./pages/authority/ResourceCategory";
 
 function LegacyRedirect({ to }: { to: string }) {
   const location = useLocation();

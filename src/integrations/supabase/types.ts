@@ -810,6 +810,84 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_operations_youtube_videos: {
+        Row: {
+          channel_id: string
+          created_at: string
+          description: string
+          duration_seconds: number | null
+          id: string
+          last_synced_at: string
+          original_filename: string | null
+          playlist_ids: string[]
+          playlist_names: string[]
+          privacy_status: string
+          published_at: string | null
+          tenant_id: string
+          title: string
+          transcript: string | null
+          transcript_attempts: number
+          transcript_error: string | null
+          transcript_language: string | null
+          transcript_last_attempt_at: string | null
+          transcript_source: string | null
+          transcript_status: string
+          updated_at: string
+          url: string
+          video_id: string
+        }
+        Insert: {
+          channel_id: string
+          created_at?: string
+          description?: string
+          duration_seconds?: number | null
+          id?: string
+          last_synced_at?: string
+          original_filename?: string | null
+          playlist_ids?: string[]
+          playlist_names?: string[]
+          privacy_status?: string
+          published_at?: string | null
+          tenant_id: string
+          title?: string
+          transcript?: string | null
+          transcript_attempts?: number
+          transcript_error?: string | null
+          transcript_language?: string | null
+          transcript_last_attempt_at?: string | null
+          transcript_source?: string | null
+          transcript_status?: string
+          updated_at?: string
+          url: string
+          video_id: string
+        }
+        Update: {
+          channel_id?: string
+          created_at?: string
+          description?: string
+          duration_seconds?: number | null
+          id?: string
+          last_synced_at?: string
+          original_filename?: string | null
+          playlist_ids?: string[]
+          playlist_names?: string[]
+          privacy_status?: string
+          published_at?: string | null
+          tenant_id?: string
+          title?: string
+          transcript?: string | null
+          transcript_attempts?: number
+          transcript_error?: string | null
+          transcript_language?: string | null
+          transcript_last_attempt_at?: string | null
+          transcript_source?: string | null
+          transcript_status?: string
+          updated_at?: string
+          url?: string
+          video_id?: string
+        }
+        Relationships: []
+      }
       appointment_clinical_note_revisions: {
         Row: {
           actor_profile_id: string | null
@@ -2548,6 +2626,7 @@ export type Database = {
       }
       claim_lines: {
         Row: {
+          adjudication_disposition: string | null
           adjusted_amount: number | null
           allowed_amount: number | null
           appointment_id: string | null
@@ -2573,6 +2652,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          adjudication_disposition?: string | null
           adjusted_amount?: number | null
           allowed_amount?: number | null
           appointment_id?: string | null
@@ -2598,6 +2678,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          adjudication_disposition?: string | null
           adjusted_amount?: number | null
           allowed_amount?: number | null
           appointment_id?: string | null
@@ -11717,34 +11798,82 @@ export type Database = {
       }
       edge_function_executions: {
         Row: {
+          attempted_source_ids: string[]
+          cursor_end: string | null
+          cursor_start: string | null
           duration_ms: number | null
+          error_count: number
           error_message: string | null
+          errors: Json
           executed_at: string | null
+          failed_source_ids: string[]
           function_name: string
           id: string
           items_processed: number | null
+          metrics: Json
+          requested_cursor: string | null
+          returned_cursor: string | null
+          run_mode: string | null
+          skipped_source_ids: string[]
+          source_ids: string[]
+          source_record_count: number
           status: string
+          succeeded_source_ids: string[]
           tenant_id: string | null
+          timeout_reached: boolean
+          truncated: boolean
         }
         Insert: {
+          attempted_source_ids?: string[]
+          cursor_end?: string | null
+          cursor_start?: string | null
           duration_ms?: number | null
+          error_count?: number
           error_message?: string | null
+          errors?: Json
           executed_at?: string | null
+          failed_source_ids?: string[]
           function_name: string
           id?: string
           items_processed?: number | null
+          metrics?: Json
+          requested_cursor?: string | null
+          returned_cursor?: string | null
+          run_mode?: string | null
+          skipped_source_ids?: string[]
+          source_ids?: string[]
+          source_record_count?: number
           status: string
+          succeeded_source_ids?: string[]
           tenant_id?: string | null
+          timeout_reached?: boolean
+          truncated?: boolean
         }
         Update: {
+          attempted_source_ids?: string[]
+          cursor_end?: string | null
+          cursor_start?: string | null
           duration_ms?: number | null
+          error_count?: number
           error_message?: string | null
+          errors?: Json
           executed_at?: string | null
+          failed_source_ids?: string[]
           function_name?: string
           id?: string
           items_processed?: number | null
+          metrics?: Json
+          requested_cursor?: string | null
+          returned_cursor?: string | null
+          run_mode?: string | null
+          skipped_source_ids?: string[]
+          source_ids?: string[]
+          source_record_count?: number
           status?: string
+          succeeded_source_ids?: string[]
           tenant_id?: string | null
+          timeout_reached?: boolean
+          truncated?: boolean
         }
         Relationships: [
           {
@@ -16379,6 +16508,65 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "tenants"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      reddit_authority_activity: {
+        Row: {
+          canonical_topic_key: string
+          created_at: string
+          external_action_status: string
+          external_comment_url: string | null
+          external_subreddit: string | null
+          external_thread_url: string | null
+          id: string
+          notes: string | null
+          researched_at: string
+          resource_action: string
+          resource_id: string | null
+          tenant_id: string
+          valorwell_post_status: string
+          valorwell_subreddit_post_url: string | null
+        }
+        Insert: {
+          canonical_topic_key: string
+          created_at?: string
+          external_action_status?: string
+          external_comment_url?: string | null
+          external_subreddit?: string | null
+          external_thread_url?: string | null
+          id?: string
+          notes?: string | null
+          researched_at?: string
+          resource_action: string
+          resource_id?: string | null
+          tenant_id?: string
+          valorwell_post_status?: string
+          valorwell_subreddit_post_url?: string | null
+        }
+        Update: {
+          canonical_topic_key?: string
+          created_at?: string
+          external_action_status?: string
+          external_comment_url?: string | null
+          external_subreddit?: string | null
+          external_thread_url?: string | null
+          id?: string
+          notes?: string | null
+          researched_at?: string
+          resource_action?: string
+          resource_id?: string | null
+          tenant_id?: string
+          valorwell_post_status?: string
+          valorwell_subreddit_post_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reddit_authority_resource_fk"
+            columns: ["tenant_id", "resource_id"]
+            isOneToOne: false
+            referencedRelation: "website_resources"
+            referencedColumns: ["tenant_id", "id"]
           },
         ]
       }
@@ -22503,6 +22691,72 @@ export type Database = {
         }
         Relationships: []
       }
+      website_resources: {
+        Row: {
+          audience_tags: string[]
+          body_markdown: string
+          canonical_topic_key: string
+          coverage_status: string
+          created_at: string
+          faq: Json
+          id: string
+          last_researched_at: string | null
+          live_url: string | null
+          primary_question: string
+          published_at: string | null
+          slug: string
+          source_urls: string[]
+          status: string
+          summary: string
+          tenant_id: string
+          title: string
+          topic_aliases: string[]
+          updated_at: string
+        }
+        Insert: {
+          audience_tags?: string[]
+          body_markdown: string
+          canonical_topic_key: string
+          coverage_status?: string
+          created_at?: string
+          faq?: Json
+          id?: string
+          last_researched_at?: string | null
+          live_url?: string | null
+          primary_question: string
+          published_at?: string | null
+          slug: string
+          source_urls?: string[]
+          status?: string
+          summary: string
+          tenant_id?: string
+          title: string
+          topic_aliases?: string[]
+          updated_at?: string
+        }
+        Update: {
+          audience_tags?: string[]
+          body_markdown?: string
+          canonical_topic_key?: string
+          coverage_status?: string
+          created_at?: string
+          faq?: Json
+          id?: string
+          last_researched_at?: string | null
+          live_url?: string | null
+          primary_question?: string
+          published_at?: string | null
+          slug?: string
+          source_urls?: string[]
+          status?: string
+          summary?: string
+          tenant_id?: string
+          title?: string
+          topic_aliases?: string[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       website_submissions: {
         Row: {
           consent: boolean | null
@@ -24682,6 +24936,10 @@ export type Database = {
         }
         Returns: Json
       }
+      apply_era_claim_summary_state_v1: {
+        Args: { p_era_claim_id: string }
+        Returns: Json
+      }
       apply_relationship_activity: {
         Args: {
           p_activity_type: string
@@ -24866,6 +25124,14 @@ export type Database = {
         Args: { p_end: string; p_staff_id: string; p_start: string }
         Returns: boolean
       }
+      checkpoint_claimmd_response_inbox_v1: {
+        Args: {
+          p_inbox_id: string
+          p_progress_ordinal: number
+          p_tenant_id: string
+        }
+        Returns: boolean
+      }
       claim_appointment_provisioning_work: {
         Args: {
           p_appointment_id?: string
@@ -24882,6 +25148,31 @@ export type Database = {
           job_id: string
           max_attempts: number
           tenant_id: string
+        }[]
+      }
+      claim_claimmd_era_inbox_v1: {
+        Args: { p_limit?: number; p_tenant_id: string }
+        Returns: {
+          attempt_count: number
+          inbox_id: string
+          payload: Json
+          source_document_id: string
+          source_era_id: string
+          source_metadata: Json
+        }[]
+      }
+      claim_claimmd_response_inbox_v1: {
+        Args: { p_limit?: number; p_tenant_id: string }
+        Returns: {
+          attempt_count: number
+          inbox_id: string
+          payload: Json
+          progress_ordinal: number
+          requested_cursor: string
+          returned_cursor: string
+          source_document_id: string
+          source_key: string
+          source_metadata: Json
         }[]
       }
       claim_google_ads_donations: {
@@ -25107,6 +25398,27 @@ export type Database = {
           p_import_id: string
         }
         Returns: Json
+      }
+      complete_claimmd_era_inbox_v1: {
+        Args: {
+          p_error?: string
+          p_inbox_id: string
+          p_retryable?: boolean
+          p_success: boolean
+          p_tenant_id: string
+        }
+        Returns: boolean
+      }
+      complete_claimmd_response_inbox_v1: {
+        Args: {
+          p_error?: string
+          p_inbox_id: string
+          p_progress_ordinal?: number
+          p_retryable?: boolean
+          p_success: boolean
+          p_tenant_id: string
+        }
+        Returns: boolean
       }
       complete_client_registration:
         | {
@@ -26150,6 +26462,14 @@ export type Database = {
       enqueue_appointment_provisioning: {
         Args: { p_action?: string; p_appointment_id: string }
         Returns: string
+      }
+      enqueue_claimmd_era_inbox_v1: {
+        Args: { p_source_document_id: string; p_tenant_id: string }
+        Returns: Json
+      }
+      enqueue_claimmd_response_inbox_v1: {
+        Args: { p_source_document_id: string; p_tenant_id: string }
+        Returns: Json
       }
       enroll_relationship_targets: {
         Args: {
@@ -27243,6 +27563,46 @@ export type Database = {
         }
         Returns: Json
       }
+      record_billing_integration_execution_v1: {
+        Args: {
+          p_attempted_source_ids?: string[]
+          p_cursor_end?: string
+          p_cursor_start?: string
+          p_duration_ms: number
+          p_errors?: Json
+          p_failed_source_ids?: string[]
+          p_fatal_error?: string
+          p_function_name: string
+          p_items_processed?: number
+          p_metrics?: Json
+          p_requested_cursor?: string
+          p_returned_cursor?: string
+          p_run_mode?: string
+          p_skipped_source_ids?: string[]
+          p_source_ids?: string[]
+          p_source_record_count?: number
+          p_succeeded_source_ids?: string[]
+          p_tenant_id: string
+          p_timeout_reached?: boolean
+          p_truncated?: boolean
+        }
+        Returns: string
+      }
+      record_claimmd_source_evidence_v1: {
+        Args: {
+          p_endpoint: string
+          p_payload: Json
+          p_records?: Json
+          p_requested_cursor?: string
+          p_returned_cursor?: string
+          p_source_era_id?: string
+          p_source_key: string
+          p_source_kind: string
+          p_source_metadata?: Json
+          p_tenant_id: string
+        }
+        Returns: Json
+      }
       record_client_eligibility_result: {
         Args: {
           p_claimmd_eligibility_id?: string
@@ -27277,6 +27637,18 @@ export type Database = {
           p_new_status: string
           p_proxy_content_type: string
           p_proxy_http_status: number
+        }
+        Returns: Json
+      }
+      record_relationship_campaign_work_result: {
+        Args: {
+          p_claim_token: string
+          p_error_code?: string
+          p_error_message?: string
+          p_idempotency_key: string
+          p_outcome: string
+          p_retry_at?: string
+          p_work_item_id: string
         }
         Returns: Json
       }
@@ -28491,6 +28863,8 @@ export type Database = {
         | "unpaid"
         | "payment_reported"
         | "partially_paid"
+        | "zero_paid"
+        | "denied"
         | "paid_pending_adjudication"
         | "paid"
         | "overpaid"
@@ -29030,6 +29404,8 @@ export const Constants = {
         "unpaid",
         "payment_reported",
         "partially_paid",
+        "zero_paid",
+        "denied",
         "paid_pending_adjudication",
         "paid",
         "overpaid",

@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { SEO, BreadcrumbSchema } from "@/components/SEO";
-import { getPublishedResources } from "@/lib/websiteResources";
+import { usePublishedResources } from "@/lib/websiteResources";
 import { trackHomeEvent } from "@/lib/tracking";
 
 type ResourceCategory = {
@@ -30,12 +30,6 @@ const iconBySlug: Record<string, LucideIcon> = {
   "family-systems": Users,
 };
 
-const categories: ResourceCategory[] = getPublishedResources().map((resource) => ({
-  name: resource.title,
-  href: `/resources/${resource.slug}`,
-  body: resource.summary,
-  Icon: iconBySlug[resource.slug] ?? BookOpen,
-}));
 
 function Eyebrow({ children, light = false }: { children: ReactNode; light?: boolean }) {
   return (
@@ -53,6 +47,16 @@ export default function Resources() {
   useEffect(() => {
     trackHomeEvent("resources_page_view", { page: "resources" });
   }, []);
+
+  const { data, isPending, isError } = usePublishedResources();
+
+  const categories: ResourceCategory[] = (data ?? []).map((resource) => ({
+    name: resource.title,
+    href: `/resources/${resource.slug}`,
+    body: resource.summary,
+    Icon: iconBySlug[resource.slug] ?? BookOpen,
+  }));
+
 
   return (
     <Layout>
@@ -119,6 +123,18 @@ export default function Resources() {
                 Browse current guidance.
               </h2>
             </div>
+
+            {isPending && (
+              <p className="mt-12 text-[#111814]/64" role="status" aria-live="polite">
+                Loading resources…
+              </p>
+            )}
+
+            {isError && (
+              <p className="mt-12 text-[#111814]/64" role="status" aria-live="polite">
+                We could not load the resource library right now. Please refresh the page and try again.
+              </p>
+            )}
 
             <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
               {categories.map(({ name, href, body, Icon }) => (

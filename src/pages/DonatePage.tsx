@@ -6,7 +6,7 @@ import { SEO } from "@/components/SEO";
 import { trackHomeEvent } from "@/lib/tracking";
 
 const SESSION_COST = "$75";
-const FOUNDATION_EIN = "93-3129745";
+const FOUNDATION_EIN = "99-2872954";
 
 const moneyFlow = [
   {

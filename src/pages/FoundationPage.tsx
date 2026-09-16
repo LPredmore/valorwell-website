@@ -24,7 +24,7 @@ import {
 } from "@/components/SEO";
 import { trackHomeEvent } from "@/lib/tracking";
 
-const FOUNDATION_EIN = "93-3129745";
+const FOUNDATION_EIN = "99-2872954";
 const FOUNDATION_STATUS = "501(c)(3)";
 const FOUNDATION_FOUNDED = "May 13, 2024";
 const SESSION_COST = "$75";
@@ -78,7 +78,7 @@ export default function FoundationPage() {
     <Layout>
       <SEO
         title="ValorWell Foundation | 100% of Donations Fund Therapy"
-        description="Learn how the ValorWell Foundation, a registered 501(c)(3) nonprofit (EIN 93-3129745), uses 100% of donated funds to pay community therapists for veterans and their immediate family members."
+        description="Learn how the ValorWell Foundation, a registered 501(c)(3) nonprofit (EIN 99-2872954), uses 100% of donated funds to pay community therapists for veterans and their immediate family members."
         canonical="/foundation"
       />
       <BreadcrumbSchema

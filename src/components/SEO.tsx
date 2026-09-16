@@ -247,7 +247,7 @@ export function NonprofitOrganizationSchema() {
     name: "ValorWell Foundation",
     url: `${SITE_URL}/foundation`,
     logo: `${SITE_URL}/brand/valorwell-logo.png`,
-    taxID: "93-3129745",
+    taxID: "99-2872954",
     description:
       "The ValorWell Foundation funds mental-health therapy for veterans and their immediate family members. 100% of donated funds pay qualified community therapists for treatment, and no Foundation donation dollars are transferred to ValorWell.",
     foundingDate: "2024-05-13",

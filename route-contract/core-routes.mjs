@@ -38,9 +38,9 @@ export const routes = [
   {
     "path": "/foundation",
     "title": "ValorWell Foundation | 100% of Donations Fund Therapy",
-    "description": "Learn how the ValorWell Foundation, a registered 501(c)(3) nonprofit (EIN 93-3129745), uses 100% of donated funds to pay community therapists for veterans and their immediate family members.",
+    "description": "Learn how the ValorWell Foundation, a registered 501(c)(3) nonprofit (EIN 99-2872954), uses 100% of donated funds to pay community therapists for veterans and their immediate family members.",
     "h1": "Every donated dollar becomes care.",
-    "lead": "The ValorWell Foundation is a separate 501(c)(3) nonprofit, EIN 93-3129745. 100% of donated funds pay qualified community mental-health therapists for treatment provided to veterans and their immediate family members, and none of those donation dollars go to ValorWell.",
+    "lead": "The ValorWell Foundation is a separate 501(c)(3) nonprofit, EIN 99-2872954. 100% of donated funds pay qualified community mental-health therapists for treatment provided to veterans and their immediate family members, and none of those donation dollars go to ValorWell.",
     "indexable": true,
     "sitemap": true
   },
@@ -56,9 +56,9 @@ export const routes = [
   {
     "path": "/donate",
     "title": "Donate | $75 Funds One Therapy Session | ValorWell Foundation",
-    "description": "Donate to the ValorWell Foundation, a registered 501(c)(3), EIN 93-3129745. $75 funds one completed therapy session for a veteran, and 100% of every donation pays clinicians providing that care.",
+    "description": "Donate to the ValorWell Foundation, a registered 501(c)(3), EIN 99-2872954. $75 funds one completed therapy session for a veteran, and 100% of every donation pays clinicians providing that care.",
     "h1": "$75 pays for one therapy session for a veteran who cannot get one.",
-    "lead": "The ValorWell Foundation is a registered 501(c)(3) nonprofit, EIN 93-3129745. Donations pay qualified mental-health clinicians in the community for treating veterans who cannot get seen through the appropriate VA care channels. 100% of each donation goes to that care, and none of it goes to ValorWell.",
+    "lead": "The ValorWell Foundation is a registered 501(c)(3) nonprofit, EIN 99-2872954. Donations pay qualified mental-health clinicians in the community for treating veterans who cannot get seen through the appropriate VA care channels. 100% of each donation goes to that care, and none of it goes to ValorWell.",
     "indexable": true,
     "sitemap": true
   },

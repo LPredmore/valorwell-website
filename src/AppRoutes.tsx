@@ -36,7 +36,6 @@ import AuthorityMilitaryFamilyTherapy from "./pages/authority/MilitaryFamilyTher
 import AuthorityVeteranMentalHealthCare from "./pages/authority/VeteranMentalHealthCare";
 import AuthorityVACommunityCareMentalHealth from "./pages/authority/VACommunityCareMentalHealth";
 import AuthorityResourceDetail from "./pages/authority/ResourceDetail";
-import { getPublishedResourceByPath } from "./lib/websiteResources";
 
 function LegacyRedirect({ to }: { to: string }) {
   const location = useLocation();
@@ -87,10 +86,11 @@ const routeElements: Record<string, ReactNode> = {
   "/pendulo": <Pendulo />,
 };
 
+const RESOURCE_DETAIL_PATTERN = /^\/resources\/[^/]+$/;
+
 function resolveRouteElement(path: string): ReactNode {
-  const resource = getPublishedResourceByPath(path);
-  if (resource) {
-    return <AuthorityResourceDetail slug={resource.slug} />;
+  if (RESOURCE_DETAIL_PATTERN.test(path)) {
+    return <AuthorityResourceDetail />;
   }
 
   return routeElements[path] ?? <NotFound />;
@@ -99,7 +99,12 @@ function resolveRouteElement(path: string): ReactNode {
 export function AppRoutes() {
   return (
     <Routes>
-      {canonicalRoutes.map((route) => (
+      {/* Generic runtime route: any published resource slug resolves at runtime. */}
+      <Route path="/resources/:slug" element={<AuthorityResourceDetail />} />
+
+      {canonicalRoutes
+        .filter((route) => !RESOURCE_DETAIL_PATTERN.test(route.path))
+        .map((route) => (
         <Route
           key={route.path}
           path={route.path}

@@ -279,9 +279,3 @@
   display: none;
 }
 
-/* Homepage model: serve the vector rendering so it stays crisp at phone and desktop sizes. */
-.home-theme img[src="/valorwell-model.webp"] {
-  content: url("/valorwell-model.svg");
-  aspect-ratio: 9 / 10;
-  object-fit: contain;
-}

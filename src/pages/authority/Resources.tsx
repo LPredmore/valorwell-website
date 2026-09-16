@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { SEO, BreadcrumbSchema } from "@/components/SEO";
-import { usePublishedResources } from "@/lib/websiteResources";
+import { usePublishedCategories } from "@/lib/websiteResources";
 import { trackHomeEvent } from "@/lib/tracking";
 
 type ResourceCategory = {
@@ -48,7 +48,7 @@ export default function Resources() {
     trackHomeEvent("resources_page_view", { page: "resources" });
   }, []);
 
-  const { data, isPending, isError } = usePublishedResources();
+  const { data, isPending, isError } = usePublishedCategories();
 
   const categories: ResourceCategory[] = (data ?? []).map((resource) => ({
     name: resource.title,

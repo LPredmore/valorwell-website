@@ -16,6 +16,8 @@ export type GeneratedWebsiteResource = {
   live_url: string | null;
   last_researched_at: string | null;
   published_at: string | null;
+  resource_kind: "category" | "article";
+  category_slug: string | null;
 };
 
 export const generatedWebsiteResources: GeneratedWebsiteResource[] = [
@@ -46,7 +48,9 @@ export const generatedWebsiteResources: GeneratedWebsiteResource[] = [
     "status": "published",
     "live_url": "https://valorwell.org/resources/champva",
     "last_researched_at": "2026-09-06T12:00:00+00:00",
-    "published_at": "2026-09-15T20:04:36.686535+00:00"
+    "published_at": "2026-09-15T20:04:36.686535+00:00",
+    "resource_kind": "category",
+    "category_slug": null
   },
   {
     "slug": "documentation",
@@ -72,7 +76,9 @@ export const generatedWebsiteResources: GeneratedWebsiteResource[] = [
     "status": "published",
     "live_url": "https://valorwell.org/resources/documentation",
     "last_researched_at": null,
-    "published_at": "2026-09-15T20:04:36.686535+00:00"
+    "published_at": "2026-09-15T20:04:36.686535+00:00",
+    "resource_kind": "category",
+    "category_slug": null
   },
   {
     "slug": "military-separation-limited-communication",
@@ -130,7 +136,9 @@ export const generatedWebsiteResources: GeneratedWebsiteResource[] = [
     "status": "published",
     "live_url": "https://valorwell.org/resources/family-systems/military-separation-limited-communication",
     "last_researched_at": "2026-09-16T17:38:56.24652+00:00",
-    "published_at": "2026-09-15T20:04:36.686535+00:00"
+    "published_at": "2026-09-15T20:04:36.686535+00:00",
+    "resource_kind": "article",
+    "category_slug": "family-systems"
   },
   {
     "slug": "family-systems",
@@ -158,7 +166,9 @@ export const generatedWebsiteResources: GeneratedWebsiteResource[] = [
     "status": "published",
     "live_url": "https://valorwell.org/resources/family-systems",
     "last_researched_at": null,
-    "published_at": "2026-09-15T20:04:36.686535+00:00"
+    "published_at": "2026-09-15T20:04:36.686535+00:00",
+    "resource_kind": "category",
+    "category_slug": null
   },
   {
     "slug": "va-community-care",
@@ -187,7 +197,9 @@ export const generatedWebsiteResources: GeneratedWebsiteResource[] = [
     "status": "published",
     "live_url": "https://valorwell.org/resources/va-community-care",
     "last_researched_at": "2026-09-06T12:00:00+00:00",
-    "published_at": "2026-09-15T20:04:36.686535+00:00"
+    "published_at": "2026-09-15T20:04:36.686535+00:00",
+    "resource_kind": "category",
+    "category_slug": null
   },
   {
     "slug": "veteran-mental-health",
@@ -214,6 +226,8 @@ export const generatedWebsiteResources: GeneratedWebsiteResource[] = [
     "status": "published",
     "live_url": "https://valorwell.org/resources/veteran-mental-health",
     "last_researched_at": null,
-    "published_at": "2026-09-15T20:04:36.686535+00:00"
+    "published_at": "2026-09-15T20:04:36.686535+00:00",
+    "resource_kind": "category",
+    "category_slug": null
   }
 ];

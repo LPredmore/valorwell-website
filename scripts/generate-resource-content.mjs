@@ -33,6 +33,8 @@ endpoint.searchParams.set(
     "live_url",
     "last_researched_at",
     "published_at",
+    "resource_kind",
+    "category_slug",
   ].join(","),
 );
 endpoint.searchParams.set("tenant_id", `eq.${TENANT_ID}`);
@@ -89,16 +91,28 @@ for (const row of rows) {
   }
 }
 
+for (const row of rows) {
+  const kind = row.resource_kind === "article" ? "article" : "category";
+  row.resource_kind = kind;
+  row.category_slug = typeof row.category_slug === "string" ? row.category_slug : null;
+  if (kind === "article" && !row.category_slug) {
+    throw new Error(`Published article ${row.slug} is missing category_slug.`);
+  }
+}
+
 const uniqueSlugs = new Set(rows.map((row) => row.slug));
 if (uniqueSlugs.size !== rows.length) {
   throw new Error("Published website resources contain duplicate slugs.");
 }
 
-const tsHeader = `// Generated from public.website_resources. Do not edit by hand.\n// scripts/generate-resource-content.mjs refreshes this file before production builds.\n\nexport type GeneratedWebsiteResource = {\n  slug: string;\n  title: string;\n  primary_question: string;\n  summary: string;\n  body_markdown: string;\n  faq: unknown[];\n  audience_tags: string[];\n  topic_aliases: string[];\n  source_urls: string[];\n  coverage_status: \"partial\" | \"complete\" | \"needs_review\";\n  status: \"published\";\n  live_url: string | null;\n  last_researched_at: string | null;\n  published_at: string | null;\n};\n\n`;
+const tsHeader = `// Generated from public.website_resources. Do not edit by hand.\n// scripts/generate-resource-content.mjs refreshes this file before production builds.\n\nexport type GeneratedWebsiteResource = {\n  slug: string;\n  title: string;\n  primary_question: string;\n  summary: string;\n  body_markdown: string;\n  faq: unknown[];\n  audience_tags: string[];\n  topic_aliases: string[];\n  source_urls: string[];\n  coverage_status: \"partial\" | \"complete\" | \"needs_review\";\n  status: \"published\";\n  live_url: string | null;\n  last_researched_at: string | null;\n  published_at: string | null;\n  resource_kind: "category" | "article";\n  category_slug: string | null;\n};\n\n`;
 
 const resourceModule = `${tsHeader}export const generatedWebsiteResources: GeneratedWebsiteResource[] = ${JSON.stringify(rows, null, 2)};\n`;
 const routeRows = rows.map((row) => ({
-  path: `/resources/${row.slug}`,
+  path:
+    row.resource_kind === "article"
+      ? `/resources/${row.category_slug}/${row.slug}`
+      : `/resources/${row.slug}`,
   title: `${row.title} | ValorWell`,
   description: row.summary,
   h1: row.title,

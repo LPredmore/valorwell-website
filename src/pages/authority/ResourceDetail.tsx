@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import { useParams } from "react-router-dom";
 import {
   AuthorityPage,
@@ -7,12 +6,13 @@ import {
 import { Layout } from "@/components/layout/Layout";
 import NotFound from "@/pages/NotFound";
 import {
-  usePublishedResource,
-  usePublishedResources,
+  usePublishedArticle,
+  usePublishedCategoryArticles,
 } from "@/lib/websiteResources";
 
 type ResourceDetailProps = {
-  slug?: string;
+  categorySlug?: string;
+  articleSlug?: string;
 };
 
 type ParsedSection = {
@@ -21,9 +21,46 @@ type ParsedSection = {
   bullets: string[];
 };
 
+const SUPPRESSED_HEADINGS = [
+  "authoritative sources reviewed",
+  "sources reviewed",
+  "sources",
+  "last reviewed",
+  "last researched",
+];
+
+const SUPPRESSED_LINE_PREFIXES = [
+  "last researched and verified:",
+  "last researched:",
+  "last reviewed:",
+  "sources reviewed:",
+  "authoritative sources reviewed:",
+  "last updated:",
+];
+
+function isSuppressedHeading(heading: string): boolean {
+  const normalized = heading.trim().toLowerCase().replace(/[:.]+$/, "");
+  return SUPPRESSED_HEADINGS.some(
+    (candidate) => normalized === candidate || normalized.startsWith(`${candidate} `),
+  );
+}
+
+function isSuppressedLine(line: string): boolean {
+  const normalized = line.trim().toLowerCase().replace(/^[*_\s]+/, "");
+  return SUPPRESSED_LINE_PREFIXES.some((prefix) => normalized.startsWith(prefix));
+}
+
+function stripInlineMarkdown(value: string): string {
+  return value
+    .replace(/\*\*(.+?)\*\*/g, "$1")
+    .replace(/__(.+?)__/g, "$1")
+    .trim();
+}
+
 function parseResourceMarkdown(markdown: string): AuthoritySection[] {
   const sections: ParsedSection[] = [];
   let current: ParsedSection | null = null;
+  let suppressing = false;
 
   const pushCurrent = () => {
     if (!current) return;
@@ -36,28 +73,34 @@ function parseResourceMarkdown(markdown: string): AuthoritySection[] {
     const line = rawLine.trim();
     if (!line) continue;
 
-    if (line.startsWith("## ")) {
+    const headingMatch = line.match(/^(#{1,6})\s+(.*)$/);
+    if (headingMatch) {
+      const heading = stripInlineMarkdown(headingMatch[2]);
+
+      if (isSuppressedHeading(heading)) {
+        pushCurrent();
+        current = null;
+        suppressing = true;
+        continue;
+      }
+
+      suppressing = false;
       pushCurrent();
-      current = {
-        heading: line.slice(3).trim(),
-        paragraphs: [],
-        bullets: [],
-      };
+      current = { heading, paragraphs: [], bullets: [] };
       continue;
     }
 
+    if (suppressing) continue;
+    if (isSuppressedLine(line)) continue;
+
     if (!current) {
-      current = {
-        heading: "Overview",
-        paragraphs: [],
-        bullets: [],
-      };
+      current = { heading: "Overview", paragraphs: [], bullets: [] };
     }
 
-    if (line.startsWith("- ")) {
-      current.bullets.push(line.slice(2).trim());
+    if (/^[-*]\s+/.test(line)) {
+      current.bullets.push(stripInlineMarkdown(line.replace(/^[-*]\s+/, "")));
     } else {
-      current.paragraphs.push(line);
+      current.paragraphs.push(stripInlineMarkdown(line));
     }
   }
 
@@ -77,51 +120,6 @@ function parseResourceMarkdown(markdown: string): AuthoritySection[] {
   }));
 }
 
-function formatReviewedDate(value: string | null): string | undefined {
-  if (!value) return undefined;
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return undefined;
-
-  return new Intl.DateTimeFormat("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-    timeZone: "UTC",
-  }).format(date);
-}
-
-function sourceName(url: string): string {
-  try {
-    return new URL(url).hostname.replace(/^www\./, "");
-  } catch {
-    return url;
-  }
-}
-
-function buildSourceNote(urls: string[]): ReactNode | undefined {
-  if (urls.length === 0) return undefined;
-
-  return (
-    <>
-      Sources reviewed:{" "}
-      {urls.map((url, index) => (
-        <span key={url}>
-          {index > 0 && ", "}
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-bold underline underline-offset-2"
-          >
-            {sourceName(url)}
-          </a>
-        </span>
-      ))}
-      . Confirm time-sensitive eligibility, authorization, coverage, and administrative details with the responsible program or provider.
-    </>
-  );
-}
-
 function ResourceStatus({ message }: { message: string }) {
   return (
     <Layout>
@@ -136,14 +134,21 @@ function ResourceStatus({ message }: { message: string }) {
   );
 }
 
-export default function ResourceDetail({ slug: slugProp }: ResourceDetailProps) {
-  const params = useParams<{ slug: string }>();
-  const slug = slugProp ?? params.slug;
+export default function ResourceDetail({
+  categorySlug: categorySlugProp,
+  articleSlug: articleSlugProp,
+}: ResourceDetailProps) {
+  const params = useParams<{ categorySlug: string; articleSlug: string }>();
+  const categorySlug = categorySlugProp ?? params.categorySlug;
+  const articleSlug = articleSlugProp ?? params.articleSlug;
 
-  const { data: resource, isPending, isError } = usePublishedResource(slug);
-  const { data: allResources } = usePublishedResources();
+  const { data: resource, isPending, isError } = usePublishedArticle(
+    categorySlug,
+    articleSlug,
+  );
+  const { data: siblings } = usePublishedCategoryArticles(categorySlug);
 
-  if (!slug) return <NotFound />;
+  if (!categorySlug || !articleSlug) return <NotFound />;
   if (isPending) return <ResourceStatus message="Loading resource…" />;
   if (isError) {
     return (
@@ -152,36 +157,42 @@ export default function ResourceDetail({ slug: slugProp }: ResourceDetailProps) 
   }
   if (!resource) return <NotFound />;
 
-  const related = (allResources ?? [])
-    .filter((candidate) => candidate.slug !== resource.slug)
+  const related = (siblings ?? [])
+    .filter(
+      (candidate) =>
+        candidate.resource_kind === "article" && candidate.slug !== resource.slug,
+    )
     .slice(0, 3)
     .map((candidate) => ({
       name: candidate.title,
-      href: `/resources/${candidate.slug}`,
-      body: candidate.summary,
+      href: `/resources/${candidate.category_slug}/${candidate.slug}`,
     }));
+
+  const path = `/resources/${categorySlug}/${resource.slug}`;
 
   return (
     <AuthorityPage
       title={`${resource.title} | ValorWell`}
       description={resource.summary}
-      canonical={`/resources/${resource.slug}`}
+      canonical={path}
       breadcrumbs={[
         { name: "Home", url: "/" },
         { name: "Resources", url: "/resources" },
-        { name: resource.title, url: `/resources/${resource.slug}` },
+        { name: resource.title, url: path },
       ]}
       eyebrow="Resource Guide"
       h1={resource.title}
       subhead={resource.summary}
-      lastReviewed={formatReviewedDate(resource.last_researched_at)}
-      sourceNote={buildSourceNote(resource.source_urls)}
       sections={parseResourceMarkdown(resource.body_markdown)}
       faqs={resource.faq}
       related={related}
       finalCTAs={[
         { label: "Find Care", to: "/get-care" },
-        { label: "Explore All Resources", to: "/resources", variant: "secondary" },
+        {
+          label: "Back to This Topic",
+          to: `/resources/${categorySlug}`,
+          variant: "secondary",
+        },
       ]}
     />
   );

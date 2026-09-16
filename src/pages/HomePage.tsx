@@ -366,12 +366,13 @@ export default function HomePage() {
         <section className="border-b border-[#3B5147]/15 bg-white">
           <div className="container-wide py-12 text-center md:py-20 lg:py-24">
             <img
-              src="/valorwell-model.webp"
+              src={homepageThreeParts.url}
               alt="ValorWell model: VA coverage is made usable, the Foundation bridges structural gaps, and lessons from those gaps feed back into system change"
               className="mx-auto h-auto w-full max-w-[900px]"
-              width="900"
-              height="986"
+              width="1198"
+              height="1313"
               loading="lazy"
+              decoding="async"
             />
             <div className="mt-8 text-center">
               <TrackedLink

@@ -4,6 +4,9 @@ import { ArrowDown, ArrowRight } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { BreadcrumbSchema, SEO } from "@/components/SEO";
 import { trackHomeEvent } from "@/lib/tracking";
+import champvaImage from "@/assets/how-it-works-champva-high-res.png.asset.json";
+import vaccnImage from "@/assets/how-it-works-vaccn-high-res.png.asset.json";
+import foundationImage from "@/assets/how-it-works-foundation-high-res.png.asset.json";
 
 function Eyebrow({ children, light = false }: { children: ReactNode; light?: boolean }) {
   return (
@@ -103,10 +106,10 @@ export default function HowItWorksPage() {
             </div>
             <figure className="order-1 lg:order-2 lg:col-span-6">
               <img
-                src="/how-it-works-champva.webp"
+                src={champvaImage.url}
                 alt="A family with CHAMPVA coverage facing paperwork, reimbursement, and credentialing barriers, with ValorWell creating a path through to therapy."
-                width="600"
-                height="450"
+                width="1448"
+                height="1086"
                 loading="lazy"
                 decoding="async"
                 className="w-full rounded-[1.75rem] border border-[#3B5147]/15 shadow-[0_24px_70px_rgba(17,24,20,0.18)]"
@@ -124,10 +127,10 @@ export default function HowItWorksPage() {
           <div className="container-wide grid gap-10 py-16 md:py-24 lg:grid-cols-12 lg:items-center lg:gap-16">
             <figure className="order-1 lg:col-span-6">
               <img
-                src="/how-it-works-vaccn.webp"
+                src={vaccnImage.url}
                 alt="A veteran holding a VA Community Care authorization facing credentialing, paperwork, and operational barriers, while ValorWell opens the path to an appointment."
-                width="600"
-                height="450"
+                width="1448"
+                height="1086"
                 loading="lazy"
                 decoding="async"
                 className="w-full rounded-[1.75rem] border border-[#3B5147]/15 shadow-[0_24px_70px_rgba(17,24,20,0.18)]"
@@ -179,10 +182,10 @@ export default function HowItWorksPage() {
             </div>
             <figure className="order-1 lg:order-2 lg:col-span-6">
               <img
-                src="/how-it-works-foundation.webp"
+                src={foundationImage.url}
                 alt="A veteran family stranded by a structural system gap, with the ValorWell Foundation bridging the gap so therapy can happen now."
-                width="600"
-                height="450"
+                width="1448"
+                height="1086"
                 loading="lazy"
                 decoding="async"
                 className="w-full rounded-[1.75rem] border border-[#D7A92E]/30 shadow-[0_24px_80px_rgba(0,0,0,0.42)]"

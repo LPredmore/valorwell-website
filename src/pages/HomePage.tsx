@@ -20,6 +20,8 @@ import {
   YAxis,
 } from "recharts";
 import heroFamily from "@/assets/hero-family.jpg";
+import homepageFixingBothSides from "@/assets/homepage-fixing-from-both-sides.png.asset.json";
+import homepageThreeParts from "@/assets/homepage-three-connected-parts.png.asset.json";
 import { Layout } from "@/components/layout/Layout";
 import { OrganizationSchema, SEO } from "@/components/SEO";
 import { billingHubSupabase } from "@/integrations/supabase/client";

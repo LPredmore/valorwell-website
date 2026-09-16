@@ -372,7 +372,7 @@ for (const route of generatedResourceRoutes) {
 }
 
 const supportsGeneratedResourceRoutes =
-  appRoutesSource.includes("getPublishedResourceByPath") &&
+  appRoutesSource.includes('path="/resources/:slug"') &&
   appRoutesSource.includes("AuthorityResourceDetail");
 
 for (const route of canonicalRoutes) {

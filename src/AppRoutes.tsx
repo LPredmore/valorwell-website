@@ -87,11 +87,19 @@ const routeElements: Record<string, ReactNode> = {
   "/pendulo": <Pendulo />,
 };
 
-const RESOURCE_DETAIL_PATTERN = /^\/resources\/[^/]+$/;
+const RESOURCE_CATEGORY_PATTERN = /^\/resources\/[^/]+$/;
+const RESOURCE_ARTICLE_PATTERN = /^\/resources\/[^/]+\/[^/]+$/;
+
+function isRuntimeResourcePath(path: string): boolean {
+  return RESOURCE_CATEGORY_PATTERN.test(path) || RESOURCE_ARTICLE_PATTERN.test(path);
+}
 
 function resolveRouteElement(path: string): ReactNode {
-  if (RESOURCE_DETAIL_PATTERN.test(path)) {
+  if (RESOURCE_ARTICLE_PATTERN.test(path)) {
     return <AuthorityResourceDetail />;
+  }
+  if (RESOURCE_CATEGORY_PATTERN.test(path)) {
+    return <AuthorityResourceCategory />;
   }
 
   return routeElements[path] ?? <NotFound />;
@@ -100,11 +108,15 @@ function resolveRouteElement(path: string): ReactNode {
 export function AppRoutes() {
   return (
     <Routes>
-      {/* Generic runtime route: any published resource slug resolves at runtime. */}
-      <Route path="/resources/:slug" element={<AuthorityResourceDetail />} />
+      {/* Generic runtime routes: any published category or article resolves at runtime. */}
+      <Route path="/resources/:categorySlug" element={<AuthorityResourceCategory />} />
+      <Route
+        path="/resources/:categorySlug/:articleSlug"
+        element={<AuthorityResourceDetail />}
+      />
 
       {canonicalRoutes
-        .filter((route) => !RESOURCE_DETAIL_PATTERN.test(route.path))
+        .filter((route) => !isRuntimeResourcePath(route.path))
         .map((route) => (
         <Route
           key={route.path}

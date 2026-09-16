@@ -56,11 +56,13 @@ function renderAt(path: string) {
   });
 
   return render(
-    <QueryClientProvider client={queryClient}>
-      <MemoryRouter initialEntries={[path]}>
-        <AppRoutes />
-      </MemoryRouter>
-    </QueryClientProvider>,
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={[path]}>
+          <AppRoutes />
+        </MemoryRouter>
+      </QueryClientProvider>
+    </HelmetProvider>,
   );
 }
 

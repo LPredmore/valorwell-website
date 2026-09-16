@@ -372,8 +372,10 @@ for (const route of generatedResourceRoutes) {
 }
 
 const supportsGeneratedResourceRoutes =
-  appRoutesSource.includes('path="/resources/:slug"') &&
-  appRoutesSource.includes("AuthorityResourceDetail");
+  appRoutesSource.includes('path="/resources/:categorySlug"') &&
+  appRoutesSource.includes('path="/resources/:categorySlug/:articleSlug"') &&
+  appRoutesSource.includes("AuthorityResourceDetail") &&
+  appRoutesSource.includes("AuthorityResourceCategory");
 
 for (const route of canonicalRoutes) {
   if (route.path === "/") continue;

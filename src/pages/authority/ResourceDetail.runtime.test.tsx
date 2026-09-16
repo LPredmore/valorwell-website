@@ -176,7 +176,9 @@ describe("runtime resource routing", () => {
       ).toBeInTheDocument(),
     );
 
-    expect(screen.getByRole("heading", { name: "Daily routines" })).toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.getByRole("heading", { name: "Daily routines" })).toBeInTheDocument(),
+    );
     expect(screen.queryByText(/###/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Last reviewed/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Last researched/i)).not.toBeInTheDocument();

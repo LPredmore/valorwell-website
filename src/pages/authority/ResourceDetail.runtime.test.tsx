@@ -177,8 +177,26 @@ describe("runtime resource routing", () => {
     );
 
     await waitFor(() =>
-      expect(screen.getByRole("heading", { name: "Daily routines" })).toBeInTheDocument(),
+      expect(
+        screen.getByRole("heading", { level: 3, name: "Daily routines" }),
+      ).toBeInTheDocument(),
     );
+
+    expect(
+      screen.getByRole("heading", { level: 2, name: "What to expect" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("important details", { selector: "strong" })).toBeInTheDocument();
+    expect(screen.getByText("careful context", { selector: "em" })).toBeInTheDocument();
+
+    const listItem = screen.getByText("First list item");
+    const afterList = screen.getByText("Paragraph after the list.");
+    expect(
+      listItem.compareDocumentPosition(afterList) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+
+    const tocLinks = screen.getAllByRole("link", { name: "What to expect" });
+    expect(tocLinks.some((link) => link.getAttribute("href") === "#what-to-expect")).toBe(true);
+
     expect(screen.queryByText(/###/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Last reviewed/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Last researched/i)).not.toBeInTheDocument();

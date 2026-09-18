@@ -275,13 +275,13 @@ function collectToc(markup: string): ResourceTocItem[] {
 
 function countWords(markup: string): number {
   const plain = markup
-    .replace(/\\{%[\\s\\S]*?%\\}/g, " ")
+    .replace(/\{%[\s\S]*?%\}/g, " ")
     .replaceAll("[", " ")
     .replaceAll("]", " ")
     .replaceAll("/", " ")
     .replace(/[#>*_~`(){}|+-]/g, " ")
-    .replace(/https?:\\/\\/\\S+/g, " ");
-  return plain.split(/\\s+/).filter(Boolean).length;
+    .replace(/https?:\/\/\S+/g, " ");
+  return plain.split(/\s+/).filter(Boolean).length;
 }
 
 export function validateResourceMarkup(markdown: string): ResourceContentDiagnostic[] {

@@ -9,24 +9,31 @@ if (!fs.existsSync(GENERATED)) {
   throw new Error("Generated website resource snapshot is missing. Run npm run generate:resources first.");
 }
 
-function readGeneratedResources() {
-  const source = fs.readFileSync(GENERATED, "utf8");
-  const marker = "export const generatedWebsiteResources: GeneratedWebsiteResource[] = ";
-  const start = source.indexOf(marker);
+function extractGeneratedArray(source, exportName) {
+  const marker = `export const ${exportName}`;
+  const markerStart = source.indexOf(marker);
 
-  if (start < 0) {
-    throw new Error("Could not locate generatedWebsiteResources in the generated resource module.");
+  if (markerStart < 0) {
+    throw new Error(`Could not locate ${exportName} in the generated resource module.`);
   }
 
-  const jsonStart = start + marker.length;
-  const jsonEnd = source.lastIndexOf(";");
+  const equals = source.indexOf("=", markerStart);
+  if (equals < 0) throw new Error(`${exportName} has no assignment.`);
 
-  if (jsonEnd <= jsonStart) {
-    throw new Error("Generated resource module has an invalid payload.");
+  const jsonStart = source.indexOf("[", equals);
+  const jsonEnd = source.indexOf(";\n", jsonStart);
+
+  if (jsonStart < 0 || jsonEnd < 0) {
+    throw new Error(`${exportName} has an invalid generated payload.`);
   }
 
   return JSON.parse(source.slice(jsonStart, jsonEnd));
 }
+
+const generatedSource = fs.readFileSync(GENERATED, "utf8");
+const rows = extractGeneratedArray(generatedSource, "generatedWebsiteResources");
+const sources = extractGeneratedArray(generatedSource, "generatedWebsiteResourceSources");
+const relations = extractGeneratedArray(generatedSource, "generatedWebsiteResourceRelations");
 
 const tags = {
   answer: {
@@ -122,6 +129,31 @@ function duplicateFaqErrors(row) {
   return errors;
 }
 
+const sourcesByResource = new Map();
+for (const source of sources) {
+  const keys = sourcesByResource.get(source.resource_id) ?? new Set();
+  keys.add(source.citation_key);
+  sourcesByResource.set(source.resource_id, keys);
+}
+
+function citationErrors(ast, row) {
+  const errors = [];
+  const keys = sourcesByResource.get(row.id) ?? new Set();
+
+  for (const node of ast.walk()) {
+    if (node.type !== "tag" || node.tag !== "cite") continue;
+
+    const key = node.attributes?.source;
+    if (typeof key !== "string" || !key.trim()) continue;
+
+    if (!keys.has(key)) {
+      errors.push(`citation references missing public source key: ${key}`);
+    }
+  }
+
+  return errors;
+}
+
 function validateRow(row) {
   const errors = [];
 
@@ -166,17 +198,18 @@ function validateRow(row) {
   errors.push(...headingStructureErrors(ast, row));
   errors.push(...duplicateFaqErrors(row));
 
+  if (row.content_schema_version >= 2) {
+    errors.push(...citationErrors(ast, row));
+  }
+
   return errors;
 }
 
-const rows = readGeneratedResources();
 const failures = [];
 
 for (const row of rows) {
   const errors = validateRow(row);
-  if (errors.length > 0) {
-    failures.push({ slug: row.slug, errors });
-  }
+  if (errors.length > 0) failures.push({ slug: row.slug, errors });
 }
 
 const slugs = rows.map((row) => row.slug);
@@ -187,11 +220,31 @@ if (new Set(slugs).size !== slugs.length) {
 const categories = new Set(
   rows.filter((row) => row.resource_kind === "category").map((row) => row.slug),
 );
+const publicIds = new Set(rows.map((row) => row.id));
+
 for (const row of rows.filter((item) => item.resource_kind === "article")) {
   if (!categories.has(row.category_slug)) {
     failures.push({
       slug: row.slug,
       errors: [`references missing published category: ${row.category_slug}`],
+    });
+  }
+}
+
+for (const source of sources) {
+  if (!publicIds.has(source.resource_id)) {
+    failures.push({
+      slug: "(sources)",
+      errors: [`source ${source.citation_key} references non-public resource ${source.resource_id}`],
+    });
+  }
+}
+
+for (const relation of relations) {
+  if (!publicIds.has(relation.resource_id) || !publicIds.has(relation.related_resource_id)) {
+    failures.push({
+      slug: "(relations)",
+      errors: ["curated relation references a non-public resource"],
     });
   }
 }
@@ -208,5 +261,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Validated ${rows.length} published resources (${rows.filter((row) => row.resource_kind === "article").length} articles, ${rows.filter((row) => row.resource_kind === "category").length} categories).`,
+  `Validated ${rows.length} published resources, ${sources.length} public sources, and ${relations.length} curated relations.`,
 );

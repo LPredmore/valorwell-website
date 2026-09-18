@@ -59,7 +59,7 @@ const sourceSchema = z.object({
 const relationSchema = z.object({
   resource_id: z.string().uuid(),
   related_resource_id: z.string().uuid(),
-  relation_type: z.enum(["related", "next", "prerequisite", "start_here"]),
+  relation_type: z.enum(["related", "start_here", "next", "previous"]),
   display_order: z.number().int().default(100),
 });
 

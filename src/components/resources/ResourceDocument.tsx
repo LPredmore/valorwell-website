@@ -1,5 +1,6 @@
-import React from "react";
+import React, { createContext, useContext } from "react";
 import Markdoc, { type RenderableTreeNode } from "@markdoc/markdoc";
+import type { WebsiteResourceSource } from "@/lib/websiteResources";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -10,7 +11,10 @@ import {
 
 type ResourceDocumentProps = {
   content: RenderableTreeNode | RenderableTreeNode[];
+  sources?: WebsiteResourceSource[];
 };
+
+const CitationContext = createContext<Map<string, number>>(new Map());
 
 type ResourceTagProps = {
   children?: React.ReactNode;
@@ -160,6 +164,27 @@ function ResourceDefinition({
   );
 }
 
+
+function ResourceCitation({ source }: { source?: string }) {
+  const citations = useContext(CitationContext);
+  if (!source) return null;
+
+  const number = citations.get(source);
+  if (!number) return null;
+
+  return (
+    <sup className="resource-citation ml-0.5 align-super text-[0.72em] font-bold leading-none">
+      <a
+        href={`#source-${source}`}
+        className="rounded-sm text-[#3B5147] no-underline hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147]"
+        aria-label={`Source ${number}`}
+      >
+        [{number}]
+      </a>
+    </sup>
+  );
+}
+
 function ResourceTable({ children }: { children?: React.ReactNode }) {
   return (
     <div className="not-prose my-8 overflow-x-auto rounded-xl border border-[#3B5147]/15">
@@ -177,13 +202,20 @@ const components = {
   ResourceVerify,
   ResourceCallout,
   ResourceDefinition,
+  ResourceCitation,
   ResourceTable,
 };
 
-export function ResourceDocument({ content }: ResourceDocumentProps) {
+export function ResourceDocument({ content, sources = [] }: ResourceDocumentProps) {
+  const citationNumbers = new Map(
+    sources.map((source, index) => [source.citation_key, index + 1] as const),
+  );
+
   return (
-    <div className="resource-prose prose prose-lg max-w-none prose-headings:text-[#111814] prose-p:text-[#111814]/78 prose-li:text-[#111814]/78 prose-strong:text-[#111814] prose-a:font-semibold prose-a:text-[#3B5147] prose-a:decoration-[#3B5147]/30 prose-a:underline-offset-4 prose-blockquote:border-l-[#D7A92E] prose-blockquote:text-[#111814]/72 prose-hr:border-[#3B5147]/12">
-      {Markdoc.renderers.react(content, React, { components })}
-    </div>
+    <CitationContext.Provider value={citationNumbers}>
+      <div className="resource-prose prose prose-lg max-w-none prose-headings:text-[#111814] prose-p:text-[#111814]/78 prose-li:text-[#111814]/78 prose-strong:text-[#111814] prose-a:font-semibold prose-a:text-[#3B5147] prose-a:decoration-[#3B5147]/30 prose-a:underline-offset-4 prose-blockquote:border-l-[#D7A92E] prose-blockquote:text-[#111814]/72 prose-hr:border-[#3B5147]/12">
+        {Markdoc.renderers.react(content, React, { components })}
+      </div>
+    </CitationContext.Provider>
   );
 }

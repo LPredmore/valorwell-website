@@ -73,7 +73,7 @@ const rows: Row[] = [
     title: "Coping With Limited or No Contact During a Military Separation",
     summary: "Practical ways military families can manage uncertainty.",
     body_markdown:
-      "## What to expect\n\nCommunication can include **important details** and *careful context*. {% cite key=\"source-01\" /%}\n\n- First list item\n- Second list item\n\nParagraph after the list.\n\n### Daily routines\n\nKeep predictable anchors.\n\n## A second section\n\nMore guidance.\n\n## Authoritative sources reviewed\n\n- https://www.va.gov/example-source\n\nLast researched and verified: September 16, 2026",
+      "## What to expect\n\nCommunication can include **important details** and *careful context*. {% cite source=\"source-01\" /%}\n\n- First list item\n- Second list item\n\nParagraph after the list.\n\n### Daily routines\n\nKeep predictable anchors.\n\n## A second section\n\nMore guidance.\n\n## Authoritative sources reviewed\n\n- https://www.va.gov/example-source\n\nLast researched and verified: September 16, 2026",
     editorial_type: "guide",
     resource_kind: "article",
     category_slug: "family-systems",

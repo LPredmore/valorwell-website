@@ -276,9 +276,9 @@ function collectToc(markup: string): ResourceTocItem[] {
 function countWords(markup: string): number {
   const plain = markup
     .replace(/\{%[\s\S]*?%\}/g, " ")
-    .replaceAll("[", " ")
-    .replaceAll("]", " ")
-    .replaceAll("/", " ")
+    .split("[").join(" ")
+    .split("]").join(" ")
+    .split("/").join(" ")
     .replace(/[#>*_~`(){}|+-]/g, " ")
     .replace(/https?:\/\/\S+/g, " ");
   return plain.split(/\s+/).filter(Boolean).length;

@@ -183,7 +183,7 @@ export const resourceMarkdocConfig = {
       render: "ResourceCitation",
       selfClosing: true,
       attributes: {
-        key: { type: String, required: true },
+        source: { type: String, required: true },
       },
     },
   },

@@ -120,8 +120,9 @@ export function ResourceLibrarySearch({
       try {
         if (!pagefindAvailable) throw new Error("Pagefind unavailable");
 
+        const pagefindPath = "/pagefind/pagefind.js";
         const pagefind = (await import(
-          /* @vite-ignore */ "/pagefind/pagefind.js"
+          /* @vite-ignore */ pagefindPath
         )) as unknown as PagefindModule;
 
         const search = await pagefind.search(value, {

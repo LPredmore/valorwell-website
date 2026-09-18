@@ -22935,22 +22935,130 @@ export type Database = {
         }
         Relationships: []
       }
+      website_resource_relations: {
+        Row: {
+          created_at: string
+          display_order: number
+          related_resource_id: string
+          relation_type: string
+          resource_id: string
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          related_resource_id: string
+          relation_type?: string
+          resource_id: string
+          tenant_id: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          related_resource_id?: string
+          relation_type?: string
+          resource_id?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "website_resource_relations_related_resource_fkey"
+            columns: ["tenant_id", "related_resource_id"]
+            isOneToOne: false
+            referencedRelation: "website_resources"
+            referencedColumns: ["tenant_id", "id"]
+          },
+          {
+            foreignKeyName: "website_resource_relations_resource_fkey"
+            columns: ["tenant_id", "resource_id"]
+            isOneToOne: false
+            referencedRelation: "website_resources"
+            referencedColumns: ["tenant_id", "id"]
+          },
+        ]
+      }
+      website_resource_sources: {
+        Row: {
+          citation_key: string
+          created_at: string
+          display_order: number
+          id: string
+          is_public: boolean
+          organization: string | null
+          resource_id: string
+          source_published_at: string | null
+          source_type: string
+          tenant_id: string
+          title: string | null
+          updated_at: string
+          url: string
+          verified_at: string | null
+        }
+        Insert: {
+          citation_key: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_public?: boolean
+          organization?: string | null
+          resource_id: string
+          source_published_at?: string | null
+          source_type?: string
+          tenant_id: string
+          title?: string | null
+          updated_at?: string
+          url: string
+          verified_at?: string | null
+        }
+        Update: {
+          citation_key?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_public?: boolean
+          organization?: string | null
+          resource_id?: string
+          source_published_at?: string | null
+          source_type?: string
+          tenant_id?: string
+          title?: string | null
+          updated_at?: string
+          url?: string
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "website_resource_sources_resource_fkey"
+            columns: ["tenant_id", "resource_id"]
+            isOneToOne: false
+            referencedRelation: "website_resources"
+            referencedColumns: ["tenant_id", "id"]
+          },
+        ]
+      }
       website_resources: {
         Row: {
           audience_tags: string[]
           body_markdown: string
           canonical_topic_key: string
           category_slug: string | null
+          content_schema_version: number
           coverage_status: string
           created_at: string
+          editorial_type: string
           faq: Json
+          featured: boolean
           id: string
           last_researched_at: string | null
           live_url: string | null
           primary_question: string
+          public_updated_at: string | null
           published_at: string | null
           resource_kind: string
+          seo_description: string | null
+          seo_title: string | null
           slug: string
+          sort_order: number
           source_urls: string[]
           status: string
           summary: string
@@ -22964,16 +23072,23 @@ export type Database = {
           body_markdown: string
           canonical_topic_key: string
           category_slug?: string | null
+          content_schema_version?: number
           coverage_status?: string
           created_at?: string
+          editorial_type?: string
           faq?: Json
+          featured?: boolean
           id?: string
           last_researched_at?: string | null
           live_url?: string | null
           primary_question: string
+          public_updated_at?: string | null
           published_at?: string | null
           resource_kind?: string
+          seo_description?: string | null
+          seo_title?: string | null
           slug: string
+          sort_order?: number
           source_urls?: string[]
           status?: string
           summary: string
@@ -22987,16 +23102,23 @@ export type Database = {
           body_markdown?: string
           canonical_topic_key?: string
           category_slug?: string | null
+          content_schema_version?: number
           coverage_status?: string
           created_at?: string
+          editorial_type?: string
           faq?: Json
+          featured?: boolean
           id?: string
           last_researched_at?: string | null
           live_url?: string | null
           primary_question?: string
+          public_updated_at?: string | null
           published_at?: string | null
           resource_kind?: string
+          seo_description?: string | null
+          seo_title?: string | null
           slug?: string
+          sort_order?: number
           source_urls?: string[]
           status?: string
           summary?: string

@@ -52,7 +52,7 @@ const representativeBodyContent = new Map([
   [
     "/resources",
     [
-      "Practical guidance for navigating care, coverage, documentation, and family systems.",
+      "Clear answers for complicated veteran and military-family systems.",
       "Clinical Documentation",
       "Veteran Mental Health",
       "Family Systems",

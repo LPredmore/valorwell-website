@@ -17,7 +17,8 @@ function renderSitemap() {
     .filter((route) => route.sitemap)
     .map((route) => {
       const url = route.path === "/" ? `${SITE_URL}/` : `${SITE_URL}${route.path}`;
-      return `  <url><loc>${url}</loc></url>`;
+      const lastmod = route.lastmod ? `<lastmod>${String(route.lastmod).slice(0, 10)}</lastmod>` : "";
+      return `  <url><loc>${url}</loc>${lastmod}</url>`;
     })
     .join("\n");
 
@@ -33,7 +34,7 @@ const CANONICAL_PAGES = new Set(${JSON.stringify(canonicalPaths, null, 2)});
 
 const LEGACY_REDIRECTS = new Map(${JSON.stringify(redirectPairs, null, 2)});
 
-const ASSET_PREFIXES = ["/assets/", "/brand/", "/__l5e/"];
+const ASSET_PREFIXES = ["/assets/", "/brand/", "/pagefind/", "/__l5e/"];
 
 function isAssetPath(pathname) {
   return (

@@ -144,11 +144,11 @@ export default function ResourceDetail({
               {tag}
             </span>
           ))}
-          {resource.topic_aliases.map((alias) => (
-            <span key={alias} data-pagefind-meta="alias">
-              {alias}
+          {resource.topic_aliases.length > 0 && (
+            <span data-pagefind-meta="aliases">
+              {resource.topic_aliases.join(" · ")}
             </span>
-          ))}
+          )}
         </div>
 
         <header className="resource-article-hero border-b border-[#3B5147]/12 bg-[#F4F1E8]">

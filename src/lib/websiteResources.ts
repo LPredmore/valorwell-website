@@ -139,7 +139,7 @@ function normalizeResource(row: Record<string, unknown>): WebsiteResource | null
     return null;
   }
 
-  return parsed.data;
+  return parsed.data as WebsiteResource;
 }
 
 function normalizeMany(data: unknown): WebsiteResource[] {
@@ -188,7 +188,7 @@ export async function fetchPublishedCategoryBySlug(
   if (error) throw error;
   if (!data) return null;
 
-  const resource = normalizeResource(data as Record<string, unknown>);
+  const resource = normalizeResource(data as unknown as Record<string, unknown>);
   return resource && resource.resource_kind === "category" ? resource : null;
 }
 
@@ -222,7 +222,7 @@ export async function fetchPublishedArticle(
   if (error) throw error;
   if (!data) return null;
 
-  const resource = normalizeResource(data as Record<string, unknown>);
+  const resource = normalizeResource(data as unknown as Record<string, unknown>);
   return resource &&
     resource.resource_kind === "article" &&
     resource.category_slug === categorySlug &&
@@ -261,7 +261,7 @@ export async function fetchPublicResourceSources(
 
   return data.flatMap((row) => {
     const parsed = sourceSchema.safeParse(row);
-    return parsed.success ? [parsed.data] : [];
+    return parsed.success ? [parsed.data as WebsiteResourceSource] : [];
   });
 }
 

@@ -64,7 +64,7 @@ const rows: Row[] = [
     title: "Coping With Limited or No Contact During a Military Separation",
     summary: "Practical ways military families can manage uncertainty.",
     body_markdown:
-      "## What to expect\n\nCommunication can be limited for long stretches.\n\n### Daily routines\n\nKeep predictable anchors.\n\n## Authoritative sources reviewed\n\n- https://www.va.gov/example-source\n\nLast researched and verified: September 16, 2026",
+      "## What to expect\n\nCommunication can include **important details** and *careful context*.\n\n- First list item\n- Second list item\n\nParagraph after the list.\n\n### Daily routines\n\nKeep predictable anchors.\n\n## A second section\n\nMore guidance.\n\n## Authoritative sources reviewed\n\n- https://www.va.gov/example-source\n\nLast researched and verified: September 16, 2026",
     source_urls: ["https://www.va.gov/example-source"],
     last_researched_at: "2026-09-16T00:00:00Z",
     resource_kind: "article",
@@ -177,8 +177,26 @@ describe("runtime resource routing", () => {
     );
 
     await waitFor(() =>
-      expect(screen.getByRole("heading", { name: "Daily routines" })).toBeInTheDocument(),
+      expect(
+        screen.getByRole("heading", { level: 3, name: "Daily routines" }),
+      ).toBeInTheDocument(),
     );
+
+    expect(
+      screen.getByRole("heading", { level: 2, name: "What to expect" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("important details", { selector: "strong" })).toBeInTheDocument();
+    expect(screen.getByText("careful context", { selector: "em" })).toBeInTheDocument();
+
+    const listItem = screen.getByText("First list item");
+    const afterList = screen.getByText("Paragraph after the list.");
+    expect(
+      listItem.compareDocumentPosition(afterList) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+
+    const tocLinks = screen.getAllByRole("link", { name: "What to expect" });
+    expect(tocLinks.some((link) => link.getAttribute("href") === "#what-to-expect")).toBe(true);
+
     expect(screen.queryByText(/###/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Last reviewed/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Last researched/i)).not.toBeInTheDocument();

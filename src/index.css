@@ -279,3 +279,118 @@
   display: none;
 }
 
+
+
+/* Resource article editorial reading surface */
+.resource-article-body > .resource-article-heading:first-child {
+  margin-top: 0;
+  border-top: 0;
+  padding-top: 0;
+}
+
+.resource-article-body > p:first-child {
+  margin-top: 0;
+}
+
+.resource-print-faq {
+  display: none;
+}
+
+@media print {
+  @page {
+    margin: 18mm 16mm;
+  }
+
+  .site-header,
+  .site-footer,
+  .resource-print-hidden,
+  .resource-screen-faq {
+    display: none !important;
+  }
+
+  html,
+  body,
+  #root,
+  .resource-article-page,
+  .resource-article-hero {
+    background: #ffffff !important;
+  }
+
+  body {
+    color: #111814 !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .resource-article-hero {
+    border: 0 !important;
+  }
+
+  .resource-article-hero > div {
+    max-width: none !important;
+    padding: 0 0 10mm !important;
+  }
+
+  .resource-article-hero h1 {
+    max-width: none !important;
+    font-size: 30pt !important;
+    line-height: 1.08 !important;
+  }
+
+  .resource-article-hero p {
+    max-width: none !important;
+  }
+
+  .resource-article-shell {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+
+  .resource-article-grid {
+    display: block !important;
+    max-width: none !important;
+  }
+
+  .resource-article-surface {
+    max-width: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  .resource-article-body {
+    max-width: none !important;
+  }
+
+  .resource-article-body p,
+  .resource-article-body li,
+  .resource-print-faq {
+    color: #111814 !important;
+  }
+
+  .resource-article-body h2,
+  .resource-article-body h3,
+  .resource-article-body h4,
+  .resource-print-faq h3 {
+    break-after: avoid-page;
+    page-break-after: avoid;
+  }
+
+  .resource-article-body li,
+  .resource-article-body blockquote,
+  .resource-print-faq-item {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .resource-print-faq {
+    display: block !important;
+    margin-top: 10mm;
+  }
+
+  .resource-article-page a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+}

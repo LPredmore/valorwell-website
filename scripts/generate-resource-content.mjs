@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { loadEnv } from "vite";
+import { validateResourceMarkup } from "./resource-content-rules.mjs";
 
 const TENANT_ID = "00000000-0000-0000-0000-000000000001";
 const ROOT = process.cwd();
@@ -15,10 +16,38 @@ if (!supabaseUrl || !publishableKey) {
   );
 }
 
-const endpoint = new URL("/rest/v1/website_resources", supabaseUrl);
-endpoint.searchParams.set(
-  "select",
+const headers = {
+  apikey: publishableKey,
+  Authorization: `Bearer ${publishableKey}`,
+  Accept: "application/json",
+};
+
+async function fetchRows(table, select, params = {}) {
+  const endpoint = new URL(`/rest/v1/${table}`, supabaseUrl);
+  endpoint.searchParams.set("select", select);
+  for (const [key, value] of Object.entries(params)) {
+    endpoint.searchParams.set(key, value);
+  }
+
+  const response = await fetch(endpoint, { headers });
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(
+      `Could not generate resource data from ${table} (${response.status}): ${body.slice(0, 300)}`,
+    );
+  }
+
+  const rows = await response.json();
+  if (!Array.isArray(rows)) {
+    throw new Error(`${table} returned an invalid payload.`);
+  }
+  return rows;
+}
+
+const rows = await fetchRows(
+  "website_resources",
   [
+    "id",
     "slug",
     "title",
     "primary_question",
@@ -27,39 +56,61 @@ endpoint.searchParams.set(
     "faq",
     "audience_tags",
     "topic_aliases",
-    "source_urls",
-    "coverage_status",
     "status",
     "live_url",
-    "last_researched_at",
     "published_at",
     "resource_kind",
     "category_slug",
+    "content_schema_version",
+    "editorial_type",
+    "featured",
+    "sort_order",
+    "seo_title",
+    "seo_description",
+    "public_updated_at",
   ].join(","),
-);
-endpoint.searchParams.set("tenant_id", `eq.${TENANT_ID}`);
-endpoint.searchParams.set("status", "eq.published");
-endpoint.searchParams.set("order", "title.asc");
-
-const response = await fetch(endpoint, {
-  headers: {
-    apikey: publishableKey,
-    Authorization: `Bearer ${publishableKey}`,
-    Accept: "application/json",
+  {
+    tenant_id: `eq.${TENANT_ID}`,
+    status: "eq.published",
+    order: "sort_order.asc,title.asc",
   },
-});
+);
 
-if (!response.ok) {
-  const body = await response.text();
-  throw new Error(
-    `Could not generate website resources from Billing Hub (${response.status}): ${body.slice(0, 300)}`,
-  );
-}
+const sources = await fetchRows(
+  "website_resource_sources",
+  [
+    "id",
+    "resource_id",
+    "citation_key",
+    "organization",
+    "title",
+    "url",
+    "source_type",
+    "source_published_at",
+    "verified_at",
+    "is_public",
+    "display_order",
+  ].join(","),
+  {
+    tenant_id: `eq.${TENANT_ID}`,
+    is_public: "eq.true",
+    order: "resource_id.asc,display_order.asc,citation_key.asc",
+  },
+);
 
-const rows = await response.json();
-if (!Array.isArray(rows)) {
-  throw new Error("Billing Hub returned an invalid website_resources payload.");
-}
+const relations = await fetchRows(
+  "website_resource_relations",
+  [
+    "resource_id",
+    "related_resource_id",
+    "relation_type",
+    "display_order",
+  ].join(","),
+  {
+    tenant_id: `eq.${TENANT_ID}`,
+    order: "resource_id.asc,display_order.asc",
+  },
+);
 
 function requireString(row, field) {
   if (typeof row[field] !== "string" || !row[field].trim()) {
@@ -67,20 +118,33 @@ function requireString(row, field) {
   }
 }
 
+const resourceIds = new Set();
+const resourceSlugs = new Set();
+const categorySlugs = new Set(
+  rows
+    .filter((row) => row.resource_kind === "category")
+    .map((row) => row.slug),
+);
+
 for (const row of rows) {
   for (const field of [
+    "id",
     "slug",
     "title",
     "primary_question",
     "summary",
     "body_markdown",
-    "coverage_status",
     "status",
+    "resource_kind",
+    "editorial_type",
   ]) {
     requireString(row, field);
   }
 
-  for (const field of ["faq", "audience_tags", "topic_aliases", "source_urls"]) {
+  if (!Array.isArray(row.faq)) {
+    throw new Error(`Published resource ${row.slug} has invalid faq.`);
+  }
+  for (const field of ["audience_tags", "topic_aliases"]) {
     if (!Array.isArray(row[field])) {
       throw new Error(`Published resource ${row.slug} has invalid ${field}.`);
     }
@@ -89,38 +153,135 @@ for (const row of rows) {
   if (row.status !== "published") {
     throw new Error(`Non-published resource ${row.slug} reached the public build.`);
   }
+  if (!["category", "article"].includes(row.resource_kind)) {
+    throw new Error(`Published resource ${row.slug} has invalid resource_kind.`);
+  }
+  if (!["category", "guide", "explainer", "checklist", "reference"].includes(row.editorial_type)) {
+    throw new Error(`Published resource ${row.slug} has invalid editorial_type.`);
+  }
+  if (row.resource_kind === "category" && row.editorial_type !== "category") {
+    throw new Error(`Published category ${row.slug} must use editorial_type=category.`);
+  }
+  if (row.resource_kind === "article") {
+    if (!row.category_slug || !categorySlugs.has(row.category_slug)) {
+      throw new Error(
+        `Published article ${row.slug} references missing category ${row.category_slug ?? "(none)"}.`,
+      );
+    }
+    if (row.editorial_type === "category") {
+      throw new Error(`Published article ${row.slug} cannot use editorial_type=category.`);
+    }
+  }
+
+  const validation = validateResourceMarkup(row.body_markdown);
+  if (validation.errors.length > 0) {
+    throw new Error(
+      `Published resource ${row.slug} has invalid Markdoc content:\n- ${validation.errors.join("\n- ")}`,
+    );
+  }
+
+  resourceIds.add(row.id);
+  if (resourceSlugs.has(row.slug)) {
+    throw new Error(`Published website resources contain duplicate slug ${row.slug}.`);
+  }
+  resourceSlugs.add(row.slug);
 }
 
-for (const row of rows) {
-  const kind = row.resource_kind === "article" ? "article" : "category";
-  row.resource_kind = kind;
-  row.category_slug = typeof row.category_slug === "string" ? row.category_slug : null;
-  if (kind === "article" && !row.category_slug) {
-    throw new Error(`Published article ${row.slug} is missing category_slug.`);
+for (const source of sources) {
+  for (const field of ["id", "resource_id", "citation_key", "url", "source_type"]) {
+    requireString(source, field);
+  }
+  if (!resourceIds.has(source.resource_id)) {
+    throw new Error(
+      `Public source ${source.citation_key} points to a resource that is not published.`,
+    );
   }
 }
 
-const uniqueSlugs = new Set(rows.map((row) => row.slug));
-if (uniqueSlugs.size !== rows.length) {
-  throw new Error("Published website resources contain duplicate slugs.");
+for (const relation of relations) {
+  for (const field of ["resource_id", "related_resource_id", "relation_type"]) {
+    requireString(relation, field);
+  }
+  if (!resourceIds.has(relation.resource_id) || !resourceIds.has(relation.related_resource_id)) {
+    throw new Error("Public resource relation points to a resource that is not published.");
+  }
 }
 
-const tsHeader = `// Generated from public.website_resources. Do not edit by hand.\n// scripts/generate-resource-content.mjs refreshes this file before production builds.\n\nexport type GeneratedWebsiteResource = {\n  slug: string;\n  title: string;\n  primary_question: string;\n  summary: string;\n  body_markdown: string;\n  faq: unknown[];\n  audience_tags: string[];\n  topic_aliases: string[];\n  source_urls: string[];\n  coverage_status: \"partial\" | \"complete\" | \"needs_review\";\n  status: \"published\";\n  live_url: string | null;\n  last_researched_at: string | null;\n  published_at: string | null;\n  resource_kind: "category" | "article";\n  category_slug: string | null;\n};\n\n`;
+const tsHeader = `// Generated from Billing Hub public resource data. Do not edit by hand.
+// scripts/generate-resource-content.mjs refreshes this file before production builds.
 
-const resourceModule = `${tsHeader}export const generatedWebsiteResources: GeneratedWebsiteResource[] = ${JSON.stringify(rows, null, 2)};\n`;
+export type GeneratedWebsiteResource = {
+  id: string;
+  slug: string;
+  title: string;
+  primary_question: string;
+  summary: string;
+  body_markdown: string;
+  faq: unknown[];
+  audience_tags: string[];
+  topic_aliases: string[];
+  status: "published";
+  live_url: string | null;
+  published_at: string | null;
+  resource_kind: "category" | "article";
+  category_slug: string | null;
+  content_schema_version: number;
+  editorial_type: "category" | "guide" | "explainer" | "checklist" | "reference";
+  featured: boolean;
+  sort_order: number;
+  seo_title: string | null;
+  seo_description: string | null;
+  public_updated_at: string | null;
+};
+
+export type GeneratedWebsiteResourceSource = {
+  id: string;
+  resource_id: string;
+  citation_key: string;
+  organization: string | null;
+  title: string | null;
+  url: string;
+  source_type: "official" | "statute" | "regulation" | "policy" | "clinical" | "research" | "other";
+  source_published_at: string | null;
+  verified_at: string | null;
+  is_public: boolean;
+  display_order: number;
+};
+
+export type GeneratedWebsiteResourceRelation = {
+  resource_id: string;
+  related_resource_id: string;
+  relation_type: "related" | "start_here" | "next" | "previous";
+  display_order: number;
+};
+
+`;
+
+const resourceModule =
+  tsHeader +
+  `export const generatedWebsiteResources: GeneratedWebsiteResource[] = ${JSON.stringify(rows, null, 2)};\n\n` +
+  `export const generatedWebsiteResourceSources: GeneratedWebsiteResourceSource[] = ${JSON.stringify(sources, null, 2)};\n\n` +
+  `export const generatedWebsiteResourceRelations: GeneratedWebsiteResourceRelation[] = ${JSON.stringify(relations, null, 2)};\n`;
+
 const routeRows = rows.map((row) => ({
   path:
     row.resource_kind === "article"
       ? `/resources/${row.category_slug}/${row.slug}`
       : `/resources/${row.slug}`,
-  title: `${row.title} | ValorWell`,
-  description: row.summary,
+  title: row.seo_title?.trim() || `${row.title} | ValorWell`,
+  description: row.seo_description?.trim() || row.summary,
   h1: row.title,
   lead: row.summary,
   indexable: true,
   sitemap: true,
+  lastmod: row.public_updated_at || row.published_at || null,
 }));
-const routeModule = `// Generated from public.website_resources. Do not edit by hand.\n// scripts/generate-resource-content.mjs refreshes this file before production builds.\n\nexport const generatedResourceRoutes = ${JSON.stringify(routeRows, null, 2)};\n`;
+
+const routeModule = `// Generated from public.website_resources. Do not edit by hand.
+// scripts/generate-resource-content.mjs refreshes this file before production builds.
+
+export const generatedResourceRoutes = ${JSON.stringify(routeRows, null, 2)};
+`;
 
 const resourceOutput = path.join(ROOT, "src", "generated", "websiteResources.ts");
 const routeOutput = path.join(ROOT, "route-contract", "generated-resource-routes.mjs");
@@ -128,4 +289,6 @@ fs.mkdirSync(path.dirname(resourceOutput), { recursive: true });
 fs.writeFileSync(resourceOutput, resourceModule, "utf8");
 fs.writeFileSync(routeOutput, routeModule, "utf8");
 
-console.log(`Generated ${rows.length} published website resources from Billing Hub.`);
+console.log(
+  `Generated ${rows.length} published resources, ${sources.length} public sources, and ${relations.length} explicit relations from Billing Hub.`,
+);

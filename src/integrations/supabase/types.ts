@@ -2516,6 +2516,90 @@ export type Database = {
           },
         ]
       }
+      claim_clearinghouse_routes: {
+        Row: {
+          clearinghouse: string
+          client_id: string
+          client_insurance_id: string
+          created_at: string
+          created_by_profile_id: string | null
+          effective_from: string
+          effective_to: string | null
+          enabled: boolean
+          id: string
+          metadata: Json
+          routing_reason: string | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          clearinghouse: string
+          client_id: string
+          client_insurance_id: string
+          created_at?: string
+          created_by_profile_id?: string | null
+          effective_from?: string
+          effective_to?: string | null
+          enabled?: boolean
+          id?: string
+          metadata?: Json
+          routing_reason?: string | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          clearinghouse?: string
+          client_id?: string
+          client_insurance_id?: string
+          created_at?: string
+          created_by_profile_id?: string | null
+          effective_from?: string
+          effective_to?: string | null
+          enabled?: boolean
+          id?: string
+          metadata?: Json
+          routing_reason?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_clearinghouse_routes_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_clearinghouse_routes_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "v_client_canonical_state"
+            referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "claim_clearinghouse_routes_client_insurance_id_fkey"
+            columns: ["client_insurance_id"]
+            isOneToOne: false
+            referencedRelation: "client_insurance"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_clearinghouse_routes_client_insurance_id_fkey"
+            columns: ["client_insurance_id"]
+            isOneToOne: false
+            referencedRelation: "client_journey_exception_operations"
+            referencedColumns: ["current_insurance_id"]
+          },
+          {
+            foreignKeyName: "claim_clearinghouse_routes_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       claim_diagnoses: {
         Row: {
           claim_id: string
@@ -2855,6 +2939,7 @@ export type Database = {
           old_status: string | null
           raw_payload: Json | null
           status_message: string | null
+          submission_attempt_id: string | null
           tenant_id: string
         }
         Insert: {
@@ -2867,6 +2952,7 @@ export type Database = {
           old_status?: string | null
           raw_payload?: Json | null
           status_message?: string | null
+          submission_attempt_id?: string | null
           tenant_id: string
         }
         Update: {
@@ -2879,6 +2965,7 @@ export type Database = {
           old_status?: string | null
           raw_payload?: Json | null
           status_message?: string | null
+          submission_attempt_id?: string | null
           tenant_id?: string
         }
         Relationships: [
@@ -2890,10 +2977,126 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "claim_status_events_submission_attempt_id_fkey"
+            columns: ["submission_attempt_id"]
+            isOneToOne: false
+            referencedRelation: "claim_submission_attempts"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "claim_status_events_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      claim_submission_attempts: {
+        Row: {
+          attempt_ordinal: number
+          batch_id: string | null
+          claim_id: string
+          claimmd_batch_id: string | null
+          claimmd_claim_id: string | null
+          claimmd_file_id: string | null
+          clearinghouse: string
+          client_action_id: string | null
+          created_at: string
+          external_claim_id: string | null
+          external_submission_id: string | null
+          frequency_code: string | null
+          id: string
+          idempotency_key: string | null
+          original_claim_id: string | null
+          outcome: string
+          pcn: string
+          remote_claim_id: string | null
+          replacement_reason: string | null
+          request_payload: Json | null
+          submission_mode: string
+          submission_request_id: string | null
+          submitted_at: string
+          sync_result: Json
+          sync_status: string | null
+          tenant_id: string
+        }
+        Insert: {
+          attempt_ordinal: number
+          batch_id?: string | null
+          claim_id: string
+          claimmd_batch_id?: string | null
+          claimmd_claim_id?: string | null
+          claimmd_file_id?: string | null
+          clearinghouse?: string
+          client_action_id?: string | null
+          created_at?: string
+          external_claim_id?: string | null
+          external_submission_id?: string | null
+          frequency_code?: string | null
+          id?: string
+          idempotency_key?: string | null
+          original_claim_id?: string | null
+          outcome: string
+          pcn: string
+          remote_claim_id?: string | null
+          replacement_reason?: string | null
+          request_payload?: Json | null
+          submission_mode: string
+          submission_request_id?: string | null
+          submitted_at: string
+          sync_result?: Json
+          sync_status?: string | null
+          tenant_id: string
+        }
+        Update: {
+          attempt_ordinal?: number
+          batch_id?: string | null
+          claim_id?: string
+          claimmd_batch_id?: string | null
+          claimmd_claim_id?: string | null
+          claimmd_file_id?: string | null
+          clearinghouse?: string
+          client_action_id?: string | null
+          created_at?: string
+          external_claim_id?: string | null
+          external_submission_id?: string | null
+          frequency_code?: string | null
+          id?: string
+          idempotency_key?: string | null
+          original_claim_id?: string | null
+          outcome?: string
+          pcn?: string
+          remote_claim_id?: string | null
+          replacement_reason?: string | null
+          request_payload?: Json | null
+          submission_mode?: string
+          submission_request_id?: string | null
+          submitted_at?: string
+          sync_result?: Json
+          sync_status?: string | null
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_submission_attempts_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "claim_batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_submission_attempts_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_submission_attempts_submission_request_id_fkey"
+            columns: ["submission_request_id"]
+            isOneToOne: false
+            referencedRelation: "claim_submission_requests"
             referencedColumns: ["id"]
           },
         ]
@@ -20134,6 +20337,47 @@ export type Database = {
           },
         ]
       }
+      research_state_search_progress: {
+        Row: {
+          created_at: string
+          id: string
+          progress: Json
+          state_code: string
+          state_order: number
+          tenant_id: string
+          updated_at: string
+          workflow_key: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          progress?: Json
+          state_code: string
+          state_order: number
+          tenant_id: string
+          updated_at?: string
+          workflow_key: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          progress?: Json
+          state_code?: string
+          state_order?: number
+          tenant_id?: string
+          updated_at?: string
+          workflow_key?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "research_state_search_progress_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       security_password_remediation_log: {
         Row: {
           had_plaintext: boolean
@@ -25008,6 +25252,14 @@ export type Database = {
         }
         Returns: Json
       }
+      assign_opaque_claim_numbers_v1: {
+        Args: { p_claim_ids: string[] }
+        Returns: {
+          assigned: boolean
+          claim_id: string
+          claim_number: string
+        }[]
+      }
       autocreate_copay_for_appointment: {
         Args: { p_appointment_id: string }
         Returns: undefined
@@ -25200,6 +25452,10 @@ export type Database = {
           transaction_id: string
           wbraid: string
         }[]
+      }
+      claim_is_externally_submitted_v1: {
+        Args: { p_claim_id: string }
+        Returns: boolean
       }
       claim_pending_campaign_steps: {
         Args: { p_limit?: number }
@@ -26459,6 +26715,7 @@ export type Database = {
         }
         Returns: Json
       }
+      delete_draft_claim_v1: { Args: { p_claim_id: string }; Returns: Json }
       dismiss_champva_row: {
         Args: { p_reason: string; p_row_id: string }
         Returns: undefined
@@ -26535,6 +26792,18 @@ export type Database = {
           p_note_id: string
         }
         Returns: Json
+      }
+      finalize_stedi_submission_attempt_v2: {
+        Args: {
+          p_attempt_id: string
+          p_external_claim_id: string
+          p_external_submission_id: string
+          p_mark_submitted: boolean
+          p_outcome: string
+          p_sync_result: Json
+          p_sync_status: string
+        }
+        Returns: string
       }
       find_clients_by_emails_insensitive: {
         Args: { p_emails: string[]; p_tenant_id: string }
@@ -27222,6 +27491,14 @@ export type Database = {
           }
       get_staff_id_for_user: { Args: { p_user_id: string }; Returns: string }
       get_staff_operating_context: { Args: never; Returns: Json }
+      get_stedi_submission_candidates_v1: {
+        Args: never
+        Returns: {
+          claim_id: string
+          claim_number: string
+          tenant_id: string
+        }[]
+      }
       get_stripe_billing_integrity_report: { Args: never; Returns: Json }
       has_billing_role: {
         Args: { _tenant_id: string; _user_id: string }
@@ -27333,6 +27610,10 @@ export type Database = {
         Returns: Json
       }
       mark_at_risk_clients: { Args: { p_tenant_id: string }; Returns: number }
+      mark_stedi_submission_started_v1: {
+        Args: { p_request_id: string }
+        Returns: boolean
+      }
       match_champva_payment_rows: {
         Args: { p_document_id: string }
         Returns: Json
@@ -27492,6 +27773,10 @@ export type Database = {
         Args: { p_document_id: string }
         Returns: Json
       }
+      prepare_claim_submission_external_v1: {
+        Args: { p_request_id: string; p_sent_claim_ids: string[] }
+        Returns: Json
+      }
       prepare_relationship_campaign_delivery: {
         Args: {
           p_claim_token: string
@@ -27600,6 +27885,25 @@ export type Database = {
         }
         Returns: string
       }
+      record_claim_submission_attempt_v1: {
+        Args: {
+          p_batch_id: string
+          p_claim_id: string
+          p_claimmd_batch_id: string
+          p_claimmd_claim_id: string
+          p_claimmd_file_id: string
+          p_client_action_id: string
+          p_pcn: string
+          p_remote_claim_id: string
+          p_replacement_reason?: string
+          p_request_payload: Json
+          p_submission_mode: string
+          p_submission_request_id: string
+          p_sync_result: Json
+          p_sync_status: string
+        }
+        Returns: Json
+      }
       record_claimmd_source_evidence_v1: {
         Args: {
           p_endpoint: string
@@ -27687,6 +27991,18 @@ export type Database = {
         }
         Returns: Json
       }
+      record_stedi_submission_result_v1: {
+        Args: {
+          p_external_claim_id: string
+          p_external_submission_id: string
+          p_mark_submitted: boolean
+          p_outcome: string
+          p_request_id: string
+          p_sync_result: Json
+          p_sync_status: string
+        }
+        Returns: string
+      }
       record_therapist_match_outbox_result: {
         Args: {
           p_claim_token: string
@@ -27743,6 +28059,15 @@ export type Database = {
           p_reason: string
         }
         Returns: Json
+      }
+      release_stedi_submission_request_v1: {
+        Args: {
+          p_evidence?: Json
+          p_reason?: string
+          p_request_id: string
+          p_state: string
+        }
+        Returns: boolean
       }
       reopen_client_journey_exception: {
         Args: {
@@ -27822,6 +28147,34 @@ export type Database = {
           p_total_payment_amount: number
         }
         Returns: Json
+      }
+      reserve_stedi_submission_attempt_v1: {
+        Args: {
+          p_claim_id: string
+          p_idempotency_key: string
+          p_submission_mode?: string
+        }
+        Returns: {
+          attempt_id: string
+          reason: string
+          reserved: boolean
+        }[]
+      }
+      reserve_stedi_submission_request_v1: {
+        Args: {
+          p_claim_id: string
+          p_idempotency_key: string
+          p_submission_mode?: string
+        }
+        Returns: {
+          reason: string
+          request_id: string
+          reserved: boolean
+        }[]
+      }
+      resolve_claim_clearinghouse: {
+        Args: { p_claim_id: string }
+        Returns: string
       }
       resolve_client_journey_exception: {
         Args: {

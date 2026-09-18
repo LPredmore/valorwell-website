@@ -1,4 +1,6 @@
-import Markdoc, { Tag, nodes } from "@markdoc/markdoc";
+import Markdoc from "@markdoc/markdoc";
+
+const { Tag, nodes } = Markdoc;
 
 const INTERNAL_HEADINGS = new Set([
   "authoritative sources reviewed",

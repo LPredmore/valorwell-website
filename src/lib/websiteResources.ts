@@ -116,6 +116,19 @@ export async function fetchPublishedCategories(): Promise<WebsiteResource[]> {
   return normalizeMany(data).filter((resource) => resource.resource_kind === "category");
 }
 
+
+export async function fetchFeaturedArticles(): Promise<WebsiteResource[]> {
+  const { data, error } = await baseQuery()
+    .eq("resource_kind", "article")
+    .eq("featured", true)
+    .order("sort_order", { ascending: true })
+    .order("title", { ascending: true })
+    .limit(6);
+
+  if (error) throw error;
+  return normalizeMany(data);
+}
+
 export async function fetchPublishedCategoryBySlug(
   slug: string,
 ): Promise<WebsiteResource | null> {
@@ -249,6 +262,27 @@ export function usePublishedCategories() {
   return useQuery({
     queryKey: ["website-resource-categories", WEBSITE_RESOURCE_TENANT_ID],
     queryFn: fetchPublishedCategories,
+    initialData: seed.length > 0 ? seed : undefined,
+    initialDataUpdatedAt: 0,
+    staleTime: 30_000,
+    refetchOnMount: "always",
+  });
+}
+
+
+export function useFeaturedArticles() {
+  const seed = prerenderSnapshot
+    .filter((resource) => resource.resource_kind === "article" && resource.featured)
+    .sort(
+      (a, b) =>
+        a.sort_order - b.sort_order ||
+        a.title.localeCompare(b.title),
+    )
+    .slice(0, 6);
+
+  return useQuery({
+    queryKey: ["website-resource-featured", WEBSITE_RESOURCE_TENANT_ID],
+    queryFn: fetchFeaturedArticles,
     initialData: seed.length > 0 ? seed : undefined,
     initialDataUpdatedAt: 0,
     staleTime: 30_000,

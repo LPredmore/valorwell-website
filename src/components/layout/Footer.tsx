@@ -39,7 +39,7 @@ const groups: { title: string; links: { name: string; href: string }[] }[] = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-border/60 bg-[hsl(var(--section-alt))]">
+    <footer className="site-footer border-t border-border/60 bg-[hsl(var(--section-alt))]">
       <div className="container-wide py-14">
         <div className="grid gap-10 md:grid-cols-3 lg:grid-cols-5">
           <div className="md:col-span-3 lg:col-span-1">

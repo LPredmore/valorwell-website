@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowRight, ChevronRight, Clock3 } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
@@ -389,7 +389,7 @@ export default function ResourceDetail({
     (block): block is Extract<MarkdownBlock, { type: "heading" }> =>
       block.type === "heading" && block.level === 2,
   );
-  const readingMinutes = getReadingMinutes(blocks);
+  const hasToc = toc.length > 1;\n  const readingMinutes = getReadingMinutes(blocks);
   const topicLabel = categoryLabel(category?.title, categorySlug);
 
   const related = (siblings ?? [])
@@ -463,7 +463,7 @@ export default function ResourceDetail({
         </header>
 
         <div className="resource-article-shell container-wide py-8 md:py-12 lg:py-14">
-          {toc.length > 1 && (
+          {hasToc && (
             <details className="resource-print-hidden mb-6 rounded-2xl border border-[#3B5147]/15 bg-white p-5 shadow-sm lg:hidden">
               <summary className="cursor-pointer select-none font-bold text-[#111814]">
                 On this page
@@ -485,7 +485,7 @@ export default function ResourceDetail({
             </details>
           )}
 
-          <div className="resource-article-grid mx-auto grid max-w-[1180px] items-start gap-8 lg:grid-cols-[250px_minmax(0,760px)] lg:justify-center lg:gap-12 xl:grid-cols-[260px_minmax(0,780px)] xl:gap-16">
+          <div\n            className={`resource-article-grid mx-auto grid max-w-[1180px] items-start gap-8 lg:justify-center ${\n              hasToc\n                ? "lg:grid-cols-[250px_minmax(0,760px)] lg:gap-12 xl:grid-cols-[260px_minmax(0,780px)] xl:gap-16"\n                : "lg:grid-cols-[minmax(0,780px)]"\n            }`}\n          >
             <aside className="resource-print-hidden hidden lg:block">
               <div className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto pr-3">
                 <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#3B5147]">

@@ -128,7 +128,7 @@ export default function ResourceDetail({
     resource.content_schema_version,
   );
   const toc = document.toc.filter((item) => item.level === 2);
-  const hasToc = toc.length > 2;
+  const hasToc = toc.length > 1;
   const topicLabel = categoryLabel(category?.title, categorySlug);
   const path = `/resources/${categorySlug}/${resource.slug}`;
   const categoryPath = `/resources/${categorySlug}`;

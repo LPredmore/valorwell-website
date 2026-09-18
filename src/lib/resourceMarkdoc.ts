@@ -121,7 +121,7 @@ function createHeadingSchema(counter: Map<string, number>): Schema {
       if (!transform) return null;
 
       const rendered = transform(node, config);
-      if (!rendered) return rendered;
+      if (!(rendered instanceof Markdoc.Tag)) return rendered;
 
       const text = renderableText(rendered.children);
       const base = slugifyHeading(text);

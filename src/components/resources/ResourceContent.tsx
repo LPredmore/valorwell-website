@@ -153,9 +153,9 @@ function ResourceSteps({
   );
 }
 
-function ResourceCitation({ key: citationKey }: { key: string }) {
+function ResourceCitation({ source }: { source: string }) {
   const citations = React.useContext(CitationContext);
-  const entry = citations.get(citationKey);
+  const entry = citations.get(source);
 
   if (!entry) {
     return (

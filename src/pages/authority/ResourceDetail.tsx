@@ -191,6 +191,15 @@ export default function ResourceDetail({
               <span data-pagefind-meta="type">{editorialLabel(resource.editorial_type)}</span>
             </div>
 
+            {resource.topic_aliases.length > 0 && (
+              <span
+                className="hidden"
+                aria-hidden="true"
+                data-resource-aliases={resource.topic_aliases.join(" ")}
+                data-pagefind-index-attrs="data-resource-aliases"
+              />
+            )}
+
             {resource.audience_tags.map((tag) => (
               <span
                 key={tag}

@@ -17,7 +17,11 @@ function renderSitemap() {
     .filter((route) => route.sitemap)
     .map((route) => {
       const url = route.path === "/" ? `${SITE_URL}/` : `${SITE_URL}${route.path}`;
-      return `  <url><loc>${url}</loc></url>`;
+      const lastmod =
+        typeof route.lastmod === "string" && route.lastmod
+          ? `<lastmod>${new Date(route.lastmod).toISOString()}</lastmod>`
+          : "";
+      return `  <url><loc>${url}</loc>${lastmod}</url>`;
     })
     .join("\n");
 

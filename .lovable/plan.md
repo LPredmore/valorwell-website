@@ -1,23 +1,21 @@
-# ValorWell Homepage Rebuild
+# Editorial Resource Article Template
 
 ## Scope
-- Rebuild the homepage into the requested routing-focused sections while preserving the existing brand, layout, accessibility, and tracking conventions.
-- Add a complete `/how-it-works` explainer page.
-- Update the primary header order and register the new canonical route.
-- Add targeted safeguards for exact claims, prohibited homepage content, current Beyond The Yellow episode, valid destinations, and route/header rendering.
+- Redesign only runtime resource article detail pages; keep shared authority and category pages unchanged.
+- Preserve live Billing Hub Supabase queries, routes, SEO/schema, related-resource selection, and hidden research metadata.
 
 ## Implementation
-1. Recompose the homepage with the split origin-story opening, exact full-width claim, three-part model, verified Foundation snapshot visualization, one current Beyond The Yellow episode, and four fully clickable routing cards.
-2. Keep impact data as dated snapshot entries (`value: 540`, display `540+`) so verified future points can extend the visualization without redesign.
-3. Create the How It Works page with SEO, three sequential access paths, clear Foundation separation, and situation-based routes.
-4. Add `/how-it-works` to the route contract and app routing, then place it second in the primary header navigation while leaving Impact available elsewhere.
-5. Add focused tests/build assertions covering exact copy, excluded `$75` and placeholder tokens, the current ACP episode/video ID, route targets, header navigation, and the new page.
+1. Replace the lossy article parser with safe Markdown rendering that preserves heading hierarchy, inline emphasis/links, nested lists, and document order while excluding internal source/review sections and lines.
+2. Build a dedicated article page with a linked breadcrumb hero, category and reading-time metadata, continuous paper reading surface, stable heading anchors, and responsive H2 table of contents.
+3. Present FAQs through the existing accessible accordion, related articles as compact recommendations, and the existing care/topic actions in a concise closing area.
+4. Add article-scoped print rules that remove site chrome, breadcrumbs, navigation, recommendations, and actions while producing a clean printable document.
+5. Expand runtime tests for nested headings, sequence preservation, emphasis, metadata suppression, table-of-contents links, and future runtime slugs.
+
+## Technical Details
+- Add `react-markdown` with `remark-gfm`; raw HTML remains disabled.
+- Keep sanitization as a preprocessing step before rendering and before reading-time/TOC calculation.
+- Use semantic design tokens and article-scoped styles so non-resource authority pages retain their current appearance.
 
 ## Verification
-- Run the relevant tests and the repository production build command.
-- Check the homepage and `/how-it-works` in a browser at mobile and desktop widths for overflow, card semantics, focus visibility, media sizing, and correct destinations.
-- Confirm route-contract generation and validation complete successfully.
-
-## Assumptions
-- Reuse the strongest suitable existing candid family image after inspecting available assets; no new stock or generated imagery.
-- Use the existing donation tracking component when compatible with the requested Foundation CTA.
+- Run focused lint, TypeScript checking, resource tests, the full test suite, and the production build.
+- Inspect the Family Systems article at mobile and desktop widths, including horizontal overflow and print-media behavior.

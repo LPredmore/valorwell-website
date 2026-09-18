@@ -7,6 +7,7 @@ import { AppRoutes } from "@/AppRoutes";
 
 type Row = {
   id: string;
+  tenant_id: string;
   slug: string;
   title: string;
   primary_question: string;
@@ -29,6 +30,7 @@ type Row = {
 };
 
 const base = {
+  tenant_id: "00000000-0000-0000-0000-000000000001",
   primary_question: "",
   faq: [],
   audience_tags: [],

@@ -7,13 +7,13 @@ export const resourceFaqSchema = z.object({
 
 export const websiteResourceKindSchema = z.enum(["category", "article"]);
 export const websiteResourceStatusSchema = z.literal("published");
-export const websiteResourceArticleTypeSchema = z.enum([
+export const websiteResourceEditorialTypeSchema = z.enum([
+  "category",
   "guide",
   "explainer",
   "checklist",
   "reference",
 ]);
-export const websiteResourceContentFormatSchema = z.enum(["markdoc"]);
 
 export const publicWebsiteResourceSchema = z.object({
   id: z.string().uuid(),
@@ -30,12 +30,12 @@ export const publicWebsiteResourceSchema = z.object({
   published_at: z.string().nullable().default(null),
   resource_kind: websiteResourceKindSchema,
   category_slug: z.string().trim().min(1).nullable().default(null),
+  content_schema_version: z.number().int().min(1).max(10).default(1),
+  editorial_type: websiteResourceEditorialTypeSchema.default("guide"),
+  featured: z.boolean().default(false),
+  sort_order: z.number().int().default(100),
   seo_title: z.string().trim().min(1).nullable().default(null),
   seo_description: z.string().trim().min(1).nullable().default(null),
-  sort_order: z.number().int().default(100),
-  is_featured: z.boolean().default(false),
-  article_type: websiteResourceArticleTypeSchema.default("guide"),
-  content_format: websiteResourceContentFormatSchema.default("markdoc"),
   public_updated_at: z.string().nullable().default(null),
 });
 
@@ -43,26 +43,28 @@ export const websiteResourceSourceSchema = z.object({
   id: z.string().uuid(),
   resource_id: z.string().uuid(),
   citation_key: z.string().trim().min(1),
-  organization: z.string().trim().min(1),
-  title: z.string().trim().min(1),
+  organization: z.string().trim().min(1).nullable().default(null),
+  title: z.string().trim().min(1).nullable().default(null),
   url: z.string().url(),
   source_type: z.enum([
     "official",
     "statute",
     "regulation",
+    "policy",
     "clinical",
     "research",
-    "reference",
+    "other",
   ]),
-  published_on: z.string().nullable().default(null),
-  verified_on: z.string().nullable().default(null),
+  source_published_at: z.string().nullable().default(null),
+  verified_at: z.string().nullable().default(null),
+  is_public: z.boolean().default(true),
   display_order: z.number().int().default(100),
 });
 
 export const websiteResourceRelationSchema = z.object({
-  source_resource_id: z.string().uuid(),
-  target_resource_id: z.string().uuid(),
-  relation_type: z.enum(["related", "start_here", "next"]),
+  resource_id: z.string().uuid(),
+  related_resource_id: z.string().uuid(),
+  relation_type: z.enum(["related", "start_here", "next", "previous"]),
   display_order: z.number().int().default(100),
 });
 

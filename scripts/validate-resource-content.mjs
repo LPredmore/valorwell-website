@@ -66,6 +66,10 @@ const tags = {
     render: "ResourceDefinition",
     attributes: { term: { type: String } },
   },
+  cite: {
+    render: "ResourceCitation",
+    attributes: { source: { type: String, required: true } },
+  },
 };
 
 function headingStructureErrors(ast, row) {

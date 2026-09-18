@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
@@ -12,15 +12,13 @@ import {
 } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { SEO, BreadcrumbSchema } from "@/components/SEO";
-import { usePublishedCategories } from "@/lib/websiteResources";
+import { ResourceLibrarySearch } from "@/components/resources/ResourceLibrarySearch";
+import {
+  usePublishedArticles,
+  usePublishedCategories,
+  type WebsiteResource,
+} from "@/lib/websiteResources";
 import { trackHomeEvent } from "@/lib/tracking";
-
-type ResourceCategory = {
-  name: string;
-  href: string;
-  body: string;
-  Icon: LucideIcon;
-};
 
 const iconBySlug: Record<string, LucideIcon> = {
   champva: HeartPulse,
@@ -28,19 +26,18 @@ const iconBySlug: Record<string, LucideIcon> = {
   documentation: ClipboardCheck,
   "veteran-mental-health": Stethoscope,
   "family-systems": Users,
+  "military-health-benefits": ShieldCheck,
 };
 
+function categoryName(resource: WebsiteResource): string {
+  return resource.title.replace(/\s+Resources$/i, "");
+}
 
-function Eyebrow({ children, light = false }: { children: ReactNode; light?: boolean }) {
-  return (
-    <p
-      className={`text-xs font-bold uppercase tracking-[0.2em] ${
-        light ? "text-[#D7A92E]" : "text-[#3B5147]"
-      }`}
-    >
-      {children}
-    </p>
-  );
+function editorialLabel(resource: WebsiteResource): string {
+  if (resource.editorial_type === "explainer") return "Explainer";
+  if (resource.editorial_type === "checklist") return "Checklist";
+  if (resource.editorial_type === "reference") return "Reference";
+  return "Guide";
 }
 
 export default function Resources() {
@@ -48,21 +45,45 @@ export default function Resources() {
     trackHomeEvent("resources_page_view", { page: "resources" });
   }, []);
 
-  const { data, isPending, isError } = usePublishedCategories();
+  const {
+    data: categoryData,
+    isPending: categoriesPending,
+    isError: categoriesError,
+  } = usePublishedCategories();
+  const {
+    data: articleData,
+    isPending: articlesPending,
+    isError: articlesError,
+  } = usePublishedArticles();
 
-  const categories: ResourceCategory[] = (data ?? []).map((resource) => ({
-    name: resource.title,
-    href: `/resources/${resource.slug}`,
-    body: resource.summary,
-    Icon: iconBySlug[resource.slug] ?? BookOpen,
-  }));
+  const categories = categoryData ?? [];
+  const articles = articleData ?? [];
+  const featured = articles
+    .filter((article) => article.featured)
+    .sort(
+      (a, b) =>
+        a.sort_order - b.sort_order || a.title.localeCompare(b.title),
+    )
+    .slice(0, 6);
 
+  const articleCountByCategory = new Map<string, number>();
+  for (const article of articles) {
+    if (!article.category_slug) continue;
+    articleCountByCategory.set(
+      article.category_slug,
+      (articleCountByCategory.get(article.category_slug) ?? 0) + 1,
+    );
+  }
+
+  const categoryLabels = new Map(
+    categories.map((category) => [category.slug, categoryName(category)]),
+  );
 
   return (
     <Layout>
       <SEO
         title="Veteran & Family Mental Health Resources | ValorWell"
-        description="Browse ValorWell resources on veteran and family mental health, care access, coverage, documentation, and practical family systems."
+        description="Search and browse ValorWell guides on VA Community Care, CHAMPVA, military health benefits, veteran mental health, documentation, and military family life."
         canonical="/resources"
       />
       <BreadcrumbSchema
@@ -73,40 +94,25 @@ export default function Resources() {
       />
 
       <div className="resources-theme bg-[#F4F1E8] text-[#111814]">
-        <style>{`
-          .resources-theme {
-            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-          }
-          .resources-theme h1,
-          .resources-theme h2,
-          .resources-theme h3 {
-            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-            letter-spacing: -0.025em;
-          }
-        `}</style>
-
-        <section className="relative overflow-hidden border-b border-[#3B5147]/15">
-          <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-            <div className="absolute -right-32 -top-40 h-96 w-96 rounded-full bg-[#D7A92E]/[0.08] blur-3xl" />
-            <div className="absolute -bottom-44 -left-36 h-96 w-96 rounded-full bg-[#3B5147]/[0.08] blur-3xl" />
-          </div>
-
-          <div className="container-wide relative grid gap-10 py-16 md:py-24 lg:grid-cols-12 lg:items-end lg:py-28">
-            <div className="lg:col-span-8">
-              <Eyebrow>ValorWell Resources</Eyebrow>
-              <h1 className="mt-6 max-w-5xl text-4xl font-bold leading-[1.03] sm:text-5xl md:text-6xl lg:text-7xl">
-                Practical guidance for navigating care, coverage, documentation, and family systems.
+        <section className="border-b border-[#3B5147]/12">
+          <div className="container-wide grid gap-10 py-14 md:py-20 lg:grid-cols-12 lg:items-end lg:py-24">
+            <div className="lg:col-span-9">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#3B5147]">
+                ValorWell Resource Library
+              </p>
+              <h1 className="mt-5 max-w-5xl text-4xl font-bold leading-[1.04] tracking-[-0.035em] sm:text-5xl md:text-6xl">
+                Clear answers for complicated veteran and military-family systems.
               </h1>
-              <p className="mt-7 max-w-3xl text-lg leading-8 text-[#111814]/68 md:text-xl">
-                Choose the topic closest to the question in front of you. Resource pages explain terminology, common process steps, questions to ask, and when current information should be confirmed with the responsible program or provider.
+              <p className="mt-6 max-w-3xl text-lg leading-8 text-[#111814]/68 md:text-xl">
+                Search practical guides built around the questions veterans, spouses, and families are actually trying to answer—then verify program-specific details with the responsible official source when they matter.
               </p>
             </div>
 
-            <div className="lg:col-span-4 lg:text-right">
+            <div className="lg:col-span-3 lg:text-right">
               <Link
                 to="/get-care"
                 onClick={() => trackHomeEvent("resources_hero_care", { page: "resources" })}
-                className="inline-flex min-h-12 items-center gap-2 rounded-md bg-[#3B5147] px-6 py-3 text-sm font-bold text-white"
+                className="inline-flex min-h-12 items-center gap-2 rounded-md bg-[#3B5147] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#2F4239]"
               >
                 Find Care
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -115,102 +121,154 @@ export default function Resources() {
           </div>
         </section>
 
-        <section className="border-b border-[#3B5147]/15 bg-white">
-          <div className="container-wide py-20 md:py-28">
-            <div className="max-w-3xl">
-              <Eyebrow>Resource Library</Eyebrow>
-              <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                Browse current guidance.
-              </h2>
-            </div>
-
-            {isPending && (
-              <p className="mt-12 text-[#111814]/64" role="status" aria-live="polite">
-                Loading resources…
+        <section className="container-wide py-8 md:py-12">
+          {categoriesPending || articlesPending ? (
+            <div className="rounded-[2rem] bg-[#111814] p-8 text-white">
+              <p role="status" aria-live="polite" className="text-white/65">
+                Loading the resource library…
               </p>
-            )}
-
-            {isError && (
-              <p className="mt-12 text-[#111814]/64" role="status" aria-live="polite">
+            </div>
+          ) : categoriesError || articlesError ? (
+            <div className="rounded-[2rem] border border-[#B24A3A]/20 bg-white p-8">
+              <p role="status" aria-live="polite" className="text-[#111814]/68">
                 We could not load the resource library right now. Please refresh the page and try again.
               </p>
-            )}
-
-            <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-              {categories.map(({ name, href, body, Icon }) => (
-                <Link
-                  key={href}
-                  to={href}
-                  onClick={() =>
-                    trackHomeEvent("resources_category", {
-                      page: "resources",
-                      destination: href,
-                    })
-                  }
-                  className="group rounded-3xl border border-[#3B5147]/15 bg-[#F4F1E8] p-7 shadow-sm transition hover:-translate-y-0.5 hover:border-[#3B5147]/30 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2 motion-reduce:transform-none motion-reduce:transition-none"
-                >
-                  <Icon className="h-7 w-7 text-[#3B5147]" aria-hidden="true" />
-                  <h3 className="mt-6 text-2xl font-bold">{name}</h3>
-                  <p className="mt-4 leading-7 text-[#111814]/64">{body}</p>
-                  <span className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#3B5147]">
-                    Read this resource
-                    <ArrowRight
-                      className="h-4 w-4 transition-transform group-hover:translate-x-0.5 motion-reduce:transform-none motion-reduce:transition-none"
-                      aria-hidden="true"
-                    />
-                  </span>
-                </Link>
-              ))}
             </div>
-          </div>
+          ) : (
+            <ResourceLibrarySearch articles={articles} categories={categories} />
+          )}
         </section>
 
-        <section className="border-b border-white/10 bg-[#111814] text-white">
-          <div className="container-wide grid gap-12 py-20 md:py-28 lg:grid-cols-12 lg:items-start">
-            <div className="lg:col-span-5">
-              <Eyebrow light>Using the Library</Eyebrow>
-              <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-                Use educational guidance for orientation, then confirm details that can change.
-              </h2>
-            </div>
+        {featured.length > 0 && (
+          <section className="border-y border-[#3B5147]/12 bg-white">
+            <div className="container-wide py-16 md:py-20">
+              <div className="flex flex-wrap items-end justify-between gap-5">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#3B5147]">
+                    Start here
+                  </p>
+                  <h2 className="mt-2 text-3xl font-bold tracking-[-0.025em] md:text-4xl">
+                    Featured guidance
+                  </h2>
+                  <p className="mt-3 max-w-2xl leading-7 text-[#111814]/62">
+                    High-value guides selected as starting points across the library.
+                  </p>
+                </div>
+              </div>
 
-            <div className="lg:col-span-7">
-              <div className="space-y-5">
-                {[
-                  "Use resource pages to understand terminology, common process steps, and questions worth asking next.",
-                  "Confirm current eligibility, authorization, provider participation, and administrative requirements with the responsible program when those details affect care or payment.",
-                  "Treat mental health information as general education rather than an individual diagnosis or treatment plan.",
-                  "If you are already looking for a ValorWell care pathway, use Find Care instead of starting with the resource library.",
-                ].map((item) => (
-                  <div key={item} className="flex gap-4 border-b border-white/10 pb-5 last:border-b-0">
-                    <ShieldCheck className="mt-1 h-5 w-5 shrink-0 text-[#D7A92E]" aria-hidden="true" />
-                    <p className="leading-7 text-white/70">{item}</p>
-                  </div>
+              <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                {featured.map((article) => (
+                  <Link
+                    key={article.id}
+                    to={`/resources/${article.category_slug}/${article.slug}`}
+                    className="group flex min-h-[250px] flex-col justify-between rounded-3xl border border-[#3B5147]/13 bg-[#F4F1E8] p-7 transition hover:-translate-y-0.5 hover:border-[#3B5147]/30 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2 motion-reduce:transform-none"
+                  >
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-[0.13em]">
+                        <span className="text-[#3B5147]">{editorialLabel(article)}</span>
+                        <span className="text-[#111814]/30">•</span>
+                        <span className="text-[#111814]/48">
+                          {categoryLabels.get(article.category_slug ?? "") ?? article.category_slug}
+                        </span>
+                      </div>
+                      <h3 className="mt-4 text-2xl font-bold leading-[1.2] tracking-[-0.02em]">
+                        {article.title}
+                      </h3>
+                      <p className="mt-4 line-clamp-4 leading-7 text-[#111814]/62">
+                        {article.summary}
+                      </p>
+                    </div>
+                    <span className="mt-7 inline-flex items-center gap-2 text-sm font-bold text-[#3B5147]">
+                      Read guide
+                      <ArrowRight
+                        className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                        aria-hidden="true"
+                      />
+                    </span>
+                  </Link>
                 ))}
               </div>
             </div>
+          </section>
+        )}
+
+        <section className="bg-[#F4F1E8]">
+          <div className="container-wide py-16 md:py-22">
+            <div className="max-w-3xl">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#3B5147]">
+                Browse by topic
+              </p>
+              <h2 className="mt-2 text-3xl font-bold tracking-[-0.025em] md:text-4xl">
+                Resource centers built around the system you are navigating.
+              </h2>
+            </div>
+
+            <div className="mt-9 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+              {categories.map((category) => {
+                const Icon = iconBySlug[category.slug] ?? BookOpen;
+                const count = articleCountByCategory.get(category.slug) ?? 0;
+
+                return (
+                  <Link
+                    key={category.id}
+                    to={`/resources/${category.slug}`}
+                    onClick={() =>
+                      trackHomeEvent("resources_category", {
+                        page: "resources",
+                        destination: `/resources/${category.slug}`,
+                      })
+                    }
+                    className="group rounded-3xl border border-[#3B5147]/14 bg-white p-7 shadow-sm transition hover:-translate-y-0.5 hover:border-[#3B5147]/30 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2 motion-reduce:transform-none"
+                  >
+                    <div className="flex items-start justify-between gap-5">
+                      <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#EDF1EC]">
+                        <Icon className="h-6 w-6 text-[#3B5147]" aria-hidden="true" />
+                      </span>
+                      <span className="rounded-full bg-[#F4F1E8] px-3 py-1 text-xs font-bold text-[#111814]/55">
+                        {count} {count === 1 ? "guide" : "guides"}
+                      </span>
+                    </div>
+                    <h3 className="mt-6 text-2xl font-bold">{categoryName(category)}</h3>
+                    <p className="mt-3 line-clamp-4 leading-7 text-[#111814]/62">
+                      {category.summary}
+                    </p>
+                    <span className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-[#3B5147]">
+                      Explore topic
+                      <ArrowRight
+                        className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                        aria-hidden="true"
+                      />
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         </section>
 
-        <section className="bg-[#F4F1E8]">
-          <div className="container-wide grid gap-8 py-16 md:py-20 lg:grid-cols-12 lg:items-center">
+        <section className="border-t border-white/10 bg-[#111814] text-white">
+          <div className="container-wide grid gap-10 py-14 md:py-16 lg:grid-cols-12 lg:items-center">
             <div className="lg:col-span-8">
-              <Eyebrow>Need Something Else?</Eyebrow>
-              <h2 className="mt-4 text-3xl font-bold leading-tight md:text-4xl">
-                Go directly to care or contact ValorWell with a specific question.
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D7A92E]">
+                How to use this library
+              </p>
+              <h2 className="mt-2 text-2xl font-bold md:text-3xl">
+                Understand the system first. Verify the details that can change.
               </h2>
+              <p className="mt-3 max-w-3xl leading-7 text-white/65">
+                ValorWell resources are educational. Eligibility, authorizations, network participation, legal requirements, and program rules should be confirmed with the responsible program or professional when they affect an individual decision.
+              </p>
             </div>
             <div className="flex flex-wrap gap-3 lg:col-span-4 lg:justify-end">
               <Link
                 to="/get-care"
-                className="inline-flex min-h-12 items-center gap-2 rounded-md bg-[#3B5147] px-6 py-3 text-sm font-bold text-white"
+                className="inline-flex min-h-11 items-center rounded-md bg-[#F4F1E8] px-5 py-2.5 text-sm font-bold text-[#111814]"
               >
                 Find Care
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
               <Link
                 to="/contact"
-                className="inline-flex min-h-12 items-center rounded-md border border-[#3B5147]/25 px-6 py-3 text-sm font-bold text-[#3B5147]"
+                className="inline-flex min-h-11 items-center rounded-md border border-white/25 px-5 py-2.5 text-sm font-bold text-white"
               >
                 Contact ValorWell
               </Link>

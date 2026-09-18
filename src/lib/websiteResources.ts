@@ -1,7 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { billingHubSupabase } from "@/integrations/supabase/client";
-import { generatedWebsiteResources } from "@/generated/websiteResources";
+import {
+  generatedWebsiteResources,
+  generatedWebsiteResourceRelations,
+  generatedWebsiteResourceSources,
+} from "@/generated/websiteResources";
 
 export const WEBSITE_RESOURCE_TENANT_ID = "00000000-0000-0000-0000-000000000001";
 
@@ -97,6 +101,20 @@ const prerenderSnapshot: WebsiteResource[] = (
 )
   .map(normalizeResource)
   .filter((resource): resource is WebsiteResource => resource !== null);
+
+const prerenderSourceSnapshot: WebsiteResourceSource[] = (
+  generatedWebsiteResourceSources as unknown[]
+).flatMap((row) => {
+  const parsed = sourceSchema.safeParse(row);
+  return parsed.success ? [parsed.data] : [];
+});
+
+const prerenderRelationSnapshot: WebsiteResourceRelation[] = (
+  generatedWebsiteResourceRelations as unknown[]
+).flatMap((row) => {
+  const parsed = relationSchema.safeParse(row);
+  return parsed.success ? [parsed.data] : [];
+});
 
 function baseQuery() {
   return billingHubSupabase
@@ -360,10 +378,16 @@ export function usePublishedArticle(
 }
 
 export function usePublicResourceSources(resourceId: string | undefined) {
+  const seed = resourceId
+    ? prerenderSourceSnapshot.filter((source) => source.resource_id === resourceId)
+    : [];
+
   return useQuery({
     queryKey: ["website-resource-sources", resourceId],
     queryFn: () => fetchPublicResourceSources(resourceId as string),
     enabled: Boolean(resourceId),
+    initialData: seed.length > 0 ? seed : undefined,
+    initialDataUpdatedAt: 0,
     staleTime: 5 * 60_000,
   });
 }
@@ -372,10 +396,45 @@ export function useRelatedResources(
   resourceId: string | undefined,
   categorySlug: string | undefined,
 ) {
+  const relationSeed = resourceId
+    ? prerenderRelationSnapshot
+        .filter((relation) => relation.resource_id === resourceId)
+        .sort((a, b) => a.display_order - b.display_order)
+        .map((relation) =>
+          prerenderSnapshot.find(
+            (resource) => resource.id === relation.related_resource_id,
+          ),
+        )
+        .filter((resource): resource is WebsiteResource => Boolean(resource))
+        .slice(0, 3)
+    : [];
+
+  const fallbackSeed =
+    resourceId && categorySlug && relationSeed.length === 0
+      ? prerenderSnapshot
+          .filter(
+            (resource) =>
+              resource.resource_kind === "article" &&
+              resource.category_slug === categorySlug &&
+              resource.id !== resourceId,
+          )
+          .sort(
+            (a, b) =>
+              Number(b.featured) - Number(a.featured) ||
+              a.sort_order - b.sort_order ||
+              a.title.localeCompare(b.title),
+          )
+          .slice(0, 3)
+      : [];
+
+  const seed = relationSeed.length > 0 ? relationSeed : fallbackSeed;
+
   return useQuery({
     queryKey: ["website-resource-related", resourceId, categorySlug],
     queryFn: () => fetchRelatedResources(resourceId as string, categorySlug as string),
     enabled: Boolean(resourceId && categorySlug),
+    initialData: seed.length > 0 ? seed : undefined,
+    initialDataUpdatedAt: 0,
     staleTime: 5 * 60_000,
   });
 }

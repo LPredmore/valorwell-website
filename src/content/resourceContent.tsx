@@ -278,7 +278,7 @@ function countWords(markup: string): number {
     .replace(/\{%[\s\S]*?%\}/g, " ")
     .replaceAll("[", " ")
     .replaceAll("]", " ")
-    .replace(/[#>*_~`(){}|+\/-]/g, " ")
+    .replaceAll("/", " ")\n    .replace(/[#>*_~`(){}|+-]/g, " ")
     .replace(/https?:\/\/\S+/g, " ");
   return plain.split(/\s+/).filter(Boolean).length;
 }

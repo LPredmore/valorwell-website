@@ -256,9 +256,11 @@ export function ResourceSources({ sources }: { sources: PublicResourceSource[] }
                 </a>
                 {(source.organization || source.title) && (
                   <p className="mt-1 text-sm text-[#111814]/55">
-                    {[source.organization, source.title ? sourceHost(source.url) : null]
-                      .filter(Boolean)
-                      .join(" · ")}
+                    {source.title
+                      ? [source.organization, sourceHost(source.url)]
+                          .filter(Boolean)
+                          .join(" · ")
+                      : sourceHost(source.url)}
                   </p>
                 )}
               </div>

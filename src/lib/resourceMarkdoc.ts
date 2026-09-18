@@ -180,6 +180,12 @@ const semanticTags: Config["tags"] = {
       term: { type: String },
     },
   },
+  cite: {
+    render: "ResourceCitation",
+    attributes: {
+      source: { type: String, required: true },
+    },
+  },
 };
 
 function createConfig(schemaVersion: number): Config {

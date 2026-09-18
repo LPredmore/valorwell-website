@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { ArrowRight, ChevronRight, Clock3 } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
-import { SEO, BreadcrumbSchema, FAQSchema } from "@/components/SEO";
+import { SEO, ArticleSchema, BreadcrumbSchema, FAQSchema } from "@/components/SEO";
 import {
   Accordion,
   AccordionContent,
@@ -120,6 +120,15 @@ export default function ResourceDetail({
         title={resource.seo_title || `${resource.title} | ValorWell`}
         description={resource.seo_description || resource.summary}
         canonical={path}
+        type="article"
+      />
+      <ArticleSchema
+        headline={resource.title}
+        description={resource.summary}
+        url={path}
+        datePublished={resource.published_at}
+        dateModified={resource.public_updated_at || resource.published_at}
+        articleSection={topicLabel}
       />
       <BreadcrumbSchema
         items={[

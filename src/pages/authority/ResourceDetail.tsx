@@ -205,9 +205,7 @@ function renderInlineMarkdown(value: string, keyPrefix: string): ReactNode[] {
   let tokenIndex = 0;
 
   while ((match = pattern.exec(value)) !== null) {
-    if (match.index > cursor) {
-      nodes.push(value.slice(cursor, match.index));
-    }
+    if (match.index > cursor) nodes.push(value.slice(cursor, match.index));
 
     const key = `${keyPrefix}-${tokenIndex++}`;
 
@@ -257,14 +255,12 @@ function renderInlineMarkdown(value: string, keyPrefix: string): ReactNode[] {
 function getReadingMinutes(blocks: MarkdownBlock[]): number {
   const words = blocks.reduce((count, block) => {
     if (block.type === "rule") return count;
-
     const text =
       block.type === "list"
         ? block.items.join(" ")
         : block.type === "heading" || block.type === "paragraph" || block.type === "blockquote"
           ? block.text
           : "";
-
     return count + stripInlineMarkdown(text).split(/\s+/).filter(Boolean).length;
   }, 0);
 
@@ -389,7 +385,8 @@ export default function ResourceDetail({
     (block): block is Extract<MarkdownBlock, { type: "heading" }> =>
       block.type === "heading" && block.level === 2,
   );
-  const hasToc = toc.length > 1;\n  const readingMinutes = getReadingMinutes(blocks);
+  const hasToc = toc.length > 1;
+  const readingMinutes = getReadingMinutes(blocks);
   const topicLabel = categoryLabel(category?.title, categorySlug);
 
   const related = (siblings ?? [])
@@ -409,7 +406,11 @@ export default function ResourceDetail({
 
   return (
     <Layout>
-      <SEO title={`${resource.title} | ValorWell`} description={resource.summary} canonical={path} />
+      <SEO
+        title={`${resource.title} | ValorWell`}
+        description={resource.summary}
+        canonical={path}
+      />
       <BreadcrumbSchema
         items={[
           { name: "Home", url: "/" },
@@ -451,7 +452,10 @@ export default function ResourceDetail({
             </p>
 
             <div className="resource-print-hidden mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-semibold text-[#3B5147]">
-              <Link to={categoryPath} className="underline decoration-[#3B5147]/25 underline-offset-4">
+              <Link
+                to={categoryPath}
+                className="underline decoration-[#3B5147]/25 underline-offset-4"
+              >
                 {topicLabel}
               </Link>
               <span className="inline-flex items-center gap-2 text-[#111814]/55">
@@ -485,30 +489,38 @@ export default function ResourceDetail({
             </details>
           )}
 
-          <div\n            className={`resource-article-grid mx-auto grid max-w-[1180px] items-start gap-8 lg:justify-center ${\n              hasToc\n                ? "lg:grid-cols-[250px_minmax(0,760px)] lg:gap-12 xl:grid-cols-[260px_minmax(0,780px)] xl:gap-16"\n                : "lg:grid-cols-[minmax(0,780px)]"\n            }`}\n          >
-            <aside className="resource-print-hidden hidden lg:block">
-              <div className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto pr-3">
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#3B5147]">
-                  On this page
-                </p>
-                <nav aria-label="Article sections" className="mt-4">
-                  <ol className="space-y-1 border-l border-[#3B5147]/15">
-                    {toc.map((item) => (
-                      <li key={item.id}>
-                        <a
-                          href={`#${item.id}`}
-                          className="block border-l-2 border-transparent py-2 pl-4 text-sm leading-5 text-[#111814]/58 transition hover:border-[#D7A92E] hover:text-[#3B5147] focus-visible:border-[#D7A92E] focus-visible:text-[#3B5147]"
-                        >
-                          {stripInlineMarkdown(item.text)}
-                        </a>
-                      </li>
-                    ))}
-                  </ol>
-                </nav>
-              </div>
-            </aside>
+          <div
+            className={`resource-article-grid mx-auto grid max-w-[1180px] items-start gap-8 lg:justify-center ${
+              hasToc
+                ? "lg:grid-cols-[250px_minmax(0,760px)] lg:gap-12 xl:grid-cols-[260px_minmax(0,780px)] xl:gap-16"
+                : "lg:grid-cols-[minmax(0,780px)]"
+            }`}
+          >
+            {hasToc && (
+              <aside className="resource-print-hidden hidden lg:block">
+                <div className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto pr-3">
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#3B5147]">
+                    On this page
+                  </p>
+                  <nav aria-label="Article sections" className="mt-4">
+                    <ol className="space-y-1 border-l border-[#3B5147]/15">
+                      {toc.map((item) => (
+                        <li key={item.id}>
+                          <a
+                            href={`#${item.id}`}
+                            className="block border-l-2 border-transparent py-2 pl-4 text-sm leading-5 text-[#111814]/58 transition hover:border-[#D7A92E] hover:text-[#3B5147] focus-visible:border-[#D7A92E] focus-visible:text-[#3B5147]"
+                          >
+                            {stripInlineMarkdown(item.text)}
+                          </a>
+                        </li>
+                      ))}
+                    </ol>
+                  </nav>
+                </div>
+              </aside>
+            )}
 
-            <main className="min-w-0">
+            <div className="min-w-0">
               <div className="resource-article-surface rounded-[1.75rem] border border-[#3B5147]/12 bg-white px-6 py-8 shadow-[0_22px_70px_-52px_rgba(17,24,20,0.55)] sm:px-8 md:px-11 md:py-11 lg:px-12 lg:py-12">
                 <div className="resource-article-body max-w-[72ch]">
                   {blocks.map((block, index) => (
@@ -566,7 +578,7 @@ export default function ResourceDetail({
                   </div>
                 </section>
               )}
-            </main>
+            </div>
           </div>
 
           {related.length > 0 && (
@@ -574,16 +586,12 @@ export default function ResourceDetail({
               aria-labelledby="related-resources-heading"
               className="resource-print-hidden mx-auto mt-12 max-w-[1050px] border-t border-[#3B5147]/15 pt-10"
             >
-              <div className="flex items-end justify-between gap-6">
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#3B5147]">
-                    Keep reading
-                  </p>
-                  <h2 id="related-resources-heading" className="mt-2 text-2xl font-bold md:text-3xl">
-                    Related resources
-                  </h2>
-                </div>
-              </div>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#3B5147]">
+                Keep reading
+              </p>
+              <h2 id="related-resources-heading" className="mt-2 text-2xl font-bold md:text-3xl">
+                Related resources
+              </h2>
               <div className="mt-6 grid gap-4 md:grid-cols-3">
                 {related.map((item) => (
                   <Link
@@ -617,7 +625,9 @@ export default function ResourceDetail({
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D7A92E]">
                 Need care?
               </p>
-              <h2 className="mt-2 text-2xl font-bold">Use the resource for orientation. Use care when you need care.</h2>
+              <h2 className="mt-2 text-2xl font-bold">
+                Use the resource for orientation. Use care when you need care.
+              </h2>
             </div>
             <div className="mt-5 flex shrink-0 flex-wrap gap-3 md:mt-0">
               <Link

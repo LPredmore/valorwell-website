@@ -23,6 +23,11 @@ type PagefindSearchResponse = {
 
 type PagefindModule = {
   init?: () => Promise<void> | void;
+  options?: (options: {
+    ranking?: {
+      metaWeights?: Record<string, number>;
+    };
+  }) => Promise<void> | void;
   search: (
     query: string,
     options?: { filters?: Record<string, string | string[]> },
@@ -65,7 +70,18 @@ export function ResourceLibrarySearch({
 
   const initialize = () => {
     void loadPagefind()
-      .then((pagefind) => pagefind.init?.())
+      .then(async (pagefind) => {
+        await pagefind.options?.({
+          ranking: {
+            metaWeights: {
+              title: 6,
+              summary: 2.5,
+              aliases: 2,
+            },
+          },
+        });
+        await pagefind.init?.();
+      })
       .catch(() => {
         // Pagefind is generated only for production/static builds. Search remains
         // progressively enhanced and the category library still works without it.

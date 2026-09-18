@@ -1,6 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { billingHubSupabase } from "@/integrations/supabase/client";
-import { generatedWebsiteResources } from "@/generated/websiteResources";
+import {
+  generatedWebsiteResources,
+  generatedWebsiteResourceRelations,
+  generatedWebsiteResourceSources,
+} from "@/generated/websiteResources";
 import {
   publicWebsiteResourceSchema,
   websiteResourceRelationSchema,
@@ -124,6 +128,18 @@ const prerenderSnapshot: WebsiteResource[] = (
 )
   .map(normalizeResource)
   .filter((resource): resource is WebsiteResource => resource !== null);
+
+const prerenderSources: WebsiteResourceSource[] = (
+  generatedWebsiteResourceSources as unknown as Record<string, unknown>[]
+)
+  .map(normalizeSource)
+  .filter((source): source is WebsiteResourceSource => source !== null);
+
+const prerenderRelations: WebsiteResourceRelation[] = (
+  generatedWebsiteResourceRelations as unknown as Record<string, unknown>[]
+)
+  .map(normalizeRelation)
+  .filter((relation): relation is WebsiteResourceRelation => relation !== null);
 
 function baseQuery() {
   return billingHubSupabase
@@ -361,19 +377,40 @@ export function usePublishedArticle(
 }
 
 export function usePublishedResourceSources(resourceId: string | undefined) {
+  const seed = resourceId
+    ? prerenderSources
+        .filter((source) => source.resource_id === resourceId)
+        .sort((a, b) => a.display_order - b.display_order)
+    : [];
+
   return useQuery({
     queryKey: ["website-resource-sources", WEBSITE_RESOURCE_TENANT_ID, resourceId],
     queryFn: () => fetchPublishedResourceSources(resourceId as string),
     enabled: Boolean(resourceId),
+    initialData: seed.length > 0 ? seed : undefined,
+    initialDataUpdatedAt: 0,
     staleTime: 5 * 60_000,
   });
 }
 
 export function usePublishedResourceRelations(resourceId: string | undefined) {
+  const resourceMap = new Map(prerenderSnapshot.map((resource) => [resource.id, resource] as const));
+  const seed = resourceId
+    ? prerenderRelations
+        .filter((relation) => relation.resource_id === resourceId)
+        .sort((a, b) => a.display_order - b.display_order)
+        .flatMap((relation) => {
+          const resource = resourceMap.get(relation.related_resource_id);
+          return resource ? [{ ...relation, resource }] : [];
+        })
+    : [];
+
   return useQuery({
     queryKey: ["website-resource-relations", WEBSITE_RESOURCE_TENANT_ID, resourceId],
     queryFn: () => fetchPublishedResourceRelations(resourceId as string),
     enabled: Boolean(resourceId),
+    initialData: seed.length > 0 ? seed : undefined,
+    initialDataUpdatedAt: 0,
     staleTime: 5 * 60_000,
   });
 }

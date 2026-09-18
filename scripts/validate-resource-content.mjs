@@ -108,7 +108,7 @@ for (const resource of resources) {
   }
 
   const citations = [
-    ...body.matchAll(/\{%\s*cite\s+key=["']([^"']+)["'][^%]*\/%\}/g),
+    ...body.matchAll(/\{%\s*cite\s+source=["']([^"']+)["'][^%]*\/%\}/g),
   ].map((match) => match[1]);
 
   const validKeys = sourceKeys.get(resource.id) ?? new Set();

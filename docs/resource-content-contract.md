@@ -128,7 +128,7 @@ Authoritative sources are stored in `public.website_resource_sources`.
 Reference a public source by its `citation_key`:
 
 ```md
-TRICARE treats marriage as a Qualifying Life Event. {% cite key="source-01" /%}
+TRICARE treats marriage as a Qualifying Life Event. {% cite source="source-01" /%}
 ```
 
 The build fails when a schema-v2 citation points to a missing public source.

@@ -15,9 +15,39 @@ if (!supabaseUrl || !publishableKey) {
   );
 }
 
-const endpoint = new URL("/rest/v1/website_resources_public", supabaseUrl);
-endpoint.searchParams.set(
-  "select",
+const headers = {
+  apikey: publishableKey,
+  Authorization: `Bearer ${publishableKey}`,
+  Accept: "application/json",
+};
+
+async function fetchTable(table, select, params = {}) {
+  const endpoint = new URL(`/rest/v1/${table}`, supabaseUrl);
+  endpoint.searchParams.set("select", select);
+  endpoint.searchParams.set("tenant_id", `eq.${TENANT_ID}`);
+
+  for (const [key, value] of Object.entries(params)) {
+    endpoint.searchParams.set(key, value);
+  }
+
+  const response = await fetch(endpoint, { headers });
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(
+      `Could not generate resource data from ${table} (${response.status}): ${body.slice(0, 300)}`,
+    );
+  }
+
+  const data = await response.json();
+  if (!Array.isArray(data)) {
+    throw new Error(`${table} returned an invalid array payload.`);
+  }
+
+  return data;
+}
+
+const rows = await fetchTable(
+  "website_resources_public",
   [
     "id",
     "tenant_id",
@@ -42,30 +72,39 @@ endpoint.searchParams.set(
     "seo_description",
     "public_updated_at",
   ].join(","),
-);
-endpoint.searchParams.set("tenant_id", `eq.${TENANT_ID}`);
-endpoint.searchParams.set("status", "eq.published");
-endpoint.searchParams.set("order", "resource_kind.asc,sort_order.asc,title.asc");
-
-const response = await fetch(endpoint, {
-  headers: {
-    apikey: publishableKey,
-    Authorization: `Bearer ${publishableKey}`,
-    Accept: "application/json",
+  {
+    status: "eq.published",
+    order: "resource_kind.asc,sort_order.asc,title.asc",
   },
-});
+);
 
-if (!response.ok) {
-  const body = await response.text();
-  throw new Error(
-    `Could not generate website resources from Billing Hub (${response.status}): ${body.slice(0, 300)}`,
-  );
-}
+const sources = await fetchTable(
+  "website_resource_sources",
+  [
+    "id",
+    "resource_id",
+    "citation_key",
+    "organization",
+    "title",
+    "url",
+    "source_type",
+    "source_published_at",
+    "verified_at",
+    "display_order",
+  ].join(","),
+  {
+    is_public: "eq.true",
+    order: "resource_id.asc,display_order.asc",
+  },
+);
 
-const rows = await response.json();
-if (!Array.isArray(rows)) {
-  throw new Error("Billing Hub returned an invalid website_resources_public payload.");
-}
+const relations = await fetchTable(
+  "website_resource_relations",
+  "resource_id,related_resource_id,relation_type,display_order",
+  {
+    order: "resource_id.asc,display_order.asc",
+  },
+);
 
 function requireString(row, field) {
   if (typeof row[field] !== "string" || !row[field].trim()) {
@@ -121,7 +160,23 @@ if (uniqueSlugs.size !== rows.length) {
   throw new Error("Published website resources contain duplicate slugs.");
 }
 
-const tsHeader = `// Generated from public.website_resources_public. Do not edit by hand.
+const publicIds = new Set(rows.map((row) => row.id));
+
+for (const source of sources) {
+  if (!publicIds.has(source.resource_id)) {
+    throw new Error(
+      `Public source ${source.citation_key || source.id} references a non-public resource.`,
+    );
+  }
+}
+
+for (const relation of relations) {
+  if (!publicIds.has(relation.resource_id) || !publicIds.has(relation.related_resource_id)) {
+    throw new Error("Public resource relation references a non-public resource.");
+  }
+}
+
+const tsHeader = `// Generated from Billing Hub public resource views. Do not edit by hand.
 // scripts/generate-resource-content.mjs refreshes this file before production builds.
 
 export type GeneratedWebsiteResource = {
@@ -149,10 +204,32 @@ export type GeneratedWebsiteResource = {
   public_updated_at: string | null;
 };
 
+export type GeneratedWebsiteResourceSource = {
+  id: string;
+  resource_id: string;
+  citation_key: string;
+  organization: string | null;
+  title: string | null;
+  url: string;
+  source_type: "official" | "statute" | "regulation" | "policy" | "clinical" | "research" | "other";
+  source_published_at: string | null;
+  verified_at: string | null;
+  display_order: number;
+};
+
+export type GeneratedWebsiteResourceRelation = {
+  resource_id: string;
+  related_resource_id: string;
+  relation_type: "related" | "start_here" | "next" | "previous";
+  display_order: number;
+};
+
 `;
 
-const resourceModule = `${tsHeader}export const generatedWebsiteResources: GeneratedWebsiteResource[] = ${JSON.stringify(rows, null, 2)};
-`;
+const resourceModule =
+  `${tsHeader}export const generatedWebsiteResources: GeneratedWebsiteResource[] = ${JSON.stringify(rows, null, 2)};\n\n` +
+  `export const generatedWebsiteResourceSources: GeneratedWebsiteResourceSource[] = ${JSON.stringify(sources, null, 2)};\n\n` +
+  `export const generatedWebsiteResourceRelations: GeneratedWebsiteResourceRelation[] = ${JSON.stringify(relations, null, 2)};\n`;
 
 const routeRows = rows.map((row) => ({
   path:
@@ -180,4 +257,6 @@ fs.mkdirSync(path.dirname(resourceOutput), { recursive: true });
 fs.writeFileSync(resourceOutput, resourceModule, "utf8");
 fs.writeFileSync(routeOutput, routeModule, "utf8");
 
-console.log(`Generated ${rows.length} published website resources from Billing Hub.`);
+console.log(
+  `Generated ${rows.length} published resources, ${sources.length} public sources, and ${relations.length} curated relations from Billing Hub.`,
+);

@@ -308,7 +308,7 @@ export default function ResourceDetail({
 
             <div className="min-w-0">
               <div className="resource-article-surface rounded-[1.75rem] border border-[#3B5147]/12 bg-white px-6 py-8 shadow-[0_22px_70px_-52px_rgba(17,24,20,0.55)] sm:px-8 md:px-10 md:py-11 lg:px-12 lg:py-12">
-                <ResourceDocument content={document.content} />
+                <ResourceDocument content={document.content} sources={sources} />
               </div>
 
               {resource.faq.length > 0 && (
@@ -379,7 +379,8 @@ export default function ResourceDetail({
                     {sources.map((source, index) => (
                       <li
                         key={source.id}
-                        className="grid grid-cols-[2rem_minmax(0,1fr)] gap-3 border-t border-[#3B5147]/10 pt-4 first:border-t-0 first:pt-0"
+                        id={`source-${source.citation_key}`}
+                        className="scroll-mt-28 grid grid-cols-[2rem_minmax(0,1fr)] gap-3 border-t border-[#3B5147]/10 pt-4 first:border-t-0 first:pt-0"
                       >
                         <span className="pt-0.5 text-sm font-bold tabular-nums text-[#3B5147]/70">
                           {index + 1}.

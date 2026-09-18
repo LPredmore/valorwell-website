@@ -15,10 +15,12 @@ if (!supabaseUrl || !publishableKey) {
   );
 }
 
-const endpoint = new URL("/rest/v1/website_resources", supabaseUrl);
+const endpoint = new URL("/rest/v1/website_resources_public", supabaseUrl);
 endpoint.searchParams.set(
   "select",
   [
+    "id",
+    "tenant_id",
     "slug",
     "title",
     "primary_question",
@@ -27,19 +29,23 @@ endpoint.searchParams.set(
     "faq",
     "audience_tags",
     "topic_aliases",
-    "source_urls",
-    "coverage_status",
     "status",
     "live_url",
-    "last_researched_at",
     "published_at",
     "resource_kind",
     "category_slug",
+    "content_schema_version",
+    "editorial_type",
+    "featured",
+    "sort_order",
+    "seo_title",
+    "seo_description",
+    "public_updated_at",
   ].join(","),
 );
 endpoint.searchParams.set("tenant_id", `eq.${TENANT_ID}`);
 endpoint.searchParams.set("status", "eq.published");
-endpoint.searchParams.set("order", "title.asc");
+endpoint.searchParams.set("order", "resource_kind.asc,sort_order.asc,title.asc");
 
 const response = await fetch(endpoint, {
   headers: {
@@ -58,7 +64,7 @@ if (!response.ok) {
 
 const rows = await response.json();
 if (!Array.isArray(rows)) {
-  throw new Error("Billing Hub returned an invalid website_resources payload.");
+  throw new Error("Billing Hub returned an invalid website_resources_public payload.");
 }
 
 function requireString(row, field) {
@@ -69,18 +75,21 @@ function requireString(row, field) {
 
 for (const row of rows) {
   for (const field of [
+    "id",
+    "tenant_id",
     "slug",
     "title",
     "primary_question",
     "summary",
     "body_markdown",
-    "coverage_status",
     "status",
+    "resource_kind",
+    "editorial_type",
   ]) {
     requireString(row, field);
   }
 
-  for (const field of ["faq", "audience_tags", "topic_aliases", "source_urls"]) {
+  for (const field of ["faq", "audience_tags", "topic_aliases"]) {
     if (!Array.isArray(row[field])) {
       throw new Error(`Published resource ${row.slug} has invalid ${field}.`);
     }
@@ -89,13 +98,20 @@ for (const row of rows) {
   if (row.status !== "published") {
     throw new Error(`Non-published resource ${row.slug} reached the public build.`);
   }
-}
 
-for (const row of rows) {
-  const kind = row.resource_kind === "article" ? "article" : "category";
-  row.resource_kind = kind;
-  row.category_slug = typeof row.category_slug === "string" ? row.category_slug : null;
-  if (kind === "article" && !row.category_slug) {
+  if (!Number.isInteger(row.content_schema_version)) {
+    throw new Error(`Published resource ${row.slug} has invalid content_schema_version.`);
+  }
+
+  if (!Number.isInteger(row.sort_order)) {
+    throw new Error(`Published resource ${row.slug} has invalid sort_order.`);
+  }
+
+  if (typeof row.featured !== "boolean") {
+    throw new Error(`Published resource ${row.slug} has invalid featured flag.`);
+  }
+
+  if (row.resource_kind === "article" && !row.category_slug) {
     throw new Error(`Published article ${row.slug} is missing category_slug.`);
   }
 }
@@ -105,22 +121,58 @@ if (uniqueSlugs.size !== rows.length) {
   throw new Error("Published website resources contain duplicate slugs.");
 }
 
-const tsHeader = `// Generated from public.website_resources. Do not edit by hand.\n// scripts/generate-resource-content.mjs refreshes this file before production builds.\n\nexport type GeneratedWebsiteResource = {\n  slug: string;\n  title: string;\n  primary_question: string;\n  summary: string;\n  body_markdown: string;\n  faq: unknown[];\n  audience_tags: string[];\n  topic_aliases: string[];\n  source_urls: string[];\n  coverage_status: \"partial\" | \"complete\" | \"needs_review\";\n  status: \"published\";\n  live_url: string | null;\n  last_researched_at: string | null;\n  published_at: string | null;\n  resource_kind: "category" | "article";\n  category_slug: string | null;\n};\n\n`;
+const tsHeader = `// Generated from public.website_resources_public. Do not edit by hand.
+// scripts/generate-resource-content.mjs refreshes this file before production builds.
 
-const resourceModule = `${tsHeader}export const generatedWebsiteResources: GeneratedWebsiteResource[] = ${JSON.stringify(rows, null, 2)};\n`;
+export type GeneratedWebsiteResource = {
+  id: string;
+  tenant_id: string;
+  slug: string;
+  title: string;
+  primary_question: string;
+  summary: string;
+  body_markdown: string;
+  faq: unknown[];
+  audience_tags: string[];
+  topic_aliases: string[];
+  status: "published";
+  live_url: string | null;
+  published_at: string | null;
+  resource_kind: "category" | "article";
+  category_slug: string | null;
+  content_schema_version: number;
+  editorial_type: "category" | "guide" | "explainer" | "checklist" | "reference";
+  featured: boolean;
+  sort_order: number;
+  seo_title: string | null;
+  seo_description: string | null;
+  public_updated_at: string | null;
+};
+
+`;
+
+const resourceModule = `${tsHeader}export const generatedWebsiteResources: GeneratedWebsiteResource[] = ${JSON.stringify(rows, null, 2)};
+`;
+
 const routeRows = rows.map((row) => ({
   path:
     row.resource_kind === "article"
       ? `/resources/${row.category_slug}/${row.slug}`
       : `/resources/${row.slug}`,
-  title: `${row.title} | ValorWell`,
-  description: row.summary,
+  title: `${row.seo_title || row.title} | ValorWell`,
+  description: row.seo_description || row.summary,
   h1: row.title,
   lead: row.summary,
   indexable: true,
   sitemap: true,
+  lastmod: row.public_updated_at || row.published_at || null,
 }));
-const routeModule = `// Generated from public.website_resources. Do not edit by hand.\n// scripts/generate-resource-content.mjs refreshes this file before production builds.\n\nexport const generatedResourceRoutes = ${JSON.stringify(routeRows, null, 2)};\n`;
+
+const routeModule = `// Generated from public.website_resources_public. Do not edit by hand.
+// scripts/generate-resource-content.mjs refreshes this file before production builds.
+
+export const generatedResourceRoutes = ${JSON.stringify(routeRows, null, 2)};
+`;
 
 const resourceOutput = path.join(ROOT, "src", "generated", "websiteResources.ts");
 const routeOutput = path.join(ROOT, "route-contract", "generated-resource-routes.mjs");

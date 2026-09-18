@@ -231,3 +231,32 @@ export const generatedWebsiteResources: GeneratedWebsiteResource[] = [
     "category_slug": null
   }
 ];
+
+
+/**
+ * Build-time structured snapshots. scripts/generate-resource-content.mjs
+ * replaces these placeholders with current public Billing Hub data before
+ * production builds.
+ */
+export type GeneratedWebsiteResourceSource = {
+  id: string;
+  resource_id: string;
+  citation_key: string;
+  organization: string | null;
+  title: string | null;
+  url: string;
+  source_type: "official" | "statute" | "regulation" | "policy" | "clinical" | "research" | "other";
+  source_published_at: string | null;
+  verified_at: string | null;
+  display_order: number;
+};
+
+export type GeneratedWebsiteResourceRelation = {
+  resource_id: string;
+  related_resource_id: string;
+  relation_type: "related" | "start_here" | "next" | "previous";
+  display_order: number;
+};
+
+export const generatedWebsiteResourceSources: GeneratedWebsiteResourceSource[] = [];
+export const generatedWebsiteResourceRelations: GeneratedWebsiteResourceRelation[] = [];

@@ -1,124 +1,115 @@
 import { useQuery } from "@tanstack/react-query";
+import { z } from "zod";
 import { billingHubSupabase } from "@/integrations/supabase/client";
 import { generatedWebsiteResources } from "@/generated/websiteResources";
 
 export const WEBSITE_RESOURCE_TENANT_ID = "00000000-0000-0000-0000-000000000001";
 
-export type WebsiteResourceFaq = {
-  question: string;
-  answer: string;
-};
+const faqSchema = z.object({
+  question: z.string().trim().min(1),
+  answer: z.string().trim().min(1),
+});
 
-export type WebsiteResourceKind = "category" | "article";
+const resourceSchema = z.object({
+  id: z.string().uuid(),
+  tenant_id: z.string().uuid(),
+  slug: z.string().trim().min(1),
+  title: z.string().trim().min(1),
+  primary_question: z.string().trim().min(1),
+  summary: z.string().trim().min(1),
+  body_markdown: z.string().trim().min(1),
+  faq: z.array(faqSchema).default([]),
+  audience_tags: z.array(z.string()).default([]),
+  topic_aliases: z.array(z.string()).default([]),
+  status: z.literal("published"),
+  live_url: z.string().nullable().default(null),
+  published_at: z.string().nullable().default(null),
+  resource_kind: z.enum(["category", "article"]),
+  category_slug: z.string().nullable().default(null),
+  content_schema_version: z.number().int().min(1).max(10).default(1),
+  editorial_type: z.enum(["category", "guide", "explainer", "checklist", "reference"]),
+  featured: z.boolean().default(false),
+  sort_order: z.number().int().default(100),
+  seo_title: z.string().nullable().default(null),
+  seo_description: z.string().nullable().default(null),
+  public_updated_at: z.string().nullable().default(null),
+});
 
-export type WebsiteResource = {
-  slug: string;
-  title: string;
-  primary_question: string;
-  summary: string;
-  body_markdown: string;
-  faq: WebsiteResourceFaq[];
-  audience_tags: string[];
-  topic_aliases: string[];
-  /** Internal research tracking only. Never rendered publicly. */
-  source_urls: string[];
-  coverage_status: "partial" | "complete" | "needs_review";
-  status: "published";
-  live_url: string | null;
-  /** Internal research tracking only. Never rendered publicly. */
-  last_researched_at: string | null;
-  published_at: string | null;
-  resource_kind: WebsiteResourceKind;
-  category_slug: string | null;
-};
+const sourceSchema = z.object({
+  id: z.string().uuid(),
+  resource_id: z.string().uuid(),
+  citation_key: z.string().trim().min(1),
+  organization: z.string().nullable().default(null),
+  title: z.string().nullable().default(null),
+  url: z.string().url(),
+  source_type: z.enum([
+    "official",
+    "statute",
+    "regulation",
+    "policy",
+    "clinical",
+    "research",
+    "other",
+  ]),
+  source_published_at: z.string().nullable().default(null),
+  verified_at: z.string().nullable().default(null),
+  display_order: z.number().int().default(100),
+});
+
+const relationSchema = z.object({
+  resource_id: z.string().uuid(),
+  related_resource_id: z.string().uuid(),
+  relation_type: z.enum(["related", "next", "prerequisite", "start_here"]),
+  display_order: z.number().int().default(100),
+});
+
+export type WebsiteResourceFaq = z.infer<typeof faqSchema>;
+export type WebsiteResource = z.infer<typeof resourceSchema>;
+export type WebsiteResourceKind = WebsiteResource["resource_kind"];
+export type WebsiteResourceSource = z.infer<typeof sourceSchema>;
+export type WebsiteResourceRelation = z.infer<typeof relationSchema>;
 
 const RESOURCE_COLUMNS =
-  "slug,title,primary_question,summary,body_markdown,faq,audience_tags,topic_aliases,source_urls,coverage_status,status,live_url,last_researched_at,published_at,resource_kind,category_slug";
+  "id,tenant_id,slug,title,primary_question,summary,body_markdown,faq,audience_tags,topic_aliases,status,live_url,published_at,resource_kind,category_slug,content_schema_version,editorial_type,featured,sort_order,seo_title,seo_description,public_updated_at";
 
-function normalizeFaq(value: unknown): WebsiteResourceFaq[] {
-  if (!Array.isArray(value)) return [];
+const SOURCE_COLUMNS =
+  "id,resource_id,citation_key,organization,title,url,source_type,source_published_at,verified_at,display_order";
 
-  return value.flatMap((item) => {
-    if (!item || typeof item !== "object") return [];
-    const candidate = item as Record<string, unknown>;
-    if (
-      typeof candidate.question !== "string" ||
-      !candidate.question.trim() ||
-      typeof candidate.answer !== "string" ||
-      !candidate.answer.trim()
-    ) {
-      return [];
-    }
-
-    return [
-      {
-        question: candidate.question.trim(),
-        answer: candidate.answer.trim(),
-      },
-    ];
-  });
+function normalizeResource(row: unknown): WebsiteResource | null {
+  const parsed = resourceSchema.safeParse(row);
+  return parsed.success ? parsed.data : null;
 }
 
-function normalizeStringArray(value: unknown): string[] {
-  if (!Array.isArray(value)) return [];
-  return value.filter((item): item is string => typeof item === "string" && item.trim().length > 0);
-}
+function normalizeMany(data: unknown): WebsiteResource[] {
+  if (!Array.isArray(data)) return [];
 
-function normalizeResource(row: Record<string, unknown>): WebsiteResource | null {
-  if (typeof row.slug !== "string" || !row.slug.trim()) return null;
-  if (typeof row.title !== "string" || !row.title.trim()) return null;
-
-  const kind = row.resource_kind === "article" ? "article" : "category";
-
-  return {
-    slug: row.slug,
-    title: row.title,
-    primary_question: typeof row.primary_question === "string" ? row.primary_question : "",
-    summary: typeof row.summary === "string" ? row.summary : "",
-    body_markdown: typeof row.body_markdown === "string" ? row.body_markdown : "",
-    faq: normalizeFaq(row.faq),
-    audience_tags: normalizeStringArray(row.audience_tags),
-    topic_aliases: normalizeStringArray(row.topic_aliases),
-    source_urls: normalizeStringArray(row.source_urls),
-    coverage_status:
-      (row.coverage_status as WebsiteResource["coverage_status"]) ?? "needs_review",
-    status: "published",
-    live_url: typeof row.live_url === "string" ? row.live_url : null,
-    last_researched_at:
-      typeof row.last_researched_at === "string" ? row.last_researched_at : null,
-    published_at: typeof row.published_at === "string" ? row.published_at : null,
-    resource_kind: kind,
-    category_slug: typeof row.category_slug === "string" ? row.category_slug : null,
-  };
+  return data
+    .map(normalizeResource)
+    .filter((resource): resource is WebsiteResource => resource !== null);
 }
 
 /**
- * Build/prerender-time snapshot. Used only to seed server-rendered HTML so SEO
- * snapshots are not blank; runtime Supabase data always supersedes it.
+ * Build/prerender-time snapshot. Runtime Supabase data always supersedes it.
+ * The generated snapshot intentionally contains public-safe fields only.
  */
 const prerenderSnapshot: WebsiteResource[] = (
-  generatedWebsiteResources as unknown as Record<string, unknown>[]
+  generatedWebsiteResources as unknown[]
 )
   .map(normalizeResource)
   .filter((resource): resource is WebsiteResource => resource !== null);
 
 function baseQuery() {
   return billingHubSupabase
-    .from("website_resources")
+    .from("website_resources_public")
     .select(RESOURCE_COLUMNS)
     .eq("tenant_id", WEBSITE_RESOURCE_TENANT_ID)
     .eq("status", "published");
 }
 
-function normalizeMany(data: unknown): WebsiteResource[] {
-  return ((data ?? []) as Record<string, unknown>[])
-    .map(normalizeResource)
-    .filter((resource): resource is WebsiteResource => resource !== null);
-}
-
 export async function fetchPublishedCategories(): Promise<WebsiteResource[]> {
   const { data, error } = await baseQuery()
     .eq("resource_kind", "category")
+    .order("sort_order", { ascending: true })
     .order("title", { ascending: true });
 
   if (error) throw error;
@@ -136,8 +127,8 @@ export async function fetchPublishedCategoryBySlug(
   if (error) throw error;
   if (!data) return null;
 
-  const resource = normalizeResource(data as Record<string, unknown>);
-  return resource && resource.resource_kind === "category" ? resource : null;
+  const resource = normalizeResource(data);
+  return resource?.resource_kind === "category" ? resource : null;
 }
 
 export async function fetchPublishedArticlesByCategory(
@@ -146,6 +137,8 @@ export async function fetchPublishedArticlesByCategory(
   const { data, error } = await baseQuery()
     .eq("resource_kind", "article")
     .eq("category_slug", categorySlug)
+    .order("featured", { ascending: false })
+    .order("sort_order", { ascending: true })
     .order("title", { ascending: true });
 
   if (error) throw error;
@@ -168,13 +161,86 @@ export async function fetchPublishedArticle(
   if (error) throw error;
   if (!data) return null;
 
-  const resource = normalizeResource(data as Record<string, unknown>);
+  const resource = normalizeResource(data);
   return resource &&
     resource.resource_kind === "article" &&
     resource.category_slug === categorySlug &&
     resource.slug === articleSlug
     ? resource
     : null;
+}
+
+export async function fetchPublicResourceSources(
+  resourceId: string,
+): Promise<WebsiteResourceSource[]> {
+  const { data, error } = await billingHubSupabase
+    .from("website_resource_sources")
+    .select(SOURCE_COLUMNS)
+    .eq("resource_id", resourceId)
+    .eq("is_public", true)
+    .order("display_order", { ascending: true });
+
+  if (error) throw error;
+  if (!Array.isArray(data)) return [];
+
+  return data.flatMap((row) => {
+    const parsed = sourceSchema.safeParse(row);
+    return parsed.success ? [parsed.data] : [];
+  });
+}
+
+async function fetchExplicitRelations(
+  resourceId: string,
+): Promise<WebsiteResourceRelation[]> {
+  const { data, error } = await billingHubSupabase
+    .from("website_resource_relations")
+    .select("resource_id,related_resource_id,relation_type,display_order")
+    .eq("resource_id", resourceId)
+    .order("display_order", { ascending: true });
+
+  if (error) throw error;
+  if (!Array.isArray(data)) return [];
+
+  return data.flatMap((row) => {
+    const parsed = relationSchema.safeParse(row);
+    return parsed.success ? [parsed.data] : [];
+  });
+}
+
+export async function fetchRelatedResources(
+  resourceId: string,
+  categorySlug: string,
+): Promise<WebsiteResource[]> {
+  const relations = await fetchExplicitRelations(resourceId);
+
+  if (relations.length > 0) {
+    const ids = relations.map((relation) => relation.related_resource_id);
+    const { data, error } = await baseQuery()
+      .eq("resource_kind", "article")
+      .in("id", ids);
+
+    if (error) throw error;
+
+    const byId = new Map(
+      normalizeMany(data).map((resource) => [resource.id, resource] as const),
+    );
+
+    return relations
+      .map((relation) => byId.get(relation.related_resource_id))
+      .filter((resource): resource is WebsiteResource => Boolean(resource))
+      .slice(0, 3);
+  }
+
+  const { data, error } = await baseQuery()
+    .eq("resource_kind", "article")
+    .eq("category_slug", categorySlug)
+    .neq("id", resourceId)
+    .order("featured", { ascending: false })
+    .order("sort_order", { ascending: true })
+    .limit(3);
+
+  if (error) throw error;
+  return normalizeMany(data);
 }
 
 export function usePublishedCategories() {
@@ -210,10 +276,17 @@ export function usePublishedCategory(slug: string | undefined) {
 
 export function usePublishedCategoryArticles(categorySlug: string | undefined) {
   const seed = categorySlug
-    ? prerenderSnapshot.filter(
-        (resource) =>
-          resource.resource_kind === "article" && resource.category_slug === categorySlug,
-      )
+    ? prerenderSnapshot
+        .filter(
+          (resource) =>
+            resource.resource_kind === "article" && resource.category_slug === categorySlug,
+        )
+        .sort(
+          (a, b) =>
+            Number(b.featured) - Number(a.featured) ||
+            a.sort_order - b.sort_order ||
+            a.title.localeCompare(b.title),
+        )
     : [];
 
   return useQuery({
@@ -249,6 +322,27 @@ export function usePublishedArticle(
     initialDataUpdatedAt: 0,
     staleTime: 30_000,
     refetchOnMount: "always",
+  });
+}
+
+export function usePublicResourceSources(resourceId: string | undefined) {
+  return useQuery({
+    queryKey: ["website-resource-sources", resourceId],
+    queryFn: () => fetchPublicResourceSources(resourceId as string),
+    enabled: Boolean(resourceId),
+    staleTime: 5 * 60_000,
+  });
+}
+
+export function useRelatedResources(
+  resourceId: string | undefined,
+  categorySlug: string | undefined,
+) {
+  return useQuery({
+    queryKey: ["website-resource-related", resourceId, categorySlug],
+    queryFn: () => fetchRelatedResources(resourceId as string, categorySlug as string),
+    enabled: Boolean(resourceId && categorySlug),
+    staleTime: 5 * 60_000,
   });
 }
 

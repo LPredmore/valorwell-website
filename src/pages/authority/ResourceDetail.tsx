@@ -151,7 +151,14 @@ export default function ResourceDetail({
           { name: resource.title, url: path },
         ]}
       />
-      {resource.faq.length > 0 && <FAQSchema faqs={resource.faq} />}
+      {resource.faq.length > 0 && (
+        <FAQSchema
+          faqs={resource.faq.map((faq) => ({
+            question: faq.question ?? "",
+            answer: faq.answer ?? "",
+          }))}
+        />
+      )}
 
       <article
         className="resource-article-page bg-[#F4F1E8] text-[#111814]"

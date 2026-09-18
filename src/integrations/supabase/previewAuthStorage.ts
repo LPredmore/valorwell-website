@@ -48,7 +48,7 @@ export function brokeredPreviewStorage() {
         const d = e.data;
         if (d && d.type === RESULT && d.requestId === requestId) finish(d);
       };
-      timer = setTimeout(() => finish(null), TIMEOUT);
+      const timer = setTimeout(() => finish(null), TIMEOUT);
       window.addEventListener('message', onMessage);
       const msg: Record<string, unknown> = { type, requestId, projectId, key };
       if (value !== undefined) msg['value'] = value;

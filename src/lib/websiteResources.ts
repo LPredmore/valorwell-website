@@ -113,7 +113,7 @@ function normalizeRelation(row: Record<string, unknown>): WebsiteResourceRelatio
 }
 
 function normalizeMany(data: unknown): WebsiteResource[] {
-  return ((data ?? []) as Record<string, unknown>[])
+  return ((data ?? []) as unknown as Record<string, unknown>[])
     .map(normalizeResource)
     .filter((resource): resource is WebsiteResource => resource !== null);
 }
@@ -176,7 +176,7 @@ export async function fetchPublishedCategoryBySlug(
   if (error) throw error;
   if (!data) return null;
 
-  const resource = normalizeResource(data as Record<string, unknown>);
+  const resource = normalizeResource(data as unknown as Record<string, unknown>);
   return resource && resource.resource_kind === "category" ? resource : null;
 }
 
@@ -221,7 +221,7 @@ export async function fetchPublishedArticle(
   if (error) throw error;
   if (!data) return null;
 
-  const resource = normalizeResource(data as Record<string, unknown>);
+  const resource = normalizeResource(data as unknown as Record<string, unknown>);
   return resource &&
     resource.resource_kind === "article" &&
     resource.category_slug === categorySlug &&
@@ -244,7 +244,7 @@ export async function fetchPublishedResourceSources(
 
   if (error) throw error;
 
-  return ((data ?? []) as Record<string, unknown>[])
+  return ((data ?? []) as unknown as Record<string, unknown>[])
     .map(normalizeSource)
     .filter((source): source is WebsiteResourceSource => source !== null);
 }
@@ -261,7 +261,7 @@ export async function fetchPublishedResourceRelations(
 
   if (relationError) throw relationError;
 
-  const relations = ((relationRows ?? []) as Record<string, unknown>[])
+  const relations = ((relationRows ?? []) as unknown as Record<string, unknown>[])
     .map(normalizeRelation)
     .filter((relation): relation is WebsiteResourceRelation => relation !== null);
 

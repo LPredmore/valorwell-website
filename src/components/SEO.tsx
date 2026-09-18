@@ -120,6 +120,56 @@ export function MedicalOrganizationSchema() {
   );
 }
 
+
+interface ArticleSchemaProps {
+  headline: string;
+  description: string;
+  url: string;
+  datePublished?: string | null;
+  dateModified?: string | null;
+}
+
+export function ArticleSchema({
+  headline,
+  description,
+  url,
+  datePublished,
+  dateModified,
+}: ArticleSchemaProps) {
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline,
+    description,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${SITE_URL}${url}`,
+    },
+    ...(datePublished ? { datePublished } : {}),
+    ...(dateModified ? { dateModified } : {}),
+    author: {
+      "@type": "Organization",
+      name: "ValorWell",
+      url: SITE_URL,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "ValorWell",
+      url: SITE_URL,
+      logo: {
+        "@type": "ImageObject",
+        url: `${SITE_URL}/brand/valorwell-logo.png`,
+      },
+    },
+  };
+
+  return (
+    <Helmet>
+      <script type="application/ld+json">{JSON.stringify(schema)}</script>
+    </Helmet>
+  );
+}
+
 interface FAQSchemaProps {
   faqs: Array<{ question: string; answer: string }>;
 }

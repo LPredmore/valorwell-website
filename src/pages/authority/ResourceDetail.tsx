@@ -115,6 +115,14 @@ export default function ResourceDetail({
   const path = `/resources/${categorySlug}/${resource.slug}`;
   const categoryPath = `/resources/${categorySlug}`;
   const updatedLabel = formatPublicDate(resource.public_updated_at ?? resource.published_at);
+  const publicFaq = resource.faq.flatMap((faq) =>
+    typeof faq.question === "string" &&
+    faq.question.trim() &&
+    typeof faq.answer === "string" &&
+    faq.answer.trim()
+      ? [{ question: faq.question.trim(), answer: faq.answer.trim() }]
+      : [],
+  );
   const seoTitle = resource.seo_title ?? resource.title;
   const seoDescription = resource.seo_description ?? resource.summary;
 
@@ -162,7 +170,7 @@ export default function ResourceDetail({
           { name: resource.title, url: path },
         ]}
       />
-      {resource.faq.length > 0 && <FAQSchema faqs={resource.faq} />}
+      {publicFaq.length > 0 && <FAQSchema faqs={publicFaq} />}
 
       <article
         className="resource-article-page bg-[#F4F1E8] text-[#111814]"
@@ -317,7 +325,7 @@ export default function ResourceDetail({
                 <div className="resource-richtext max-w-[72ch]">{compiled.rendered}</div>
               </div>
 
-              {resource.faq.length > 0 && (
+              {publicFaq.length > 0 && (
                 <section
                   aria-labelledby="resource-faq-heading"
                   className="mt-8 rounded-[1.75rem] border border-[#3B5147]/12 bg-white px-6 py-8 shadow-[0_18px_55px_-48px_rgba(17,24,20,0.5)] sm:px-8 md:px-10 md:py-10"
@@ -331,7 +339,7 @@ export default function ResourceDetail({
 
                   <div className="resource-screen-faq mt-6">
                     <Accordion type="single" collapsible className="w-full">
-                      {resource.faq.map((faq, index) => (
+                      {publicFaq.map((faq, index) => (
                         <AccordionItem
                           key={faq.question}
                           value={`faq-${index}`}
@@ -349,7 +357,7 @@ export default function ResourceDetail({
                   </div>
 
                   <div className="resource-print-faq">
-                    {resource.faq.map((faq) => (
+                    {publicFaq.map((faq) => (
                       <div key={faq.question} className="resource-print-faq-item mb-6">
                         <h3 className="font-bold">{faq.question}</h3>
                         <p className="mt-2 leading-7">{faq.answer}</p>

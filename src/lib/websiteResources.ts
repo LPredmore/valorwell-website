@@ -161,7 +161,7 @@ const prerenderSnapshot: WebsiteResource[] = (
 
 function baseQuery() {
   return billingHubSupabase
-    .from("website_resources")
+    .from("website_resources_public")
     .select(RESOURCE_COLUMNS)
     .eq("tenant_id", WEBSITE_RESOURCE_TENANT_ID)
     .eq("status", "published");

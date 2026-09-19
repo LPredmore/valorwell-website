@@ -52,7 +52,7 @@ const rows: Row[] = [
     slug: "family-systems",
     title: "Family Systems Resources",
     summary: "Shared frameworks families can use repeatedly.",
-    body_markdown: "## About this category\n\nCategory body text should render as useful orientation.",
+    body_markdown: "## About this category\\n\\nCategory body text should render as useful orientation.",
     editorial_type: "category",
     resource_kind: "category",
     category_slug: null,
@@ -185,8 +185,12 @@ describe("runtime resource routing", () => {
     );
 
     expect(
+      screen.getByRole("heading", { level: 2, name: "About this category" }),
+    ).toBeInTheDocument();
+    expect(
       screen.getByText(/Category body text should render as useful orientation/),
     ).toBeInTheDocument();
+    expect(document.body.textContent).not.toContain("\\n");
 
     await waitFor(() =>
       expect(

@@ -24,6 +24,7 @@ export type CompiledResourceMarkdoc = {
 
 export const resourceMarkdocConfig: Record<string, unknown>;
 export function slugifyResourceHeading(value: string): string;
+export function normalizeResourceMarkdown(markdown: string): string;
 export function stripInternalResourceMetadata(markdown: string): string;
 export function compileResourceMarkdoc(
   markdown: string,

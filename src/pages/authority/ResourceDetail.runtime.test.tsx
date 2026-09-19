@@ -64,7 +64,7 @@ const rows: Row[] = [
     title: "Coping With Limited or No Contact During a Military Separation",
     summary: "Practical ways military families can manage uncertainty.",
     body_markdown:
-      "## What to expect\n\nCommunication can be limited for long stretches.\n\n### Daily routines\n\nKeep predictable anchors.\n\n## Authoritative sources reviewed\n\n- https://www.va.gov/example-source\n\nLast researched and verified: September 16, 2026",
+      "## The direct answer\n\nCommunication can be **limited** for *long stretches*.\n\n- First practical step\n\nA paragraph after the list.\n\n### Daily routines\n\nKeep predictable anchors.\n\n#### A smaller detail\n\nRead [helpful guidance](/resources).\n\n## What families can do\n\n1. Start here\n2. Continue there\n\n## Authoritative sources reviewed\n\n- https://www.va.gov/example-source\n\nLast researched and verified: September 16, 2026",
     source_urls: ["https://www.va.gov/example-source"],
     last_researched_at: "2026-09-16T00:00:00Z",
     resource_kind: "article",
@@ -179,6 +179,21 @@ describe("runtime resource routing", () => {
     await waitFor(() =>
       expect(screen.getByRole("heading", { name: "Daily routines" })).toBeInTheDocument(),
     );
+    expect(screen.getByRole("heading", { level: 2, name: "The direct answer" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 3, name: "Daily routines" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 4, name: "A smaller detail" })).toBeInTheDocument();
+    expect(screen.getByText("limited").tagName).toBe("STRONG");
+    expect(screen.getByText("long stretches").tagName).toBe("EM");
+
+    const listItem = screen.getByText("First practical step");
+    const followingParagraph = screen.getByText("A paragraph after the list.");
+    expect(
+      listItem.compareDocumentPosition(followingParagraph) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+
+    const tocLinks = screen.getAllByRole("link", { name: "What families can do" });
+    expect(tocLinks).toHaveLength(1);
+    tocLinks.forEach((link) => expect(link).toHaveAttribute("href", "#what-families-can-do"));
     expect(screen.queryByText(/###/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Last reviewed/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Last researched/i)).not.toBeInTheDocument();

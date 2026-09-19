@@ -83,6 +83,14 @@ for (const resource of resources) {
     errors.push(`${label}: body contains unsafe raw markup or a javascript URL.`);
   }
 
+  const actualNewlineCount = (body.match(/\r?\n/g) ?? []).length;
+  const escapedNewlineCount = (body.match(/\\n/g) ?? []).length;
+  if (actualNewlineCount === 0 && escapedNewlineCount >= 2) {
+    errors.push(
+      `${label}: body contains literal \\n escape sequences instead of real line breaks.`,
+    );
+  }
+
   if (schemaVersion >= 2 && internalMetadataPattern.test(body)) {
     errors.push(
       `${label}: schema v2 body contains internal research metadata. Store research metadata structurally instead.`,

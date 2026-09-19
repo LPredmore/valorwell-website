@@ -4,7 +4,8 @@ This document defines the public resource-authoring contract for `public.website
 
 ## Source of truth
 
-- Billing Hub Supabase remains the canonical resource registry.
+- Billing Hub Supabase remains the canonical resource registry in `public.website_resources`.
+- Public website reads use the read-only `public.website_resources_public` projection; internal research fields are not part of the website contract.
 - `body_markdown` stores Markdoc-compatible Markdown.
 - Existing schema-version-1 resources remain valid standard Markdown.
 - New resources should use `content_schema_version = 2`.

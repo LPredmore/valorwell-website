@@ -279,3 +279,190 @@
   display: none;
 }
 
+/* Runtime resource articles use one continuous editorial reading surface. */
+.resource-article-prose {
+  color: hsl(var(--foreground));
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+
+.resource-article-prose > :first-child {
+  margin-top: 0;
+}
+
+.resource-article-prose h2 {
+  scroll-margin-top: 6rem;
+  margin-top: 3.5rem;
+  border-top: 1px solid hsl(var(--border));
+  padding-top: 1.75rem;
+  color: hsl(var(--foreground));
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.resource-article-prose h2:first-child {
+  margin: 0 0 1.5rem;
+  border: 1px solid hsl(var(--primary) / 0.18);
+  border-left: 4px solid hsl(var(--primary));
+  border-radius: var(--radius);
+  background: hsl(var(--secondary) / 0.55);
+  padding: 1rem 1.25rem;
+}
+
+.resource-article-prose h3 {
+  margin-top: 2.25rem;
+  color: hsl(var(--foreground));
+  font-size: 1.45rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.resource-article-prose h4,
+.resource-article-prose h5,
+.resource-article-prose h6 {
+  margin-top: 1.75rem;
+  color: hsl(var(--foreground));
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.resource-article-prose p,
+.resource-article-prose ul,
+.resource-article-prose ol,
+.resource-article-prose blockquote,
+.resource-article-prose pre,
+.resource-article-prose table,
+.resource-article-prose hr {
+  margin-top: 1.25rem;
+}
+
+.resource-article-prose ul,
+.resource-article-prose ol {
+  padding-left: 1.5rem;
+}
+
+.resource-article-prose ul { list-style: disc; }
+.resource-article-prose ol { list-style: decimal; }
+.resource-article-prose li { padding-left: 0.25rem; }
+.resource-article-prose li + li { margin-top: 0.5rem; }
+.resource-article-prose li > ul,
+.resource-article-prose li > ol { margin-top: 0.5rem; }
+
+.resource-article-prose strong { font-weight: 700; }
+.resource-article-prose em { font-style: italic; }
+
+.resource-article-prose a {
+  color: hsl(var(--primary));
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.resource-article-prose blockquote {
+  border-left: 4px solid hsl(var(--gold-accent));
+  background: hsl(var(--secondary) / 0.5);
+  padding: 1rem 1.25rem;
+}
+
+.resource-article-prose code {
+  border-radius: calc(var(--radius) - 4px);
+  background: hsl(var(--secondary));
+  padding: 0.15rem 0.35rem;
+  font-size: 0.9em;
+}
+
+.resource-article-prose pre {
+  overflow-x: auto;
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  background: hsl(var(--secondary));
+  padding: 1rem;
+}
+
+.resource-article-prose pre code { padding: 0; }
+
+.resource-article-prose hr {
+  border: 0;
+  border-top: 1px solid hsl(var(--border));
+}
+
+.resource-article-prose table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+.resource-article-prose th,
+.resource-article-prose td {
+  border: 1px solid hsl(var(--border));
+  padding: 0.65rem 0.8rem;
+  text-align: left;
+}
+
+@media (min-width: 768px) {
+  .resource-article-prose { font-size: 1.125rem; }
+}
+
+@media print {
+  @page { margin: 0.7in; }
+
+  body { background: white !important; }
+  body > #root > div > header,
+  body > #root > div > footer,
+  .resource-article-breadcrumb,
+  .resource-article-toc,
+  .resource-article-toc-mobile,
+  .resource-article-related,
+  .resource-article-cta {
+    display: none !important;
+  }
+
+  .resource-article-page,
+  .resource-article-hero,
+  .resource-article-surface {
+    background: white !important;
+    color: black !important;
+  }
+
+  .resource-article-hero > div,
+  .resource-article-page > div {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+
+  .resource-article-page .grid {
+    display: block !important;
+  }
+
+  .resource-article-surface {
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 1.5rem 0 0 !important;
+  }
+
+  .resource-article-prose h2,
+  .resource-article-prose h3,
+  .resource-article-prose h4,
+  .resource-article-faq h2,
+  .resource-article-faq [data-radix-collection-item] {
+    break-after: avoid-page;
+  }
+
+  .resource-article-prose blockquote,
+  .resource-article-prose pre,
+  .resource-article-prose table,
+  .resource-article-faq [data-state] {
+    break-inside: avoid-page;
+  }
+
+  .resource-article-prose h2:first-child {
+    background: white !important;
+  }
+}
+

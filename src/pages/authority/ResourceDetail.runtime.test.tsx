@@ -192,7 +192,7 @@ describe("runtime resource routing", () => {
     ).toBeTruthy();
 
     const tocLinks = screen.getAllByRole("link", { name: "What families can do" });
-    expect(tocLinks).toHaveLength(2);
+    expect(tocLinks).toHaveLength(1);
     tocLinks.forEach((link) => expect(link).toHaveAttribute("href", "#what-families-can-do"));
     expect(screen.queryByText(/###/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Last reviewed/i)).not.toBeInTheDocument();

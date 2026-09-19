@@ -70,7 +70,7 @@ function isSuppressedLine(line: string): boolean {
   return SUPPRESSED_LINE_PREFIXES.some((prefix) => normalized.startsWith(prefix));
 }
 
-export function sanitizeResourceMarkdown(markdown: string): string {
+function sanitizeResourceMarkdown(markdown: string): string {
   const retained: string[] = [];
   let suppressing = false;
 

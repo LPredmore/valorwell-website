@@ -52,8 +52,8 @@ const representativeBodyContent = new Map([
   [
     "/resources",
     [
-      "Clear answers for complicated veteran and military-family systems.",
-      "Search the library",
+      "Practical guidance for navigating care, coverage, documentation, and family systems.",
+      "Clinical Documentation",
       "Veteran Mental Health",
       "Family Systems",
     ],

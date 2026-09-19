@@ -40,9 +40,9 @@ export const routes = [
   {
     "path": "/resources",
     "title": "Veteran & Family Mental Health Resources | ValorWell",
-    "description": "Search and browse practical ValorWell guidance on VA Community Care, CHAMPVA, military health benefits, veteran mental health, documentation, and military family systems.",
-    "h1": "Clear answers for complicated veteran and military-family systems.",
-    "lead": "Search practical guidance, understand the rules behind the issue, and leave with clearer questions and next steps.",
+    "description": "Browse ValorWell resources on veteran and family mental health, care access, coverage, documentation, and practical family systems.",
+    "h1": "Practical guidance for navigating care, coverage, documentation, and family systems.",
+    "lead": "ValorWell resources explain terminology, common process steps, questions to ask, and when current information should be confirmed with the responsible program or provider.",
     "indexable": true,
     "sitemap": true
   },

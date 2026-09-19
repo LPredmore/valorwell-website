@@ -2516,6 +2516,156 @@ export type Database = {
           },
         ]
       }
+      claim_clearinghouse_events: {
+        Row: {
+          claim_id: string
+          clearinghouse: string
+          created_at: string
+          event_type: string
+          external_claim_id: string | null
+          external_event_key: string
+          external_submission_id: string | null
+          id: string
+          payload_sha256: string | null
+          processed_at: string | null
+          remote_status: string | null
+          reported_by: string | null
+          sanitized_payload: Json
+          tenant_id: string
+        }
+        Insert: {
+          claim_id: string
+          clearinghouse: string
+          created_at?: string
+          event_type: string
+          external_claim_id?: string | null
+          external_event_key: string
+          external_submission_id?: string | null
+          id?: string
+          payload_sha256?: string | null
+          processed_at?: string | null
+          remote_status?: string | null
+          reported_by?: string | null
+          sanitized_payload?: Json
+          tenant_id: string
+        }
+        Update: {
+          claim_id?: string
+          clearinghouse?: string
+          created_at?: string
+          event_type?: string
+          external_claim_id?: string | null
+          external_event_key?: string
+          external_submission_id?: string | null
+          id?: string
+          payload_sha256?: string | null
+          processed_at?: string | null
+          remote_status?: string | null
+          reported_by?: string | null
+          sanitized_payload?: Json
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_clearinghouse_events_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_clearinghouse_events_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      claim_clearinghouse_lifecycle: {
+        Row: {
+          claim_id: string
+          clearinghouse: string
+          created_at: string
+          external_claim_id: string | null
+          id: string
+          identity_status: string
+          last_reconciled_at: string | null
+          last_sync_error: string | null
+          last_synced_at: string | null
+          last_timeline_synced_at: string | null
+          latest_external_submission_id: string | null
+          next_sync_at: string | null
+          remote_status: string | null
+          remote_status_reported_by: string | null
+          remote_submitted_at: string | null
+          remote_total_charge: number | null
+          remote_total_paid: number | null
+          sync_error_count: number
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          claim_id: string
+          clearinghouse: string
+          created_at?: string
+          external_claim_id?: string | null
+          id?: string
+          identity_status?: string
+          last_reconciled_at?: string | null
+          last_sync_error?: string | null
+          last_synced_at?: string | null
+          last_timeline_synced_at?: string | null
+          latest_external_submission_id?: string | null
+          next_sync_at?: string | null
+          remote_status?: string | null
+          remote_status_reported_by?: string | null
+          remote_submitted_at?: string | null
+          remote_total_charge?: number | null
+          remote_total_paid?: number | null
+          sync_error_count?: number
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          claim_id?: string
+          clearinghouse?: string
+          created_at?: string
+          external_claim_id?: string | null
+          id?: string
+          identity_status?: string
+          last_reconciled_at?: string | null
+          last_sync_error?: string | null
+          last_synced_at?: string | null
+          last_timeline_synced_at?: string | null
+          latest_external_submission_id?: string | null
+          next_sync_at?: string | null
+          remote_status?: string | null
+          remote_status_reported_by?: string | null
+          remote_submitted_at?: string | null
+          remote_total_charge?: number | null
+          remote_total_paid?: number | null
+          sync_error_count?: number
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_clearinghouse_lifecycle_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_clearinghouse_lifecycle_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       claim_clearinghouse_routes: {
         Row: {
           clearinghouse: string
@@ -16771,6 +16921,13 @@ export type Database = {
             referencedRelation: "website_resources"
             referencedColumns: ["tenant_id", "id"]
           },
+          {
+            foreignKeyName: "reddit_authority_resource_fk"
+            columns: ["tenant_id", "resource_id"]
+            isOneToOne: false
+            referencedRelation: "website_resources_public"
+            referencedColumns: ["tenant_id", "id"]
+          },
         ]
       }
       referrals: {
@@ -22969,10 +23126,24 @@ export type Database = {
             referencedColumns: ["tenant_id", "id"]
           },
           {
+            foreignKeyName: "website_resource_relations_related_resource_fkey"
+            columns: ["tenant_id", "related_resource_id"]
+            isOneToOne: false
+            referencedRelation: "website_resources_public"
+            referencedColumns: ["tenant_id", "id"]
+          },
+          {
             foreignKeyName: "website_resource_relations_resource_fkey"
             columns: ["tenant_id", "resource_id"]
             isOneToOne: false
             referencedRelation: "website_resources"
+            referencedColumns: ["tenant_id", "id"]
+          },
+          {
+            foreignKeyName: "website_resource_relations_resource_fkey"
+            columns: ["tenant_id", "resource_id"]
+            isOneToOne: false
+            referencedRelation: "website_resources_public"
             referencedColumns: ["tenant_id", "id"]
           },
         ]
@@ -23032,6 +23203,13 @@ export type Database = {
             columns: ["tenant_id", "resource_id"]
             isOneToOne: false
             referencedRelation: "website_resources"
+            referencedColumns: ["tenant_id", "id"]
+          },
+          {
+            foreignKeyName: "website_resource_sources_resource_fkey"
+            columns: ["tenant_id", "resource_id"]
+            isOneToOne: false
+            referencedRelation: "website_resources_public"
             referencedColumns: ["tenant_id", "id"]
           },
         ]
@@ -24628,6 +24806,52 @@ export type Database = {
           title: string | null
           topic_aliases: string[] | null
         }
+        Insert: {
+          audience_tags?: string[] | null
+          body_markdown?: string | null
+          category_slug?: string | null
+          content_schema_version?: number | null
+          editorial_type?: string | null
+          faq?: Json | null
+          featured?: boolean | null
+          id?: string | null
+          primary_question?: string | null
+          public_updated_at?: string | null
+          published_at?: string | null
+          resource_kind?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          slug?: string | null
+          sort_order?: number | null
+          status?: string | null
+          summary?: string | null
+          tenant_id?: string | null
+          title?: string | null
+          topic_aliases?: string[] | null
+        }
+        Update: {
+          audience_tags?: string[] | null
+          body_markdown?: string | null
+          category_slug?: string | null
+          content_schema_version?: number | null
+          editorial_type?: string | null
+          faq?: Json | null
+          featured?: boolean | null
+          id?: string | null
+          primary_question?: string | null
+          public_updated_at?: string | null
+          published_at?: string | null
+          resource_kind?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          slug?: string | null
+          sort_order?: number | null
+          status?: string | null
+          summary?: string | null
+          tenant_id?: string | null
+          title?: string | null
+          topic_aliases?: string[] | null
+        }
         Relationships: []
       }
     }
@@ -25366,6 +25590,42 @@ export type Database = {
         Args: { p_idempotency_key: string; p_payload: Json }
         Returns: Json
       }
+      apply_stedi_claim_status_v1: {
+        Args: {
+          p_claim_id: string
+          p_external_claim_id: string
+          p_external_submission_id: string
+          p_remote_status: string
+          p_reported_by: string
+          p_sanitized_payload?: Json
+          p_status_message?: string
+        }
+        Returns: {
+          canonical_after: string
+          canonical_before: string
+          canonical_changed: boolean
+        }[]
+      }
+      apply_stedi_lifecycle_snapshot_v1: {
+        Args: {
+          p_claim_id: string
+          p_external_claim_id: string
+          p_external_submission_id: string
+          p_next_sync_at?: string
+          p_remote_status: string
+          p_remote_submitted_at: string
+          p_reported_by: string
+          p_sanitized_snapshot?: Json
+          p_total_charge: number
+          p_total_paid: number
+        }
+        Returns: {
+          canonical_after: string
+          canonical_before: string
+          canonical_changed: boolean
+          lifecycle_id: string
+        }[]
+      }
       appointment_provisioning_worker_token_valid: {
         Args: { p_token: string }
         Returns: boolean
@@ -25448,6 +25708,10 @@ export type Database = {
           p_tenant_id: string
         }
         Returns: Json
+      }
+      billing_invoke_cron_function_v1: {
+        Args: { p_body?: Json; p_function: string }
+        Returns: number
       }
       book_client_appointment: {
         Args: { p_slot_end_utc?: string; p_slot_start_utc: string }
@@ -27639,12 +27903,61 @@ export type Database = {
           }
       get_staff_id_for_user: { Args: { p_user_id: string }; Returns: string }
       get_staff_operating_context: { Args: never; Returns: Json }
+      get_stedi_lifecycle_sync_candidates_v1: {
+        Args: { p_claim_ids?: string[]; p_limit?: number }
+        Returns: {
+          attempt_external_claim_id: string
+          attempt_external_submission_id: string
+          attempt_submitted_at: string
+          claim_id: string
+          claim_number: string
+          claim_status: string
+          external_claim_id: string
+          identity_status: string
+          last_timeline_synced_at: string
+          latest_external_submission_id: string
+          remote_status: string
+          tenant_id: string
+          total_charge: number
+        }[]
+      }
+      get_stedi_lifecycle_targeted_candidates_v1: {
+        Args: { p_claim_ids: string[] }
+        Returns: {
+          attempt_external_claim_id: string
+          attempt_external_submission_id: string
+          attempt_submitted_at: string
+          claim_id: string
+          claim_number: string
+          claim_status: string
+          external_claim_id: string
+          identity_status: string
+          last_timeline_synced_at: string
+          latest_external_submission_id: string
+          remote_status: string
+          tenant_id: string
+          total_charge: number
+        }[]
+      }
       get_stedi_submission_candidates_v1: {
         Args: never
         Returns: {
           claim_id: string
           claim_number: string
           tenant_id: string
+        }[]
+      }
+      get_stedi_uncertain_requests_v1: {
+        Args: { p_limit?: number }
+        Returns: {
+          claim_id: string
+          claim_number: string
+          claim_status: string
+          external_started_at: string
+          last_reconciled_at: string
+          request_id: string
+          tenant_id: string
+          total_charge: number
         }[]
       }
       get_stripe_billing_integrity_report: { Args: never; Returns: Json }
@@ -27720,6 +28033,10 @@ export type Database = {
         }
         Returns: Json
       }
+      is_public_website_resource: {
+        Args: { p_resource_id: string; p_tenant_id: string }
+        Returns: boolean
+      }
       is_staff_or_admin: { Args: { _user_id: string }; Returns: boolean }
       is_tenant_admin: {
         Args: { _tenant_id: string; _user_id: string }
@@ -27758,6 +28075,14 @@ export type Database = {
         Returns: Json
       }
       mark_at_risk_clients: { Args: { p_tenant_id: string }; Returns: number }
+      mark_stedi_lifecycle_sync_success_v1: {
+        Args: {
+          p_claim_id: string
+          p_last_synced_at?: string
+          p_next_sync_at?: string
+        }
+        Returns: undefined
+      }
       mark_stedi_submission_started_v1: {
         Args: { p_request_id: string }
         Returns: boolean
@@ -27909,6 +28234,10 @@ export type Database = {
       }
       payroll_system_auto_approve_expired_v1: { Args: never; Returns: Json }
       payroll_system_auto_approve_expired_v2: { Args: never; Returns: Json }
+      payroll_system_auto_approve_friday_admin_v1: {
+        Args: never
+        Returns: Json
+      }
       payroll_system_prepare_friday_finalization_v1: {
         Args: never
         Returns: Json
@@ -28138,6 +28467,46 @@ export type Database = {
           p_opportunity_id: string
         }
         Returns: Json
+      }
+      record_stedi_lifecycle_event_v1: {
+        Args: {
+          p_claim_id: string
+          p_event_type: string
+          p_external_claim_id: string
+          p_external_event_id: string
+          p_external_submission_id: string
+          p_payload_sha256?: string
+          p_processed_at: string
+          p_remote_status: string
+          p_reported_by: string
+          p_sanitized_payload?: Json
+        }
+        Returns: {
+          event_id: string
+          inserted: boolean
+        }[]
+      }
+      record_stedi_lifecycle_events_v1: {
+        Args: {
+          p_claim_id: string
+          p_events: Json
+          p_external_claim_id: string
+          p_mark_timeline_synced?: boolean
+        }
+        Returns: number
+      }
+      record_stedi_lifecycle_sync_error_v1: {
+        Args: { p_claim_id: string; p_error: string; p_next_sync_at: string }
+        Returns: undefined
+      }
+      record_stedi_reconciliation_v1: {
+        Args: {
+          p_evidence?: Json
+          p_external_claim_id?: string
+          p_found: boolean
+          p_request_id: string
+        }
+        Returns: undefined
       }
       record_stedi_submission_result_v1: {
         Args: {
@@ -28865,6 +29234,18 @@ export type Database = {
         }
         Returns: Json
       }
+      stedi_map_canonical_status_v1: {
+        Args: { p_current: string; p_remote_status: string }
+        Returns: string
+      }
+      stedi_next_sync_at_v1: {
+        Args: {
+          p_canonical_status: string
+          p_remote_status: string
+          p_remote_submitted_at: string
+        }
+        Returns: string
+      }
       store_relationship_calendar_channel: {
         Args: {
           p_channel_id: string
@@ -29217,6 +29598,32 @@ export type Database = {
             }
             Returns: Json
           }
+      upsert_stedi_lifecycle_identity_v1: {
+        Args: {
+          p_claim_id: string
+          p_external_claim_id?: string
+          p_identity_status: string
+          p_latest_external_submission_id?: string
+          p_next_sync_at?: string
+          p_sync_error?: string
+        }
+        Returns: string
+      }
+      upsert_stedi_lifecycle_snapshot_v1: {
+        Args: {
+          p_claim_id: string
+          p_external_claim_id: string
+          p_last_synced_at?: string
+          p_latest_external_submission_id: string
+          p_next_sync_at?: string
+          p_remote_status: string
+          p_remote_submitted_at: string
+          p_remote_total_charge: number
+          p_remote_total_paid: number
+          p_reported_by: string
+        }
+        Returns: string
+      }
       validate_relationship_calendar_channel: {
         Args: {
           p_channel_id: string

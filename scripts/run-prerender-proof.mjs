@@ -22,7 +22,7 @@ const expectations = [
     title: "Veteran & Family Mental Health Resources | ValorWell",
     canonical: "https://valorwell.org/resources",
     body: [
-      "Clear answers for complicated veteran and military-family systems.",
+      "Practical guidance for navigating care, coverage, documentation, and family systems.",
       "Clinical Documentation",
       "Veteran Mental Health",
       "Family Systems",

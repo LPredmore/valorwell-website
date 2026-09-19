@@ -45,11 +45,29 @@ function normalizeInternalHeading(value) {
     .trim();
 }
 
+export function normalizeResourceMarkdown(markdown) {
+  const source = String(markdown ?? "");
+  const actualNewlines = (source.match(/\r?\n/g) ?? []).length;
+  const escapedNewlines = (source.match(/\\n/g) ?? []).length;
+
+  // Some legacy rows were written with JSON-escaped line breaks as literal
+  // backslash+n text. Repair only fully escaped documents so legitimate inline
+  // examples containing "\\n" are left alone.
+  if (actualNewlines === 0 && escapedNewlines >= 2) {
+    return source
+      .replace(/\\r\\n/g, "\n")
+      .replace(/\\n/g, "\n")
+      .replace(/\\r/g, "\n");
+  }
+
+  return source;
+}
+
 export function stripInternalResourceMetadata(markdown) {
   const output = [];
   let suppressedLevel = null;
 
-  for (const rawLine of String(markdown ?? "").split(/\r?\n/)) {
+  for (const rawLine of normalizeResourceMarkdown(markdown).split(/\r?\n/)) {
     const line = rawLine.trim();
     const heading = line.match(/^(#{1,6})\s+(.*)$/);
 

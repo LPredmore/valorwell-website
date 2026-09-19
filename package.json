@@ -14,7 +14,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "validate:resources": "node scripts/validate-resource-content.mjs",
-    "index:resources": "pagefind --site dist --root-selector \"[data-pagefind-body]\""
+    "index:resources": "pagefind --site dist --glob \"**/index.html\" --root-selector \"[data-pagefind-body]\""
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

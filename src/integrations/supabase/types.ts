@@ -24604,6 +24604,32 @@ export type Database = {
         }
         Relationships: []
       }
+      website_resources_public: {
+        Row: {
+          audience_tags: string[] | null
+          body_markdown: string | null
+          category_slug: string | null
+          content_schema_version: number | null
+          editorial_type: string | null
+          faq: Json | null
+          featured: boolean | null
+          id: string | null
+          primary_question: string | null
+          public_updated_at: string | null
+          published_at: string | null
+          resource_kind: string | null
+          seo_description: string | null
+          seo_title: string | null
+          slug: string | null
+          sort_order: number | null
+          status: string | null
+          summary: string | null
+          tenant_id: string | null
+          title: string | null
+          topic_aliases: string[] | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       _authorize_staff_calendar_access: {

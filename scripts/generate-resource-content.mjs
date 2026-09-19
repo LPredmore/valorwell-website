@@ -38,7 +38,7 @@ const PUBLIC_RESOURCE_FIELDS = [
   "public_updated_at",
 ];
 
-const endpoint = new URL("/rest/v1/website_resources", supabaseUrl);
+const endpoint = new URL("/rest/v1/website_resources_public", supabaseUrl);
 endpoint.searchParams.set("select", PUBLIC_RESOURCE_FIELDS.join(","));
 endpoint.searchParams.set("tenant_id", `eq.${TENANT_ID}`);
 endpoint.searchParams.set("status", "eq.published");
@@ -61,7 +61,7 @@ if (!response.ok) {
 
 const rows = await response.json();
 if (!Array.isArray(rows)) {
-  throw new Error("Billing Hub returned an invalid website_resources payload.");
+  throw new Error("Billing Hub returned an invalid website_resources_public payload.");
 }
 
 function requireString(row, field) {
@@ -141,7 +141,7 @@ for (const row of rows) {
   }
 }
 
-const tsHeader = `// Generated from public.website_resources. Do not edit by hand.
+const tsHeader = `// Generated from public.website_resources_public. Do not edit by hand.
 // scripts/generate-resource-content.mjs refreshes this file before production builds.
 
 export type GeneratedWebsiteResource = {
@@ -186,7 +186,7 @@ const routeRows = rows.map((row) => ({
   lastModified: row.public_updated_at || row.published_at || null,
 }));
 
-const routeModule = `// Generated from public.website_resources. Do not edit by hand.
+const routeModule = `// Generated from public.website_resources_public. Do not edit by hand.
 // scripts/generate-resource-content.mjs refreshes this file before production builds.
 
 export const generatedResourceRoutes = ${JSON.stringify(routeRows, null, 2)};\n`;

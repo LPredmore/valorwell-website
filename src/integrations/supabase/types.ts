@@ -646,6 +646,556 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_operations_video_clips: {
+        Row: {
+          analysis_notes: string | null
+          clip_index: number
+          clip_type: string
+          cover_image_file_id: string | null
+          cover_image_url: string | null
+          created_at: string
+          drive_file_id: string | null
+          drive_file_url: string | null
+          duration_seconds: number | null
+          end_seconds: number
+          end_timestamp: string
+          error_message: string | null
+          facebook_description: string | null
+          file_path: string | null
+          first_sentence: string
+          hashtags: string[] | null
+          id: string
+          last_sentence: string
+          length_type: string | null
+          linkedin_description: string | null
+          name: string | null
+          output_mime_type: string
+          output_size_bytes: number | null
+          parent_video: string
+          part_number: number | null
+          playlist: string | null
+          project_id: string
+          rendered_at: string | null
+          script: string | null
+          start_seconds: number
+          start_timestamp: string
+          status: string
+          storage_bucket: string | null
+          storage_path: string | null
+          tiktok_description: string | null
+          topic: string | null
+          transcript_text: string | null
+          updated_at: string
+          uploaded_at: string | null
+          working_title: string | null
+          youtube_description: string | null
+          youtube_playlist_ids: string[]
+          youtube_playlist_names: string[]
+          youtube_title: string | null
+          youtube_url: string | null
+          youtube_video_id: string | null
+        }
+        Insert: {
+          analysis_notes?: string | null
+          clip_index: number
+          clip_type: string
+          cover_image_file_id?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          drive_file_id?: string | null
+          drive_file_url?: string | null
+          duration_seconds?: number | null
+          end_seconds: number
+          end_timestamp: string
+          error_message?: string | null
+          facebook_description?: string | null
+          file_path?: string | null
+          first_sentence: string
+          hashtags?: string[] | null
+          id?: string
+          last_sentence: string
+          length_type?: string | null
+          linkedin_description?: string | null
+          name?: string | null
+          output_mime_type?: string
+          output_size_bytes?: number | null
+          parent_video: string
+          part_number?: number | null
+          playlist?: string | null
+          project_id: string
+          rendered_at?: string | null
+          script?: string | null
+          start_seconds: number
+          start_timestamp: string
+          status?: string
+          storage_bucket?: string | null
+          storage_path?: string | null
+          tiktok_description?: string | null
+          topic?: string | null
+          transcript_text?: string | null
+          updated_at?: string
+          uploaded_at?: string | null
+          working_title?: string | null
+          youtube_description?: string | null
+          youtube_playlist_ids?: string[]
+          youtube_playlist_names?: string[]
+          youtube_title?: string | null
+          youtube_url?: string | null
+          youtube_video_id?: string | null
+        }
+        Update: {
+          analysis_notes?: string | null
+          clip_index?: number
+          clip_type?: string
+          cover_image_file_id?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          drive_file_id?: string | null
+          drive_file_url?: string | null
+          duration_seconds?: number | null
+          end_seconds?: number
+          end_timestamp?: string
+          error_message?: string | null
+          facebook_description?: string | null
+          file_path?: string | null
+          first_sentence?: string
+          hashtags?: string[] | null
+          id?: string
+          last_sentence?: string
+          length_type?: string | null
+          linkedin_description?: string | null
+          name?: string | null
+          output_mime_type?: string
+          output_size_bytes?: number | null
+          parent_video?: string
+          part_number?: number | null
+          playlist?: string | null
+          project_id?: string
+          rendered_at?: string | null
+          script?: string | null
+          start_seconds?: number
+          start_timestamp?: string
+          status?: string
+          storage_bucket?: string | null
+          storage_path?: string | null
+          tiktok_description?: string | null
+          topic?: string | null
+          transcript_text?: string | null
+          updated_at?: string
+          uploaded_at?: string | null
+          working_title?: string | null
+          youtube_description?: string | null
+          youtube_playlist_ids?: string[]
+          youtube_playlist_names?: string[]
+          youtube_title?: string | null
+          youtube_url?: string | null
+          youtube_video_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_operations_video_clips_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "ai_operations_video_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_operations_video_jobs: {
+        Row: {
+          attempts: number
+          claimed_at: string | null
+          claimed_by: string | null
+          clip_id: string | null
+          completed_at: string | null
+          created_at: string
+          error_message: string | null
+          id: number
+          job_type: string
+          payload: Json
+          project_id: string
+          started_at: string | null
+          status: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          claimed_at?: string | null
+          claimed_by?: string | null
+          clip_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: number
+          job_type: string
+          payload?: Json
+          project_id: string
+          started_at?: string | null
+          status?: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          claimed_at?: string | null
+          claimed_by?: string | null
+          clip_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: number
+          job_type?: string
+          payload?: Json
+          project_id?: string
+          started_at?: string | null
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_operations_video_jobs_clip_id_fkey"
+            columns: ["clip_id"]
+            isOneToOne: false
+            referencedRelation: "ai_operations_video_clips"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_operations_video_jobs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "ai_operations_video_projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_operations_video_jobs_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_operations_video_oauth_events: {
+        Row: {
+          connection_type: string
+          created_at: string
+          id: number
+          message: string | null
+          status: string
+        }
+        Insert: {
+          connection_type: string
+          created_at?: string
+          id?: never
+          message?: string | null
+          status: string
+        }
+        Update: {
+          connection_type?: string
+          created_at?: string
+          id?: never
+          message?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
+      ai_operations_video_projects: {
+        Row: {
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          last_processed_at: string | null
+          metadata: Json
+          processing_error: string | null
+          source_file_id: string
+          source_file_name: string
+          source_file_path: string | null
+          source_folder_id: string | null
+          source_mime_type: string | null
+          source_modified_time: string | null
+          source_provider: string
+          source_size_bytes: number | null
+          source_web_url: string | null
+          status: string
+          tenant_id: string
+          transcript_completed_at: string | null
+          transcript_engine: string | null
+          transcript_error: string | null
+          transcript_language: string | null
+          transcript_model: string | null
+          transcript_source: string | null
+          transcript_text: string | null
+          transcript_word_count: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          last_processed_at?: string | null
+          metadata?: Json
+          processing_error?: string | null
+          source_file_id: string
+          source_file_name: string
+          source_file_path?: string | null
+          source_folder_id?: string | null
+          source_mime_type?: string | null
+          source_modified_time?: string | null
+          source_provider?: string
+          source_size_bytes?: number | null
+          source_web_url?: string | null
+          status?: string
+          tenant_id: string
+          transcript_completed_at?: string | null
+          transcript_engine?: string | null
+          transcript_error?: string | null
+          transcript_language?: string | null
+          transcript_model?: string | null
+          transcript_source?: string | null
+          transcript_text?: string | null
+          transcript_word_count?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          last_processed_at?: string | null
+          metadata?: Json
+          processing_error?: string | null
+          source_file_id?: string
+          source_file_name?: string
+          source_file_path?: string | null
+          source_folder_id?: string | null
+          source_mime_type?: string | null
+          source_modified_time?: string | null
+          source_provider?: string
+          source_size_bytes?: number | null
+          source_web_url?: string | null
+          status?: string
+          tenant_id?: string
+          transcript_completed_at?: string | null
+          transcript_engine?: string | null
+          transcript_error?: string | null
+          transcript_language?: string | null
+          transcript_model?: string | null
+          transcript_source?: string | null
+          transcript_text?: string | null
+          transcript_word_count?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_operations_video_projects_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_operations_video_settings: {
+        Row: {
+          cover_image_folder_id: string | null
+          cover_image_folder_url: string | null
+          created_at: string
+          default_min_clip_seconds: number
+          default_target_max_clip_seconds: number
+          drive_account_label: string | null
+          drive_folder_id: string | null
+          drive_folder_url: string | null
+          long_clip_folder_id: string | null
+          long_clip_folder_url: string | null
+          output_provider: string
+          output_storage_bucket: string | null
+          require_review_before_render: boolean
+          require_review_before_youtube_upload: boolean
+          short_clip_folder_id: string | null
+          short_clip_folder_url: string | null
+          short_clip_threshold_seconds: number
+          source_poll_interval_seconds: number
+          source_provider: string
+          tenant_id: string
+          transcription_engine: string
+          transcription_model: string
+          updated_at: string
+        }
+        Insert: {
+          cover_image_folder_id?: string | null
+          cover_image_folder_url?: string | null
+          created_at?: string
+          default_min_clip_seconds?: number
+          default_target_max_clip_seconds?: number
+          drive_account_label?: string | null
+          drive_folder_id?: string | null
+          drive_folder_url?: string | null
+          long_clip_folder_id?: string | null
+          long_clip_folder_url?: string | null
+          output_provider?: string
+          output_storage_bucket?: string | null
+          require_review_before_render?: boolean
+          require_review_before_youtube_upload?: boolean
+          short_clip_folder_id?: string | null
+          short_clip_folder_url?: string | null
+          short_clip_threshold_seconds?: number
+          source_poll_interval_seconds?: number
+          source_provider?: string
+          tenant_id: string
+          transcription_engine?: string
+          transcription_model?: string
+          updated_at?: string
+        }
+        Update: {
+          cover_image_folder_id?: string | null
+          cover_image_folder_url?: string | null
+          created_at?: string
+          default_min_clip_seconds?: number
+          default_target_max_clip_seconds?: number
+          drive_account_label?: string | null
+          drive_folder_id?: string | null
+          drive_folder_url?: string | null
+          long_clip_folder_id?: string | null
+          long_clip_folder_url?: string | null
+          output_provider?: string
+          output_storage_bucket?: string | null
+          require_review_before_render?: boolean
+          require_review_before_youtube_upload?: boolean
+          short_clip_folder_id?: string | null
+          short_clip_folder_url?: string | null
+          short_clip_threshold_seconds?: number
+          source_poll_interval_seconds?: number
+          source_provider?: string
+          tenant_id?: string
+          transcription_engine?: string
+          transcription_model?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_operations_video_settings_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: true
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_operations_video_transcript_segments: {
+        Row: {
+          created_at: string
+          end_seconds: number
+          id: number
+          project_id: string
+          segment_index: number
+          speaker_label: string | null
+          start_seconds: number
+          text: string
+          words: Json
+        }
+        Insert: {
+          created_at?: string
+          end_seconds: number
+          id?: number
+          project_id: string
+          segment_index: number
+          speaker_label?: string | null
+          start_seconds: number
+          text: string
+          words?: Json
+        }
+        Update: {
+          created_at?: string
+          end_seconds?: number
+          id?: number
+          project_id?: string
+          segment_index?: number
+          speaker_label?: string | null
+          start_seconds?: number
+          text?: string
+          words?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_operations_video_transcript_segments_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "ai_operations_video_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_operations_video_worker_heartbeats: {
+        Row: {
+          created_at: string
+          current_job_id: number | null
+          current_project_id: string | null
+          hostname: string | null
+          last_error: string | null
+          last_scan_at: string | null
+          last_seen_at: string
+          metadata: Json
+          status: string
+          tenant_id: string
+          updated_at: string
+          worker_id: string
+          worker_version: string | null
+        }
+        Insert: {
+          created_at?: string
+          current_job_id?: number | null
+          current_project_id?: string | null
+          hostname?: string | null
+          last_error?: string | null
+          last_scan_at?: string | null
+          last_seen_at?: string
+          metadata?: Json
+          status?: string
+          tenant_id: string
+          updated_at?: string
+          worker_id: string
+          worker_version?: string | null
+        }
+        Update: {
+          created_at?: string
+          current_job_id?: number | null
+          current_project_id?: string | null
+          hostname?: string | null
+          last_error?: string | null
+          last_scan_at?: string | null
+          last_seen_at?: string
+          metadata?: Json
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          worker_id?: string
+          worker_version?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_operations_video_worker_heartbeats_current_job_id_fkey"
+            columns: ["current_job_id"]
+            isOneToOne: false
+            referencedRelation: "ai_operations_video_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_operations_video_worker_heartbeats_current_project_id_fkey"
+            columns: ["current_project_id"]
+            isOneToOne: false
+            referencedRelation: "ai_operations_video_projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_operations_video_worker_heartbeats_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_operations_weekly_reviews: {
         Row: {
           created_at: string
@@ -3014,6 +3564,115 @@ export type Database = {
           workers_comp?: string | null
         }
         Relationships: []
+      }
+      claim_realtime_status_checks: {
+        Row: {
+          checkpoint_key: string
+          claim_id: string
+          clearinghouse: string
+          clearinghouse_claim_number: string | null
+          completed_at: string | null
+          created_at: string
+          entity_code: string | null
+          external_started_at: string | null
+          http_status: number | null
+          id: string
+          informational_amount_paid: number | null
+          informational_check_date: string | null
+          last_error: string | null
+          match_count: number | null
+          payer_claim_number: string | null
+          request_mode: string
+          response_sha256: string | null
+          sanitized_result: Json
+          semantic_class: string | null
+          state: string
+          status_category_code: string | null
+          status_code: string | null
+          stedi_check_id: string | null
+          submission_attempt_id: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          checkpoint_key: string
+          claim_id: string
+          clearinghouse?: string
+          clearinghouse_claim_number?: string | null
+          completed_at?: string | null
+          created_at?: string
+          entity_code?: string | null
+          external_started_at?: string | null
+          http_status?: number | null
+          id?: string
+          informational_amount_paid?: number | null
+          informational_check_date?: string | null
+          last_error?: string | null
+          match_count?: number | null
+          payer_claim_number?: string | null
+          request_mode: string
+          response_sha256?: string | null
+          sanitized_result?: Json
+          semantic_class?: string | null
+          state?: string
+          status_category_code?: string | null
+          status_code?: string | null
+          stedi_check_id?: string | null
+          submission_attempt_id: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          checkpoint_key?: string
+          claim_id?: string
+          clearinghouse?: string
+          clearinghouse_claim_number?: string | null
+          completed_at?: string | null
+          created_at?: string
+          entity_code?: string | null
+          external_started_at?: string | null
+          http_status?: number | null
+          id?: string
+          informational_amount_paid?: number | null
+          informational_check_date?: string | null
+          last_error?: string | null
+          match_count?: number | null
+          payer_claim_number?: string | null
+          request_mode?: string
+          response_sha256?: string | null
+          sanitized_result?: Json
+          semantic_class?: string | null
+          state?: string
+          status_category_code?: string | null
+          status_code?: string | null
+          stedi_check_id?: string | null
+          submission_attempt_id?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_realtime_status_checks_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_realtime_status_checks_submission_attempt_id_fkey"
+            columns: ["submission_attempt_id"]
+            isOneToOne: false
+            referencedRelation: "claim_submission_attempts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_realtime_status_checks_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       claim_resubmission_repair_audit: {
         Row: {
@@ -25865,6 +26524,10 @@ export type Database = {
           wbraid: string
         }[]
       }
+      claim_has_valid_acceptance_evidence_v1: {
+        Args: { p_claim_id: string }
+        Returns: boolean
+      }
       claim_is_externally_submitted_v1: {
         Args: { p_claim_id: string }
         Returns: boolean
@@ -27205,6 +27868,31 @@ export type Database = {
         }
         Returns: Json
       }
+      finalize_stedi_realtime_status_check_v1: {
+        Args: {
+          p_check_id: string
+          p_clearinghouse_claim_number?: string
+          p_entity_code?: string
+          p_error?: string
+          p_http_status?: number
+          p_informational_amount_paid?: number
+          p_informational_check_date?: string
+          p_match_count?: number
+          p_payer_claim_number?: string
+          p_response_sha256?: string
+          p_sanitized_result?: Json
+          p_semantic_class?: string
+          p_state: string
+          p_status_category_code?: string
+          p_status_code?: string
+          p_stedi_check_id?: string
+        }
+        Returns: {
+          canonical_after: string
+          canonical_before: string
+          canonical_changed: boolean
+        }[]
+      }
       finalize_stedi_submission_attempt_v2: {
         Args: {
           p_attempt_id: string
@@ -27939,6 +28627,23 @@ export type Database = {
           total_charge: number
         }[]
       }
+      get_stedi_realtime_status_candidates_v1: {
+        Args: { p_claim_ids?: string[]; p_limit?: number; p_manual?: boolean }
+        Returns: {
+          checkpoint_key: string
+          claim_id: string
+          claim_number: string
+          claim_status: string
+          external_claim_id: string
+          external_submission_id: string
+          lifecycle_last_synced_at: string
+          request_mode: string
+          submission_attempt_id: string
+          submitted_at: string
+          tenant_id: string
+          total_charge: number
+        }[]
+      }
       get_stedi_submission_candidates_v1: {
         Args: never
         Returns: {
@@ -28082,6 +28787,13 @@ export type Database = {
           p_next_sync_at?: string
         }
         Returns: undefined
+      }
+      mark_stedi_realtime_status_started_v1: {
+        Args: { p_check_id: string }
+        Returns: {
+          reason: string
+          started: boolean
+        }[]
       }
       mark_stedi_submission_started_v1: {
         Args: { p_request_id: string }
@@ -28577,6 +29289,10 @@ export type Database = {
         }
         Returns: Json
       }
+      release_stedi_realtime_status_check_v1: {
+        Args: { p_check_id: string; p_error: string }
+        Returns: undefined
+      }
       release_stedi_submission_request_v1: {
         Args: {
           p_evidence?: Json
@@ -28664,6 +29380,19 @@ export type Database = {
           p_total_payment_amount: number
         }
         Returns: Json
+      }
+      reserve_stedi_realtime_status_check_v1: {
+        Args: {
+          p_checkpoint_key: string
+          p_claim_id: string
+          p_request_mode: string
+          p_submission_attempt_id: string
+        }
+        Returns: {
+          check_id: string
+          reason: string
+          reserved: boolean
+        }[]
       }
       reserve_stedi_submission_attempt_v1: {
         Args: {

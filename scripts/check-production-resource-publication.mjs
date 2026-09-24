@@ -155,19 +155,20 @@ if (new Set(publishedPaths).size !== publishedPaths.length) {
   throw new Error("Published database rows contain duplicate public routes.");
 }
 
-await mapWithConcurrency(published, 10, (row) => verifyPublished(row, sitemap));
-await mapWithConcurrency(drafts, 10, (row) => verifyDraft(row, sitemap));
-
 const unknownPath = "/resources/champva/this-resource-does-not-exist";
 const unknownResponse = await fetch(`${SITE_URL}${unknownPath}`, {
   redirect: "manual",
   headers: { "user-agent": "ValorWellProductionResourceVerifier/1.0" },
 });
 if (unknownResponse.status !== 404) {
+  const sample = (await unknownResponse.text()).slice(0, 300).replaceAll("\n", " ");
   throw new Error(
-    `${unknownPath}: unknown route expected HTTP 404, received ${unknownResponse.status}.`,
+    `${unknownPath}: unknown route expected HTTP 404, received ${unknownResponse.status}; body sample: ${sample}`,
   );
 }
+
+await mapWithConcurrency(published, 5, (row) => verifyPublished(row, sitemap));
+await mapWithConcurrency(drafts, 5, (row) => verifyDraft(row, sitemap));
 
 console.log(
   `Production resource verification passed: ${published.length} published resources return HTTP 200 with canonical/indexable HTML and sitemap coverage; ${drafts.length} drafts and the unknown control route return HTTP 404.`,

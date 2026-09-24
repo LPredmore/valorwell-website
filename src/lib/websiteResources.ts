@@ -20,20 +20,14 @@ export type WebsiteResource = {
   faq: WebsiteResourceFaq[];
   audience_tags: string[];
   topic_aliases: string[];
-  /** Internal research tracking only. Never rendered publicly. */
-  source_urls: string[];
-  coverage_status: "partial" | "complete" | "needs_review";
   status: "published";
-  live_url: string | null;
-  /** Internal research tracking only. Never rendered publicly. */
-  last_researched_at: string | null;
   published_at: string | null;
   resource_kind: WebsiteResourceKind;
   category_slug: string | null;
 };
 
 const RESOURCE_COLUMNS =
-  "slug,title,primary_question,summary,body_markdown,faq,audience_tags,topic_aliases,source_urls,coverage_status,status,live_url,last_researched_at,published_at,resource_kind,category_slug";
+  "slug,title,primary_question,summary,body_markdown,faq,audience_tags,topic_aliases,status,published_at,resource_kind,category_slug";
 
 function normalizeFaq(value: unknown): WebsiteResourceFaq[] {
   if (!Array.isArray(value)) return [];
@@ -79,13 +73,7 @@ function normalizeResource(row: Record<string, unknown>): WebsiteResource | null
     faq: normalizeFaq(row.faq),
     audience_tags: normalizeStringArray(row.audience_tags),
     topic_aliases: normalizeStringArray(row.topic_aliases),
-    source_urls: normalizeStringArray(row.source_urls),
-    coverage_status:
-      (row.coverage_status as WebsiteResource["coverage_status"]) ?? "needs_review",
     status: "published",
-    live_url: typeof row.live_url === "string" ? row.live_url : null,
-    last_researched_at:
-      typeof row.last_researched_at === "string" ? row.last_researched_at : null,
     published_at: typeof row.published_at === "string" ? row.published_at : null,
     resource_kind: kind,
     category_slug: typeof row.category_slug === "string" ? row.category_slug : null,
@@ -104,7 +92,7 @@ const prerenderSnapshot: WebsiteResource[] = (
 
 function baseQuery() {
   return billingHubSupabase
-    .from("website_resources")
+    .from("website_resources_public")
     .select(RESOURCE_COLUMNS)
     .eq("tenant_id", WEBSITE_RESOURCE_TENANT_ID)
     .eq("status", "published");

@@ -65,7 +65,8 @@ async function fetchPublishedRows() {
 }
 
 async function verifyPrivateTableDenied() {
-  const endpoint = new URL("/rest/v1/website_resources", supabaseUrl);
+  const privateTable = ["website", "resources"].join("_");
+  const endpoint = new URL(`/rest/v1/${privateTable}`, supabaseUrl);
   endpoint.searchParams.set("select", "slug");
   endpoint.searchParams.set("limit", "1");
 

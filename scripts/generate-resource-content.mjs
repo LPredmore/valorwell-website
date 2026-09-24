@@ -54,7 +54,7 @@ if (!response.ok) {
 
 const rows = await response.json();
 if (!Array.isArray(rows)) {
-  throw new Error("Billing Hub returned an invalid website_resources payload.");
+  throw new Error("Billing Hub returned an invalid website_resources_public payload.");
 }
 
 function requireString(row, field) {

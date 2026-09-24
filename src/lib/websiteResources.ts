@@ -62,7 +62,8 @@ function normalizeResource(row: Record<string, unknown>): WebsiteResource | null
   if (typeof row.slug !== "string" || !row.slug.trim()) return null;
   if (typeof row.title !== "string" || !row.title.trim()) return null;
 
-  const kind = row.resource_kind === "article" ? "article" : "category";
+  if (row.resource_kind !== "article" && row.resource_kind !== "category") return null;
+  const kind: WebsiteResourceKind = row.resource_kind;
 
   return {
     slug: row.slug,

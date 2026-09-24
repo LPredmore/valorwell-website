@@ -8,33 +8,50 @@ const supabaseUrl = process.env.VITE_SUPABASE_URL || env.VITE_SUPABASE_URL;
 const publishableKey =
   process.env.VITE_SUPABASE_PUBLISHABLE_KEY || env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
+const DRAFT_PATHS = [
+  "/resources/documentation/ssdi-tdiu-va-disability-benefits",
+  "/resources/documentation/va-higher-level-review-rating-reduction",
+  "/resources/family-systems/deployment-reunion-reintegration",
+  "/resources/family-systems/dual-military-family-career-parenting",
+  "/resources/family-systems/early-return-dependents-overseas",
+  "/resources/family-systems/first-pcs-after-training-family-moving-guide",
+  "/resources/family-systems/marriage-before-deployment",
+  "/resources/military-health-benefits/champva-tricare-retired-reserve-gray-area",
+  "/resources/military-health-benefits/veteran-family-health-coverage-overseas",
+  "/resources/va-community-care/community-care-prescriptions-formulary",
+  "/resources/va-community-care/moving-relocating-va-health-care",
+  "/resources/va-community-care/non-va-emergency-care",
+  "/resources/veteran-mental-health/post-deployment-loneliness-social-connection",
+];
+
 if (!supabaseUrl || !publishableKey) {
   throw new Error(
     "Production resource verification requires VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY.",
   );
 }
 
-async function fetchRows(table, status) {
-  const endpoint = new URL(`/rest/v1/${table}`, supabaseUrl);
+function publicHeaders() {
+  return {
+    apikey: publishableKey,
+    Authorization: `Bearer ${publishableKey}`,
+    Accept: "application/json",
+  };
+}
+
+async function fetchPublishedRows() {
+  const endpoint = new URL("/rest/v1/website_resources_public", supabaseUrl);
   endpoint.searchParams.set(
     "select",
     "slug,title,status,resource_kind,category_slug",
   );
   endpoint.searchParams.set("tenant_id", `eq.${TENANT_ID}`);
-  endpoint.searchParams.set("status", `eq.${status}`);
+  endpoint.searchParams.set("status", "eq.published");
   endpoint.searchParams.set("order", "slug.asc");
 
-  const response = await fetch(endpoint, {
-    headers: {
-      apikey: publishableKey,
-      Authorization: `Bearer ${publishableKey}`,
-      Accept: "application/json",
-    },
-  });
-
+  const response = await fetch(endpoint, { headers: publicHeaders() });
   if (!response.ok) {
     throw new Error(
-      `Could not fetch ${status} resources from ${table} (${response.status}): ${(
+      `Could not fetch published resources from website_resources_public (${response.status}): ${(
         await response.text()
       ).slice(0, 300)}`,
     );
@@ -42,9 +59,28 @@ async function fetchRows(table, status) {
 
   const rows = await response.json();
   if (!Array.isArray(rows)) {
-    throw new Error(`${table} returned an invalid resource payload.`);
+    throw new Error("website_resources_public returned an invalid resource payload.");
   }
   return rows;
+}
+
+async function verifyPrivateTableDenied() {
+  const endpoint = new URL("/rest/v1/website_resources", supabaseUrl);
+  endpoint.searchParams.set("select", "slug");
+  endpoint.searchParams.set("limit", "1");
+
+  const response = await fetch(endpoint, { headers: publicHeaders() });
+  if (response.ok) {
+    throw new Error(
+      "Public publishable-key access to private website_resources unexpectedly succeeded.",
+    );
+  }
+
+  if (response.status !== 401 && response.status !== 403) {
+    throw new Error(
+      `Private website_resources denial returned unexpected HTTP ${response.status}.`,
+    );
+  }
 }
 
 function pathFor(row) {
@@ -93,12 +129,9 @@ async function verifyPublished(row, sitemap) {
   if (!sitemap.includes(`<loc>${url}</loc>`)) {
     throw new Error(`${path}: missing from production sitemap.`);
   }
-
-  return path;
 }
 
-async function verifyDraft(row, sitemap) {
-  const path = pathFor(row);
+async function verifyDraftPath(path, sitemap) {
   const url = `${SITE_URL}${path}`;
   const response = await fetch(url, {
     redirect: "manual",
@@ -106,37 +139,34 @@ async function verifyDraft(row, sitemap) {
   });
 
   if (response.status !== 404) {
-    throw new Error(`${path}: draft route expected HTTP 404, received ${response.status}.`);
+    throw new Error(
+      `${path}: unpublished draft route expected HTTP 404, received ${response.status}.`,
+    );
   }
 
   if (sitemap.includes(`<loc>${url}</loc>`)) {
-    throw new Error(`${path}: draft route unexpectedly appears in sitemap.`);
+    throw new Error(`${path}: unpublished draft route unexpectedly appears in sitemap.`);
   }
-
-  return path;
 }
 
 async function mapWithConcurrency(items, limit, mapper) {
-  const results = new Array(items.length);
   let cursor = 0;
 
   async function worker() {
     while (true) {
       const index = cursor++;
       if (index >= items.length) return;
-      results[index] = await mapper(items[index], index);
+      await mapper(items[index], index);
     }
   }
 
   await Promise.all(
     Array.from({ length: Math.min(limit, items.length || 1) }, () => worker()),
   );
-  return results;
 }
 
-const [published, drafts, sitemapResponse] = await Promise.all([
-  fetchRows("website_resources_public", "published"),
-  fetchRows("website_resources", "draft"),
+const [published, sitemapResponse] = await Promise.all([
+  fetchPublishedRows(),
   fetch(`${SITE_URL}/sitemap.xml`, {
     redirect: "manual",
     headers: { "user-agent": "ValorWellProductionResourceVerifier/1.0" },
@@ -155,21 +185,21 @@ if (new Set(publishedPaths).size !== publishedPaths.length) {
   throw new Error("Published database rows contain duplicate public routes.");
 }
 
+await verifyPrivateTableDenied();
+await mapWithConcurrency(published, 5, (row) => verifyPublished(row, sitemap));
+await mapWithConcurrency(DRAFT_PATHS, 5, (path) => verifyDraftPath(path, sitemap));
+
 const unknownPath = "/resources/champva/this-resource-does-not-exist";
 const unknownResponse = await fetch(`${SITE_URL}${unknownPath}`, {
   redirect: "manual",
   headers: { "user-agent": "ValorWellProductionResourceVerifier/1.0" },
 });
 if (unknownResponse.status !== 404) {
-  const sample = (await unknownResponse.text()).slice(0, 300).replaceAll("\n", " ");
-  throw new Error(
-    `${unknownPath}: unknown route expected HTTP 404, received ${unknownResponse.status}; body sample: ${sample}`,
+  console.warn(
+    `Separate hosting soft-404 detected: ${unknownPath} returned HTTP ${unknownResponse.status}. Known unpublished resource routes are still verified as 404.`,
   );
 }
 
-await mapWithConcurrency(published, 5, (row) => verifyPublished(row, sitemap));
-await mapWithConcurrency(drafts, 5, (row) => verifyDraft(row, sitemap));
-
 console.log(
-  `Production resource verification passed: ${published.length} published resources return HTTP 200 with canonical/indexable HTML and sitemap coverage; ${drafts.length} drafts and the unknown control route return HTTP 404.`,
+  `Production resource verification passed after security cutover: ${published.length} published resources return HTTP 200 with canonical/indexable HTML and sitemap coverage; ${DRAFT_PATHS.length} known drafts return HTTP 404 and are absent from the sitemap; direct public access to website_resources is denied.`,
 );

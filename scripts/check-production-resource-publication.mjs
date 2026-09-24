@@ -75,15 +75,18 @@ async function verifyPublished(row, sitemap) {
     throw new Error(`${path}: missing exact canonical URL ${url}.`);
   }
 
-  if (!/<title>[^<]+<\\/title>/i.test(html)) {
+  const lowerHtml = html.toLowerCase();
+  const titleStart = lowerHtml.indexOf("<title>");
+  const titleEnd = lowerHtml.indexOf("</title>", titleStart + 7);
+  if (titleStart < 0 || titleEnd <= titleStart + 7) {
     throw new Error(`${path}: missing non-empty <title>.`);
   }
 
-  if (!/<h1\\b/i.test(html)) {
+  if (!lowerHtml.includes("<h1")) {
     throw new Error(`${path}: missing rendered H1.`);
   }
 
-  if (/name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(html)) {
+  if (lowerHtml.includes("noindex")) {
     throw new Error(`${path}: unexpectedly marked noindex.`);
   }
 

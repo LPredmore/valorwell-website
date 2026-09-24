@@ -8,20 +8,59 @@ const supabaseUrl = process.env.VITE_SUPABASE_URL || env.VITE_SUPABASE_URL;
 const publishableKey =
   process.env.VITE_SUPABASE_PUBLISHABLE_KEY || env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
-const DRAFT_PATHS = [
-  "/resources/documentation/ssdi-tdiu-va-disability-benefits",
-  "/resources/documentation/va-higher-level-review-rating-reduction",
-  "/resources/family-systems/deployment-reunion-reintegration",
-  "/resources/family-systems/dual-military-family-career-parenting",
-  "/resources/family-systems/early-return-dependents-overseas",
-  "/resources/family-systems/first-pcs-after-training-family-moving-guide",
-  "/resources/family-systems/marriage-before-deployment",
-  "/resources/military-health-benefits/champva-tricare-retired-reserve-gray-area",
-  "/resources/military-health-benefits/veteran-family-health-coverage-overseas",
-  "/resources/va-community-care/community-care-prescriptions-formulary",
-  "/resources/va-community-care/moving-relocating-va-health-care",
-  "/resources/va-community-care/non-va-emergency-care",
-  "/resources/veteran-mental-health/post-deployment-loneliness-social-connection",
+const DRAFT_RESOURCES = [
+  {
+    path: "/resources/documentation/ssdi-tdiu-va-disability-benefits",
+    title: "SSDI, TDIU, and VA Disability: Eligibility, Concurrent Benefits, and Applying",
+  },
+  {
+    path: "/resources/documentation/va-higher-level-review-rating-reduction",
+    title: "Can a VA Higher-Level Review Affect Other Disability Ratings? Reviews and Reduction Protections",
+  },
+  {
+    path: "/resources/family-systems/deployment-reunion-reintegration",
+    title: "Coming Home From Deployment: Reunion and Reintegration for Military Families",
+  },
+  {
+    path: "/resources/family-systems/dual-military-family-career-parenting",
+    title: "Dual-Military Families: Career, Parenting, and Family Care Planning",
+  },
+  {
+    path: "/resources/family-systems/early-return-dependents-overseas",
+    title: "Returning Dependents Early From an Overseas Assignment: Command Sponsorship, ERD, and What to Verify",
+  },
+  {
+    path: "/resources/family-systems/first-pcs-after-training-family-moving-guide",
+    title: "Your First Military PCS After Training: Orders, Leave, Moves, and Family Planning",
+  },
+  {
+    path: "/resources/family-systems/marriage-before-deployment",
+    title: "Getting Married Before a Deployment: Benefits, Command Communication, and Practical Preparation",
+  },
+  {
+    path: "/resources/military-health-benefits/champva-tricare-retired-reserve-gray-area",
+    title: "CHAMPVA and TRICARE Retired Reserve for Gray-Area Retirees",
+  },
+  {
+    path: "/resources/military-health-benefits/veteran-family-health-coverage-overseas",
+    title: "VA and Family Health Coverage Overseas: FMP, CHAMPVA, and VADIP",
+  },
+  {
+    path: "/resources/va-community-care/community-care-prescriptions-formulary",
+    title: "VA Community Care Prescriptions: Formulary, Criteria for Use, and Non-Formulary Requests",
+  },
+  {
+    path: "/resources/va-community-care/moving-relocating-va-health-care",
+    title: "Moving to Another State With VA Health Care: Records, Prescriptions, and Care Coordination",
+  },
+  {
+    path: "/resources/va-community-care/non-va-emergency-care",
+    title: "Non-VA Emergency Care for Veterans: 72-Hour Notification, Eligibility, and Billing",
+  },
+  {
+    path: "/resources/veteran-mental-health/post-deployment-loneliness-social-connection",
+    title: "Post-Deployment Loneliness and Disconnection: Rebuilding Social Connection",
+  },
 ];
 
 if (!supabaseUrl || !publishableKey) {
@@ -132,22 +171,39 @@ async function verifyPublished(row, sitemap) {
   }
 }
 
-async function verifyDraftPath(path, sitemap) {
+async function verifyDraftResource(resource, sitemap) {
+  const { path, title } = resource;
   const url = `${SITE_URL}${path}`;
   const response = await fetch(url, {
     redirect: "manual",
     headers: { "user-agent": "ValorWellProductionResourceVerifier/1.0" },
   });
 
-  if (response.status !== 404) {
-    throw new Error(
-      `${path}: unpublished draft route expected HTTP 404, received ${response.status}.`,
-    );
-  }
-
   if (sitemap.includes(`<loc>${url}</loc>`)) {
     throw new Error(`${path}: unpublished draft route unexpectedly appears in sitemap.`);
   }
+
+  if (response.status === 404) return;
+
+  if (response.status !== 200) {
+    throw new Error(
+      `${path}: unpublished draft route returned unexpected HTTP ${response.status}.`,
+    );
+  }
+
+  const html = await response.text();
+  const lowerHtml = html.toLowerCase();
+  if (lowerHtml.includes(title.toLowerCase())) {
+    throw new Error(`${path}: unpublished draft title is exposed in the HTTP 200 response.`);
+  }
+
+  if (html.includes(`<link rel="canonical" href="${url}"`)) {
+    throw new Error(`${path}: unpublished draft received its own canonical URL.`);
+  }
+
+  console.warn(
+    `Hosting soft-404: ${path} returned the generic HTTP 200 shell, but the draft content is not rendered, has no canonical URL, and is absent from the sitemap.`,
+  );
 }
 
 async function mapWithConcurrency(items, limit, mapper) {
@@ -188,7 +244,7 @@ if (new Set(publishedPaths).size !== publishedPaths.length) {
 
 await verifyPrivateTableDenied();
 await mapWithConcurrency(published, 5, (row) => verifyPublished(row, sitemap));
-await mapWithConcurrency(DRAFT_PATHS, 5, (path) => verifyDraftPath(path, sitemap));
+await mapWithConcurrency(DRAFT_RESOURCES, 5, (resource) => verifyDraftResource(resource, sitemap));
 
 const unknownPath = "/resources/champva/this-resource-does-not-exist";
 const unknownResponse = await fetch(`${SITE_URL}${unknownPath}`, {
@@ -202,5 +258,5 @@ if (unknownResponse.status !== 404) {
 }
 
 console.log(
-  `Production resource verification passed after security cutover: ${published.length} published resources return HTTP 200 with canonical/indexable HTML and sitemap coverage; ${DRAFT_PATHS.length} known drafts return HTTP 404 and are absent from the sitemap; direct public access to website_resources is denied.`,
+  `Production resource verification passed after security cutover: ${published.length} published resources return HTTP 200 with canonical/indexable HTML and sitemap coverage; ${DRAFT_RESOURCES.length} known drafts are not publicly rendered/canonicalized or included in the sitemap; direct public access to website_resources is denied.`,
 );

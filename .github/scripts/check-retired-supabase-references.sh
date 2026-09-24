@@ -39,6 +39,18 @@ if git ls-files 'supabase/migrations/*' | grep -q .; then
   exit 1
 fi
 
+private_resource_references="$({
+  git grep -n -I -F '.from("website_resources")' -- src scripts 2>/dev/null || true
+  git grep -n -I -F ".from('website_resources')" -- src scripts 2>/dev/null || true
+  git grep -n -I -E '/rest/v1/website_resources([^_[:alnum:]]|$)' -- src scripts 2>/dev/null || true
+})"
+
+if [[ -n "$private_resource_references" ]]; then
+  echo "Public website code must read public.website_resources_public, not public.website_resources:" >&2
+  echo "$private_resource_references" >&2
+  exit 1
+fi
+
 retired_function_paths=(
   supabase/functions/create-mission-partner
   supabase/functions/send-welcome-email

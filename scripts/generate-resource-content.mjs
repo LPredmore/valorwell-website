@@ -15,7 +15,7 @@ if (!supabaseUrl || !publishableKey) {
   );
 }
 
-const endpoint = new URL("/rest/v1/website_resources", supabaseUrl);
+const endpoint = new URL("/rest/v1/website_resources_public", supabaseUrl);
 endpoint.searchParams.set(
   "select",
   [
@@ -27,11 +27,7 @@ endpoint.searchParams.set(
     "faq",
     "audience_tags",
     "topic_aliases",
-    "source_urls",
-    "coverage_status",
     "status",
-    "live_url",
-    "last_researched_at",
     "published_at",
     "resource_kind",
     "category_slug",
@@ -74,13 +70,13 @@ for (const row of rows) {
     "primary_question",
     "summary",
     "body_markdown",
-    "coverage_status",
     "status",
+    "published_at",
   ]) {
     requireString(row, field);
   }
 
-  for (const field of ["faq", "audience_tags", "topic_aliases", "source_urls"]) {
+  for (const field of ["faq", "audience_tags", "topic_aliases"]) {
     if (!Array.isArray(row[field])) {
       throw new Error(`Published resource ${row.slug} has invalid ${field}.`);
     }
@@ -92,20 +88,52 @@ for (const row of rows) {
 }
 
 for (const row of rows) {
-  const kind = row.resource_kind === "article" ? "article" : "category";
-  row.resource_kind = kind;
-  row.category_slug = typeof row.category_slug === "string" ? row.category_slug : null;
-  if (kind === "article" && !row.category_slug) {
+  if (row.resource_kind !== "article" && row.resource_kind !== "category") {
+    throw new Error(
+      `Published resource ${row.slug} has invalid resource_kind: ${String(row.resource_kind)}.`,
+    );
+  }
+
+  row.category_slug =
+    typeof row.category_slug === "string" && row.category_slug.trim()
+      ? row.category_slug.trim()
+      : null;
+
+  if (row.resource_kind === "article" && !row.category_slug) {
     throw new Error(`Published article ${row.slug} is missing category_slug.`);
+  }
+
+  if (row.resource_kind === "category" && row.category_slug !== null) {
+    throw new Error(`Published category ${row.slug} must not have category_slug.`);
   }
 }
 
-const uniqueSlugs = new Set(rows.map((row) => row.slug));
-if (uniqueSlugs.size !== rows.length) {
-  throw new Error("Published website resources contain duplicate slugs.");
+const publishedCategorySlugs = new Set(
+  rows.filter((row) => row.resource_kind === "category").map((row) => row.slug),
+);
+
+for (const row of rows) {
+  if (
+    row.resource_kind === "article" &&
+    !publishedCategorySlugs.has(row.category_slug)
+  ) {
+    throw new Error(
+      `Published article ${row.slug} references missing published category ${row.category_slug}.`,
+    );
+  }
 }
 
-const tsHeader = `// Generated from public.website_resources. Do not edit by hand.\n// scripts/generate-resource-content.mjs refreshes this file before production builds.\n\nexport type GeneratedWebsiteResource = {\n  slug: string;\n  title: string;\n  primary_question: string;\n  summary: string;\n  body_markdown: string;\n  faq: unknown[];\n  audience_tags: string[];\n  topic_aliases: string[];\n  source_urls: string[];\n  coverage_status: \"partial\" | \"complete\" | \"needs_review\";\n  status: \"published\";\n  live_url: string | null;\n  last_researched_at: string | null;\n  published_at: string | null;\n  resource_kind: "category" | "article";\n  category_slug: string | null;\n};\n\n`;
+const routePaths = rows.map((row) =>
+  row.resource_kind === "article"
+    ? `/resources/${row.category_slug}/${row.slug}`
+    : `/resources/${row.slug}`,
+);
+const uniqueRoutePaths = new Set(routePaths);
+if (uniqueRoutePaths.size !== routePaths.length) {
+  throw new Error("Published website resources contain duplicate public routes.");
+}
+
+const tsHeader = `// Generated from public.website_resources_public. Do not edit by hand.\n// scripts/generate-resource-content.mjs refreshes this file before production builds.\n\nexport type GeneratedWebsiteResource = {\n  slug: string;\n  title: string;\n  primary_question: string;\n  summary: string;\n  body_markdown: string;\n  faq: unknown[];\n  audience_tags: string[];\n  topic_aliases: string[];\n  source_urls: string[];\n  coverage_status: \"partial\" | \"complete\" | \"needs_review\";\n  status: \"published\";\n  live_url: string | null;\n  last_researched_at: string | null;\n  published_at: string | null;\n  resource_kind: "category" | "article";\n  category_slug: string | null;\n};\n\n`;
 
 const resourceModule = `${tsHeader}export const generatedWebsiteResources: GeneratedWebsiteResource[] = ${JSON.stringify(rows, null, 2)};\n`;
 const routeRows = rows.map((row) => ({
@@ -120,7 +148,7 @@ const routeRows = rows.map((row) => ({
   indexable: true,
   sitemap: true,
 }));
-const routeModule = `// Generated from public.website_resources. Do not edit by hand.\n// scripts/generate-resource-content.mjs refreshes this file before production builds.\n\nexport const generatedResourceRoutes = ${JSON.stringify(routeRows, null, 2)};\n`;
+const routeModule = `// Generated from public.website_resources_public. Do not edit by hand.\n// scripts/generate-resource-content.mjs refreshes this file before production builds.\n\nexport const generatedResourceRoutes = ${JSON.stringify(routeRows, null, 2)};\n`;
 
 const resourceOutput = path.join(ROOT, "src", "generated", "websiteResources.ts");
 const routeOutput = path.join(ROOT, "route-contract", "generated-resource-routes.mjs");
@@ -128,4 +156,4 @@ fs.mkdirSync(path.dirname(resourceOutput), { recursive: true });
 fs.writeFileSync(resourceOutput, resourceModule, "utf8");
 fs.writeFileSync(routeOutput, routeModule, "utf8");
 
-console.log(`Generated ${rows.length} published website resources from Billing Hub.`);
+console.log(`Generated ${rows.length} published website resources from Billing Hub public projection.`);

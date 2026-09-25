@@ -1,21 +1,22 @@
-# Editorial Resource Article Template
+# Findings: real HTTP 404 on Lovable hosting (no changes made)
 
-## Scope
-- Redesign only runtime resource article detail pages; keep shared authority and category pages unchanged.
-- Preserve live Billing Hub Supabase queries, routes, SEO/schema, related-resource selection, and hidden research metadata.
+## Answer
+No. On this project's current stack (React + Vite single-page app on Lovable hosting), a true server-level HTTP 404 for unknown page routes cannot be configured.
 
-## Implementation
-1. Replace the lossy article parser with safe Markdown rendering that preserves heading hierarchy, inline emphasis/links, nested lists, and document order while excluding internal source/review sections and lines.
-2. Build a dedicated article page with a linked breadcrumb hero, category and reading-time metadata, continuous paper reading surface, stable heading anchors, and responsive H2 table of contents.
-3. Present FAQs through the existing accessible accordion, related articles as compact recommendations, and the existing care/topic actions in a concise closing area.
-4. Add article-scoped print rules that remove site chrome, breadcrumbs, navigation, recommendations, and actions while producing a clean printable document.
-5. Expand runtime tests for nested headings, sequence preservation, emphasis, metadata suppression, table-of-contents links, and future runtime slugs.
+- Lovable hosting serves `index.html` (HTTP 200) for any path that is not a real file, so the React router can handle it.
+- Lovable hosting does not read platform config files: `_worker.js`, `wrangler.jsonc`, `_redirects`, `_headers`, `netlify.toml`, `vercel.json`. The generated `dist/_worker.js` allowlist and `public/404.html` are built but never executed or used as a status fallback.
+- Real 404s only occur for missing static files (e.g. a missing image/script), not page paths.
 
-## Technical Details
-- Add `react-markdown` with `remark-gfm`; raw HTML remains disabled.
-- Keep sanitization as a preprocessing step before rendering and before reading-time/TOC calculation.
-- Use semantic design tokens and article-scoped styles so non-resource authority pages retain their current appearance.
+## What is fixable client-side (already in place)
+- `NotFound` page renders for unknown routes and unknown/draft/mismatched resource slugs after loading.
+- `noindex` meta via SEO component, so Google treats these as soft 404s and does not index them.
+- Sitemap and canonicals list only real routes.
+These change what users and crawlers see, not the status code.
 
-## Verification
-- Run focused lint, TypeScript checking, resource tests, the full test suite, and the production build.
-- Inspect the Family Systems article at mobile and desktop widths, including horizontal overflow and print-media behavior.
+## What changes the actual HTTP status
+Requires server logic that decides the status per request. Options:
+1. Migrate to TanStack Start (Lovable-supported, "/" menu -> Migrate to TanStack Start). Server rendering can return 404 for unknown routes and for resources not published in Supabase. Stays on Lovable hosting.
+2. Move hosting to a platform that executes the existing Cloudflare Worker (e.g. your own Cloudflare Workers deployment using `wrangler.jsonc`). Note: the static allowlist would 404 new runtime-published resources until rebuilt unless the worker also checks Supabase. This conflicts with the current README rule to publish only via Lovable.
+
+## Recommendation
+If the soft-404 + noindex behavior is acceptable for SEO (it generally is), no change is needed. If true 404s are required, TanStack Start migration is the path that keeps Lovable hosting.

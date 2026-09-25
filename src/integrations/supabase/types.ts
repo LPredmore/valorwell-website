@@ -30992,6 +30992,10 @@ export type Database = {
         }
         Returns: string
       }
+      validate_cron_shared_secret: {
+        Args: { p_secret: string }
+        Returns: boolean
+      }
       validate_relationship_calendar_channel: {
         Args: {
           p_channel_id: string

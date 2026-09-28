@@ -29,6 +29,7 @@ import VeteransOutreachWisconsinPage from "./pages/bty/VeteransOutreachWisconsin
 import Vets2IndustryPage from "./pages/bty/Vets2IndustryPage";
 import MilitaryMissionsInActionPage from "./pages/bty/MilitaryMissionsInActionPage";
 import VeteransBreakfastClubPage from "./pages/bty/VeteransBreakfastClubPage";
+import AlwaysGiveBackPage from "./pages/bty/AlwaysGiveBackPage";
 import AmericanCorporatePartnersPage from "./pages/bty/AmericanCorporatePartnersPage";
 import AuthorityResources from "./pages/authority/Resources";
 import AuthorityFamilySystems from "./pages/authority/FamilySystems";
@@ -78,6 +79,7 @@ const routeElements: Record<string, ReactNode> = {
   "/vets2industry": <Vets2IndustryPage />,
   "/mmia": <MilitaryMissionsInActionPage />,
   "/veteransbreakfastclub": <VeteransBreakfastClubPage />,
+  "/alwaysgiveback": <AlwaysGiveBackPage />,
   "/privacy": <Privacy />,
   "/americancorporatepartners": (
     <div className="acp-page">

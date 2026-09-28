@@ -63,6 +63,15 @@ export const routes = [
     "sitemap": true
   },
   {
+    "path": "/alwaysgiveback",
+    "title": "Always Give Back | Beyond The Yellow | ValorWell",
+    "description": "Explore the Beyond The Yellow feature with Always Give Back on veteran technology access, custom PC builds, practical tech support, and community connection.",
+    "h1": "Always Give Back.",
+    "lead": "A Beyond The Yellow feature about using technology as a doorway to education, work, telehealth, digital independence, and veteran community.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
     "path": "/privacy",
     "title": "Privacy Policy | ValorWell",
     "description": "Read the ValorWell privacy policy and learn how information submitted through the public website is handled.",

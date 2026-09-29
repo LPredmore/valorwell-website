@@ -11,8 +11,8 @@ import {
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 
-const videoId = "7DG1cTpWIBM";
-const videoUrl = "https://www.youtube.com/watch?v=7DG1cTpWIBM";
+const videoId = "oT4TSM3Q82k";
+const videoUrl = "https://www.youtube.com/watch?v=oT4TSM3Q82k";
 const websiteUrl = "https://alwaysgiveback.org/";
 const programsUrl = "https://alwaysgiveback.org/programs";
 const impactUrl = "https://alwaysgiveback.org/impact";
@@ -93,7 +93,7 @@ export default function AlwaysGiveBackPage() {
                   <iframe
                     className="h-full w-full"
                     src={`https://www.youtube-nocookie.com/embed/${videoId}?rel=0`}
-                    title="Beyond The Yellow excerpt with Always Give Back founder Peeps"
+                    title="Beyond The Yellow conversation with Always Give Back founder Peeps"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     referrerPolicy="strict-origin-when-cross-origin"
                     allowFullScreen
@@ -107,7 +107,7 @@ export default function AlwaysGiveBackPage() {
                 className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-white/70 transition hover:text-white"
               >
                 <PlayCircle className="h-4 w-4 text-[hsl(var(--gold-accent))]" aria-hidden="true" />
-                Watch this Beyond The Yellow excerpt on YouTube
+                Watch on YouTube
                 <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
               </a>
             </div>

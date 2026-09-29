@@ -24,12 +24,28 @@ const FORM_ANCHOR = "bty-story-form";
 
 const episodes = [
   {
+    organization: "F.I.S.H.",
+    route: "/fish",
+    videoId: "0E9YWKQ5iXY",
+    videoUrl: "https://www.youtube.com/watch?v=0E9YWKQ5iXY",
+    line: "Veterans shouldn't have to beg for help. Someone should notice first.",
+    current: true,
+  },
+  {
+    organization: "Always Give Back",
+    route: "/alwaysgiveback",
+    videoId: "oT4TSM3Q82k",
+    videoUrl: "https://www.youtube.com/watch?v=oT4TSM3Q82k",
+    line: "A computer is not the mission. It is the doorway.",
+    current: false,
+  },
+  {
     organization: "American Corporate Partners",
     route: "/americancorporatepartners",
     videoId: "JHuLEqw2yG8",
     videoUrl: "https://www.youtube.com/watch?v=JHuLEqw2yG8",
     line: "A year of mentorship can turn military experience into a clearer civilian career path.",
-    current: true,
+    current: false,
   },
   {
     organization: "Veterans Breakfast Club",
@@ -37,22 +53,6 @@ const episodes = [
     videoId: "A4CUe3c8rJE",
     videoUrl: "https://www.youtube.com/watch?v=A4CUe3c8rJE",
     line: "Some veterans carry a story for decades. Sometimes the right room is what finally lets it out.",
-    current: false,
-  },
-  {
-    organization: "Veterans Outreach of Wisconsin",
-    route: "/VOW",
-    videoId: "hLvZfGcycOQ",
-    videoUrl: "https://www.youtube.com/watch?v=hLvZfGcycOQ",
-    line: "A tiny home is the beginning. Stability takes more than a roof.",
-    current: false,
-  },
-  {
-    organization: "GallantFew",
-    route: "/gallantfew",
-    videoId: "zsaTKjNVeew",
-    videoUrl: "https://www.youtube.com/watch?v=zsaTKjNVeew",
-    line: "The mission ends. The need for direction doesn’t.",
     current: false,
   },
 ] as const;

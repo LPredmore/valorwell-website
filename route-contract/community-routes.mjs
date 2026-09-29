@@ -72,6 +72,15 @@ export const routes = [
     "sitemap": true
   },
   {
+    "path": "/fish",
+    "title": "F.I.S.H. | Beyond The Yellow | ValorWell",
+    "description": "Explore the Beyond The Yellow feature with Friends In Service of Heroes on practical support, service dogs, mobility assistance, recognition, and financial help for veterans and military families.",
+    "h1": "F.I.S.H.",
+    "lead": "A Beyond The Yellow conversation about helping veterans before hardship becomes a deeper crisis while protecting their dignity and independence.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
     "path": "/privacy",
     "title": "Privacy Policy | ValorWell",
     "description": "Read the ValorWell privacy policy and learn how information submitted through the public website is handled.",

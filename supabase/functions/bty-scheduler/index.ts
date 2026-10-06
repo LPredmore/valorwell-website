@@ -72,6 +72,7 @@ type CalendarEvent = {
   eventType?: string;
   start?: { dateTime?: string; date?: string };
   end?: { dateTime?: string; date?: string };
+  attendees?: Array<{ email?: string }>;
 };
 
 type BusyEvent = {
@@ -300,11 +301,19 @@ async function resolveContactContext(admin: SupabaseClient, email: string) {
     .order("starts_at", { ascending: true });
   if (meetingError) throw new Error(meetingError.message);
 
-  const activeMeeting = (meetings ?? [])[0] ?? null;
+  let activeMeeting = (meetings ?? [])[0] ?? null;
   const organization =
     eligibleOrganizations.find(
       (row) => row.id === activeMeeting?.organization_id,
     ) ?? eligibleOrganizations[0];
+
+  if (!activeMeeting) {
+    activeMeeting = await findExistingCalendarBooking(
+      admin,
+      organization,
+      email,
+    );
+  }
 
   const { data: opportunities, error: opportunityError } = await admin
     .from("relationship_opportunities")
@@ -492,6 +501,68 @@ function normalizeCalendarEvent(event: CalendarEvent): BusyEvent | null {
       /beyond\s+the\s+yellow/i.test(String(event.summary ?? "")) ||
       serialized.includes(STREAMYARD_URL),
   };
+}
+
+function comparableText(value: unknown) {
+  return String(value ?? "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim()
+    .replace(/\s+/g, " ");
+}
+
+async function findExistingCalendarBooking(
+  admin: SupabaseClient,
+  organization: OrganizationRecord,
+  contactEmail: string,
+) {
+  const connections = await relationshipCalendarConnections(admin);
+  const infoConnection = connections.find(
+    (row) => row.google_account_email === INFO_CALENDAR,
+  );
+  if (!infoConnection) {
+    throw new Error("Calendar availability is temporarily unavailable.");
+  }
+
+  const accessToken = await relationshipAccessToken(admin, infoConnection.id);
+  const now = DateTime.now().setZone(CENTRAL_ZONE);
+  const events = await googleEvents(
+    accessToken,
+    INFO_CALENDAR,
+    now.minus({ days: 1 }).toUTC().toISO()!,
+    now.plus({ days: 365 }).toUTC().toISO()!,
+  );
+  const organizationNeedle = comparableText(organization.name);
+  const normalizedEmail = normalizeEmail(contactEmail);
+
+  for (const event of events) {
+    const normalized = normalizeCalendarEvent(event);
+    if (!normalized?.isBty || normalized.end < now) continue;
+
+    const attendeeEmails = (event.attendees ?? [])
+      .map((attendee) => normalizeEmail(attendee.email))
+      .filter(Boolean);
+    const summary = comparableText(event.summary);
+    const matchesEmail = attendeeEmails.includes(normalizedEmail);
+    const matchesOrganization =
+      organizationNeedle.length >= 4 && summary.includes(organizationNeedle);
+
+    if (!matchesEmail && !matchesOrganization) continue;
+
+    return {
+      id: null,
+      opportunity_id: null,
+      organization_id: organization.id,
+      contact_id: null,
+      starts_at: normalized.start.toUTC().toISO(),
+      ends_at: normalized.end.toUTC().toISO(),
+      event_status: "confirmed",
+      streamyard_url: STREAMYARD_URL,
+      external_event_id: event.id ?? null,
+    };
+  }
+
+  return null;
 }
 
 async function collectBusyEvents(

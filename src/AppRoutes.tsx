@@ -18,6 +18,7 @@ import FoundationPage from "./pages/FoundationPage";
 import ImpactPage from "./pages/ImpactPage";
 import DonatePage from "./pages/DonatePage";
 import BtyBillingHubPage from "./pages/BtyBillingHubPage";
+import BtySchedulerPage from "./pages/BtySchedulerPage";
 import Clinicians from "./pages/Clinicians";
 import GetCareWithSignup from "./pages/GetCareWithSignup";
 import Partner from "./pages/Partner";
@@ -64,6 +65,7 @@ const routeElements: Record<string, ReactNode> = {
   "/impact": <ImpactPage />,
   "/donate": <DonatePage />,
   "/beyond-the-yellow": <BtyBillingHubPage />,
+  "/beyond-the-yellow/schedule": <BtySchedulerPage />,
   "/watch": <WatchPage />,
   "/network": <NetworkPage />,
   "/get-care": <GetCareWithSignup />,

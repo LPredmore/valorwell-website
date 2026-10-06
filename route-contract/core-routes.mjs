@@ -72,6 +72,15 @@ export const routes = [
     "sitemap": true
   },
   {
+    "path": "/beyond-the-yellow/schedule",
+    "title": "Schedule Beyond The Yellow | ValorWell",
+    "description": "Private scheduling page for invited Beyond The Yellow guests.",
+    "h1": "Schedule your Beyond The Yellow conversation.",
+    "lead": "Invited guests can verify their organizational email and choose an available recording time.",
+    "indexable": false,
+    "sitemap": false
+  },
+  {
     "path": "/watch",
     "title": "Watch ValorWell | Veteran, Family & Beyond The Yellow Videos",
     "description": "Watch ValorWell videos about veteran systems, CHAMPVA, VA Community Care, mental health, military families, and Beyond The Yellow conversations.",

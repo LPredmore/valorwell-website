@@ -1,8 +1,8 @@
 import { FormEvent, useMemo, useState } from "react";
 import {
-  CalendarDays,
   CheckCircle2,
-  Clock3,
+  ChevronLeft,
+  ChevronRight,
   Loader2,
   LockKeyhole,
   Mail,
@@ -14,6 +14,7 @@ import { billingHubSupabase } from "@/integrations/supabase/client";
 
 const CENTRAL_ZONE = "America/Chicago";
 const STREAMYARD_URL = "https://streamyard.com/frr4zf8e3s";
+const SLOT_HOURS = [9, 10, 11, 12, 13];
 
 type Identity = {
   contact: { name: string; email: string };
@@ -97,11 +98,100 @@ function localTimeLabel(startUtc: string, localZone: string) {
   }).format(new Date(startUtc));
 }
 
+function dateOnlyToUtc(date: string) {
+  const [year, month, day] = date.split("-").map(Number);
+  return new Date(Date.UTC(year, month - 1, day, 12));
+}
+
+function utcToDateOnly(date: Date) {
+  return [
+    date.getUTCFullYear(),
+    String(date.getUTCMonth() + 1).padStart(2, "0"),
+    String(date.getUTCDate()).padStart(2, "0"),
+  ].join("-");
+}
+
+function addDays(date: string, amount: number) {
+  const next = dateOnlyToUtc(date);
+  next.setUTCDate(next.getUTCDate() + amount);
+  return utcToDateOnly(next);
+}
+
+function buildWeekStarts(firstDate: string, lastDate: string) {
+  if (!firstDate || !lastDate) return [];
+  const starts: string[] = [];
+  for (
+    let current = firstDate;
+    current <= lastDate;
+    current = addDays(current, 7)
+  ) {
+    starts.push(current);
+  }
+  return starts;
+}
+
+function weekRangeLabel(weekStart: string) {
+  const start = dateOnlyToUtc(weekStart);
+  const end = dateOnlyToUtc(addDays(weekStart, 4));
+  const sameMonth = start.getUTCMonth() === end.getUTCMonth();
+
+  const month = new Intl.DateTimeFormat("en-US", {
+    month: sameMonth ? "long" : "short",
+    timeZone: "UTC",
+  }).format(start);
+  const startDay = start.getUTCDate();
+
+  if (sameMonth) {
+    return `${month} ${startDay}–${end.getUTCDate()}`;
+  }
+
+  const endLabel = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  }).format(end);
+  return `${month} ${startDay} – ${endLabel}`;
+}
+
+function dayHeader(date: string) {
+  const value = dateOnlyToUtc(date);
+  return {
+    weekday: new Intl.DateTimeFormat("en-US", {
+      weekday: "short",
+      timeZone: "UTC",
+    }).format(value),
+    date: new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      timeZone: "UTC",
+    }).format(value),
+  };
+}
+
+function hourLabel(hour: number) {
+  const date = new Date(Date.UTC(2026, 0, 1, hour, 0, 0));
+  return new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: "UTC",
+  }).format(date);
+}
+
+function centralStartHour(startUtc: string) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: CENTRAL_ZONE,
+    hour: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(new Date(startUtc));
+  const hour = parts.find((part) => part.type === "hour")?.value;
+  return hour ? Number(hour) : -1;
+}
+
 function SchedulerShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-[70vh] bg-[#F4F1E8] text-[#111814]">
-      <div className="container-wide py-12 md:py-16 lg:py-20">
-        <div className="mx-auto max-w-5xl">{children}</div>
+      <div className="container-wide py-10 md:py-14 lg:py-16">
+        <div className="mx-auto max-w-6xl">{children}</div>
       </div>
     </div>
   );
@@ -117,7 +207,8 @@ export default function BtySchedulerPage() {
   const [identity, setIdentity] = useState<Identity | null>(null);
   const [sessionToken, setSessionToken] = useState("");
   const [days, setDays] = useState<SchedulerDay[]>([]);
-  const [selectedDate, setSelectedDate] = useState("");
+  const [weekStarts, setWeekStarts] = useState<string[]>([]);
+  const [weekIndex, setWeekIndex] = useState(0);
   const [selectedSlot, setSelectedSlot] = useState<SchedulerSlot | null>(null);
   const [booking, setBooking] = useState<Booking | null>(null);
   const [checking, setChecking] = useState(false);
@@ -125,12 +216,35 @@ export default function BtySchedulerPage() {
   const [bookingNow, setBookingNow] = useState(false);
   const [error, setError] = useState("");
 
-  const selectedDay = useMemo(
-    () => days.find((day) => day.date === selectedDate) ?? null,
-    [days, selectedDate],
+  const currentWeekStart = weekStarts[weekIndex] ?? "";
+
+  const currentWeekDates = useMemo(
+    () =>
+      currentWeekStart
+        ? Array.from({ length: 5 }, (_, index) =>
+            addDays(currentWeekStart, index),
+          )
+        : [],
+    [currentWeekStart],
   );
 
-  async function loadAvailability(token: string) {
+  const slotByDateHour = useMemo(() => {
+    const slots = new Map<string, SchedulerSlot>();
+    for (const day of days) {
+      for (const slot of day.slots) {
+        slots.set(
+          `${day.date}|${centralStartHour(slot.startUtc)}`,
+          slot,
+        );
+      }
+    }
+    return slots;
+  }, [days]);
+
+  async function loadAvailability(
+    token: string,
+    preferredWeekStart?: string,
+  ) {
     setLoadingAvailability(true);
     setError("");
     try {
@@ -138,8 +252,18 @@ export default function BtySchedulerPage() {
         action: "availability",
         sessionToken: token,
       });
-      setDays(result.days ?? []);
-      setSelectedDate(result.days?.[0]?.date ?? "");
+      const nextDays = result.days ?? [];
+      const nextWeeks = buildWeekStarts(
+        result.firstBookableDate,
+        result.lastBookableDate,
+      );
+
+      setDays(nextDays);
+      setWeekStarts(nextWeeks);
+      const preferredIndex = preferredWeekStart
+        ? nextWeeks.indexOf(preferredWeekStart)
+        : -1;
+      setWeekIndex(preferredIndex >= 0 ? preferredIndex : 0);
       setSelectedSlot(null);
     } catch (requestError) {
       setError(
@@ -158,7 +282,8 @@ export default function BtySchedulerPage() {
     setError("");
     setBooking(null);
     setDays([]);
-    setSelectedDate("");
+    setWeekStarts([]);
+    setWeekIndex(0);
     setSelectedSlot(null);
 
     try {
@@ -210,6 +335,8 @@ export default function BtySchedulerPage() {
     if (!sessionToken || !selectedSlot) return;
     setBookingNow(true);
     setError("");
+    const weekToPreserve = currentWeekStart;
+
     try {
       const result = await invokeScheduler<BookResponse>({
         action: "book",
@@ -222,7 +349,7 @@ export default function BtySchedulerPage() {
           result.error ||
             "That time could not be booked. Please choose another time.",
         );
-        await loadAvailability(sessionToken);
+        await loadAvailability(sessionToken, weekToPreserve);
         return;
       }
       if (result.contact && result.organization) {
@@ -233,7 +360,8 @@ export default function BtySchedulerPage() {
       }
       setBooking(result.booking);
       setDays([]);
-      setSelectedDate("");
+      setWeekStarts([]);
+      setWeekIndex(0);
       setSelectedSlot(null);
     } catch (requestError) {
       setSelectedSlot(null);
@@ -242,7 +370,7 @@ export default function BtySchedulerPage() {
           ? requestError.message
           : "That time could not be booked.",
       );
-      await loadAvailability(sessionToken);
+      await loadAvailability(sessionToken, weekToPreserve);
     } finally {
       setBookingNow(false);
     }
@@ -252,7 +380,8 @@ export default function BtySchedulerPage() {
     setIdentity(null);
     setSessionToken("");
     setDays([]);
-    setSelectedDate("");
+    setWeekStarts([]);
+    setWeekIndex(0);
     setSelectedSlot(null);
     setBooking(null);
     setError("");
@@ -412,81 +541,57 @@ export default function BtySchedulerPage() {
         )}
 
         {identity && !booking && (
-          <div className="grid gap-6 lg:grid-cols-[0.75fr_1.25fr]">
-            <aside className="rounded-3xl border border-[#3B5147]/15 bg-[#3B5147] p-6 text-white shadow-sm md:p-8">
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#F4F1E8]/70">
-                Scheduling for
-              </p>
-              <h2 className="mt-3 text-2xl font-bold">
-                {identity.organization.name}
-              </h2>
-              <p className="mt-2 text-white/75">
-                {identity.contact.name}
-                <br />
-                {identity.contact.email}
-              </p>
-
-              <div className="mt-8 space-y-5 border-t border-white/15 pt-6 text-sm leading-6 text-white/80">
-                <div className="flex gap-3">
-                  <Clock3 className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
-                  <p>
-                    Recordings are one hour. Every displayed time includes the
-                    required calendar buffers.
-                  </p>
-                </div>
-                <div className="flex gap-3">
-                  <CalendarDays
-                    className="mt-0.5 h-5 w-5 shrink-0"
-                    aria-hidden="true"
-                  />
-                  <p>
-                    Only one Beyond The Yellow recording can be scheduled on a
-                    calendar day.
-                  </p>
-                </div>
-                <div className="flex gap-3">
-                  <Video className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
-                  <p>
-                    Your calendar invitation will use ValorWell's StreamYard
-                    recording room. No Google Meet is added.
-                  </p>
-                </div>
+          <div>
+            <section className="mb-6 flex flex-col gap-4 rounded-3xl border border-[#3B5147]/15 bg-[#3B5147] p-5 text-white shadow-sm sm:flex-row sm:items-center sm:justify-between md:p-6">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#F4F1E8]/70">
+                  Scheduling for
+                </p>
+                <h2 className="mt-2 text-xl font-bold md:text-2xl">
+                  {identity.organization.name}
+                </h2>
+                <p className="mt-1 text-sm text-white/75 md:text-base">
+                  {identity.contact.name} · {identity.contact.email}
+                </p>
               </div>
 
               <button
                 type="button"
                 onClick={reset}
-                className="mt-8 min-h-11 rounded-xl border border-white/30 px-4 py-2 text-sm font-bold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                className="min-h-11 shrink-0 rounded-xl border border-white/30 px-4 py-2 text-sm font-bold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
               >
                 Use a different email
               </button>
-            </aside>
+            </section>
 
-            <section className="rounded-3xl border border-[#3B5147]/15 bg-white p-6 shadow-sm md:p-8">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3B5147]">
-                  Select a date
-                </p>
-                <h2 className="mt-2 text-2xl font-bold">
-                  Available recording times
-                </h2>
-                <p className="mt-2 leading-6 text-[#111814]/65">
-                  Every time below is labeled in Central Time. If your device is
-                  set to another timezone, your local time appears underneath.
+            <section className="rounded-3xl border border-[#3B5147]/15 bg-white p-4 shadow-sm sm:p-6 md:p-8">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3B5147]">
+                    Select a time
+                  </p>
+                  <h2 className="mt-2 text-2xl font-bold">
+                    Available recording times
+                  </h2>
+                </div>
+                <p className="text-sm font-medium text-[#111814]/55">
+                  Central Time
                 </p>
               </div>
 
               {loadingAvailability ? (
-                <div className="flex min-h-64 items-center justify-center gap-3 text-[#3B5147]">
+                <div className="flex min-h-72 items-center justify-center gap-3 text-[#3B5147]">
                   <Loader2
                     className="h-6 w-6 animate-spin motion-reduce:animate-none"
                     aria-hidden="true"
                   />
                   <span className="font-bold">Checking calendars</span>
                 </div>
-              ) : days.length === 0 ? (
+              ) : weekStarts.length === 0 ? (
                 <div className="mt-8 rounded-2xl bg-[#F4F1E8] p-6">
-                  <p className="font-bold">No valid recording times are open right now.</p>
+                  <p className="font-bold">
+                    No valid recording times are open right now.
+                  </p>
                   <p className="mt-2 leading-6 text-[#111814]/65">
                     Email info@valorwell.org and we can coordinate a time
                     directly.
@@ -494,81 +599,162 @@ export default function BtySchedulerPage() {
                 </div>
               ) : (
                 <>
-                  <div className="mt-7 flex gap-3 overflow-x-auto pb-2">
-                    {days.map((day) => {
-                      const reference = day.slots[0]?.startUtc;
-                      const active = selectedDate === day.date;
-                      return (
-                        <button
-                          key={day.date}
-                          type="button"
-                          onClick={() => {
-                            setSelectedDate(day.date);
-                            setSelectedSlot(null);
-                            setError("");
-                          }}
-                          className={`min-h-20 min-w-36 rounded-2xl border px-4 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2 ${
-                            active
-                              ? "border-[#3B5147] bg-[#3B5147] text-white"
-                              : "border-[#3B5147]/15 bg-[#F4F1E8] hover:border-[#3B5147]/40"
-                          }`}
-                        >
-                          <span className="block text-sm font-bold">
-                            {reference ? centralDateLabel(reference) : day.date}
-                          </span>
-                          <span
-                            className={`mt-1 block text-xs ${
-                              active ? "text-white/70" : "text-[#111814]/55"
+                  <div className="mt-6 rounded-2xl border border-[#3B5147]/15 bg-[#F8F6F0] p-3 sm:p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setWeekIndex((current) => Math.max(0, current - 1));
+                          setSelectedSlot(null);
+                          setError("");
+                        }}
+                        disabled={weekIndex === 0}
+                        className="inline-flex min-h-11 items-center gap-1 rounded-xl border border-[#3B5147]/15 bg-white px-3 py-2 text-sm font-bold text-[#3B5147] transition hover:border-[#3B5147]/40 disabled:cursor-not-allowed disabled:opacity-35"
+                        aria-label="Previous week"
+                      >
+                        <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+                        <span className="hidden sm:inline">Previous</span>
+                      </button>
+
+                      <div className="min-w-0 text-center">
+                        <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#3B5147]/65">
+                          Week
+                        </p>
+                        <p className="mt-0.5 truncate text-base font-bold sm:text-lg">
+                          {weekRangeLabel(currentWeekStart)}
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setWeekIndex((current) =>
+                            Math.min(weekStarts.length - 1, current + 1),
+                          );
+                          setSelectedSlot(null);
+                          setError("");
+                        }}
+                        disabled={weekIndex === weekStarts.length - 1}
+                        className="inline-flex min-h-11 items-center gap-1 rounded-xl border border-[#3B5147]/15 bg-white px-3 py-2 text-sm font-bold text-[#3B5147] transition hover:border-[#3B5147]/40 disabled:cursor-not-allowed disabled:opacity-35"
+                        aria-label="Next week"
+                      >
+                        <span className="hidden sm:inline">Next</span>
+                        <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                      </button>
+                    </div>
+
+                    <div
+                      className="mt-3 flex gap-2 overflow-x-auto pb-1"
+                      aria-label="Choose a week"
+                    >
+                      {weekStarts.map((weekStart, index) => {
+                        const active = index === weekIndex;
+                        return (
+                          <button
+                            key={weekStart}
+                            type="button"
+                            onClick={() => {
+                              setWeekIndex(index);
+                              setSelectedSlot(null);
+                              setError("");
+                            }}
+                            className={`min-h-10 shrink-0 rounded-lg border px-3 py-2 text-xs font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2 ${
+                              active
+                                ? "border-[#3B5147] bg-[#3B5147] text-white"
+                                : "border-[#3B5147]/15 bg-white text-[#3B5147] hover:border-[#3B5147]/40"
                             }`}
                           >
-                            {day.slots.length}{" "}
-                            {day.slots.length === 1 ? "time" : "times"}
-                          </span>
-                        </button>
-                      );
-                    })}
+                            {weekRangeLabel(weekStart)}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
 
-                  {selectedDay && (
-                    <div className="mt-7">
-                      <h3 className="text-lg font-bold">
-                        {centralDateLabel(selectedDay.slots[0].startUtc)}
-                      </h3>
-                      <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                        {selectedDay.slots.map((slot) => {
-                          const active =
-                            selectedSlot?.startUtc === slot.startUtc;
+                  <div className="mt-5 overflow-x-auto rounded-2xl border border-[#3B5147]/15 bg-white">
+                    <div className="min-w-[760px]">
+                      <div className="grid grid-cols-[88px_repeat(5,minmax(132px,1fr))] border-b border-[#3B5147]/15 bg-[#F4F1E8]">
+                        <div className="sticky left-0 z-20 flex min-h-16 items-center justify-center border-r border-[#3B5147]/15 bg-[#F4F1E8] px-2 text-xs font-bold uppercase tracking-[0.1em] text-[#3B5147]/65">
+                          Central
+                        </div>
+                        {currentWeekDates.map((date) => {
+                          const header = dayHeader(date);
                           return (
-                            <button
-                              key={slot.startUtc}
-                              type="button"
-                              onClick={() => {
-                                setSelectedSlot(slot);
-                                setError("");
-                              }}
-                              className={`min-h-20 rounded-2xl border p-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2 ${
-                                active
-                                  ? "border-[#D7A92E] bg-[#D7A92E]/15"
-                                  : "border-[#3B5147]/15 hover:border-[#3B5147]/40"
-                              }`}
+                            <div
+                              key={date}
+                              className="flex min-h-16 flex-col items-center justify-center border-r border-[#3B5147]/10 px-2 text-center last:border-r-0"
                             >
-                              <span className="block font-bold text-[#111814]">
-                                {centralTimeLabel(slot.startUtc)}
+                              <span className="text-xs font-bold uppercase tracking-[0.08em] text-[#3B5147]/65">
+                                {header.weekday}
                               </span>
-                              {localZone !== CENTRAL_ZONE && (
-                                <span className="mt-1 block text-sm text-[#111814]/55">
-                                  {localTimeLabel(slot.startUtc, localZone)} local
-                                </span>
-                              )}
-                            </button>
+                              <span className="mt-1 text-sm font-bold text-[#111814]">
+                                {header.date}
+                              </span>
+                            </div>
                           );
                         })}
                       </div>
+
+                      {SLOT_HOURS.map((hour) => (
+                        <div
+                          key={hour}
+                          className="grid grid-cols-[88px_repeat(5,minmax(132px,1fr))] border-b border-[#3B5147]/10 last:border-b-0"
+                        >
+                          <div className="sticky left-0 z-10 flex min-h-[78px] items-center justify-center border-r border-[#3B5147]/15 bg-[#F8F6F0] px-2 text-sm font-bold text-[#3B5147]">
+                            {hourLabel(hour)}
+                          </div>
+
+                          {currentWeekDates.map((date) => {
+                            const slot = slotByDateHour.get(`${date}|${hour}`);
+                            const active =
+                              Boolean(slot) &&
+                              selectedSlot?.startUtc === slot?.startUtc;
+
+                            if (!slot) {
+                              return (
+                                <div
+                                  key={date}
+                                  className="flex min-h-[78px] items-center justify-center border-r border-[#3B5147]/10 bg-[#F8F6F0]/55 px-2 last:border-r-0"
+                                  aria-label={`${dayHeader(date).weekday} ${hourLabel(hour)} unavailable`}
+                                >
+                                  <span className="text-xs font-medium text-[#111814]/30">
+                                    Unavailable
+                                  </span>
+                                </div>
+                              );
+                            }
+
+                            return (
+                              <button
+                                key={date}
+                                type="button"
+                                onClick={() => {
+                                  setSelectedSlot(slot);
+                                  setError("");
+                                }}
+                                className={`min-h-[78px] border-r border-[#3B5147]/10 px-3 py-3 text-center transition last:border-r-0 focus-visible:relative focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#3B5147] ${
+                                  active
+                                    ? "bg-[#D7A92E]/20"
+                                    : "bg-white hover:bg-[#3B5147]/5"
+                                }`}
+                                aria-pressed={active}
+                              >
+                                <span className="block text-sm font-bold text-[#3B5147]">
+                                  {hourLabel(hour)}
+                                </span>
+                                <span className="mt-1 block text-xs font-medium text-[#111814]/55">
+                                  Available
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      ))}
                     </div>
-                  )}
+                  </div>
 
                   {selectedSlot && (
-                    <div className="mt-7 rounded-2xl border border-[#D7A92E]/35 bg-[#D7A92E]/10 p-5">
+                    <div className="mt-5 rounded-2xl border border-[#D7A92E]/35 bg-[#D7A92E]/10 p-5">
                       <p className="text-sm font-bold uppercase tracking-[0.12em] text-[#3B5147]">
                         Confirm recording
                       </p>
@@ -586,7 +772,7 @@ export default function BtySchedulerPage() {
                         type="button"
                         onClick={handleBook}
                         disabled={bookingNow}
-                        className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#3B5147] px-5 py-3 font-bold text-white transition hover:bg-[#30443b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#3B5147] px-5 py-3 font-bold text-white transition hover:bg-[#30443b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:min-w-56"
                       >
                         {bookingNow ? (
                           <>

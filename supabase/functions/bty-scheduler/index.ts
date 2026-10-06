@@ -41,7 +41,7 @@ const json = (body: unknown, status = 200) =>
 type SessionPayload = {
   contactId: string;
   organizationId: string;
-  opportunityId: string;
+  opportunityId: string | null;
   email: string;
   exp: number;
 };
@@ -90,11 +90,16 @@ type ContactRecord = {
   preferred_name: string | null;
 };
 
+type OrganizationRecord = {
+  id: string;
+  name: string;
+  metadata: Record<string, unknown> | null;
+  updated_at: string;
+};
+
 type OpportunityRecord = {
   id: string;
   organization_id: string;
-  status: string;
-  review_status: string;
   qualification: Record<string, unknown> | null;
   metadata: Record<string, unknown> | null;
   updated_at: string;
@@ -197,7 +202,6 @@ async function verifySession(token: unknown): Promise<SessionPayload> {
   if (
     !payload.contactId ||
     !payload.organizationId ||
-    !payload.opportunityId ||
     !payload.email ||
     !payload.exp ||
     payload.exp <= Math.floor(Date.now() / 1000)
@@ -232,8 +236,21 @@ function isBtyOpportunity(opportunity: OpportunityRecord) {
   );
 }
 
-function schedulerEnabled(opportunity: OpportunityRecord) {
-  return opportunity.metadata?.scheduler_enabled === true;
+function isEligibleBtyOrganization(organization: OrganizationRecord) {
+  const metadata = organization.metadata ?? {};
+  return (
+    metadata.btyNominationOutreachSent === true ||
+    String(metadata.btyNominationOutreachSent ?? "").toLowerCase() === "true" ||
+    metadata.btySchedulerEnabled === true
+  );
+}
+
+function organizationPriority(organization: OrganizationRecord) {
+  const raw =
+    organization.metadata?.btyNominationOutreachLastSentAt ??
+    organization.updated_at;
+  const timestamp = Date.parse(String(raw ?? ""));
+  return Number.isFinite(timestamp) ? timestamp : 0;
 }
 
 async function resolveContactContext(admin: SupabaseClient, email: string) {
@@ -258,22 +275,19 @@ async function resolveContactContext(admin: SupabaseClient, email: string) {
   ];
   if (!organizationIds.length) return null;
 
-  const { data: opportunities, error: opportunityError } = await admin
-    .from("relationship_opportunities")
-    .select(
-      "id,organization_id,status,review_status,qualification,metadata,updated_at",
-    )
+  const { data: organizations, error: organizationError } = await admin
+    .from("relationship_organizations")
+    .select("id,name,metadata,updated_at")
     .eq("tenant_id", TENANT_ID)
-    .in("organization_id", organizationIds)
-    .order("updated_at", { ascending: false });
-  if (opportunityError) throw new Error(opportunityError.message);
+    .in("id", organizationIds);
+  if (organizationError) throw new Error(organizationError.message);
 
-  const btyOpportunities = ((opportunities ?? []) as OpportunityRecord[]).filter(
-    isBtyOpportunity,
-  );
-  if (!btyOpportunities.length) return null;
+  const eligibleOrganizations = ((organizations ?? []) as OrganizationRecord[])
+    .filter(isEligibleBtyOrganization)
+    .sort((a, b) => organizationPriority(b) - organizationPriority(a));
+  if (!eligibleOrganizations.length) return null;
 
-  const opportunityIds = btyOpportunities.map((row) => row.id);
+  const eligibleOrganizationIds = eligibleOrganizations.map((row) => row.id);
   const { data: meetings, error: meetingError } = await admin
     .from("relationship_meetings")
     .select(
@@ -281,30 +295,27 @@ async function resolveContactContext(admin: SupabaseClient, email: string) {
     )
     .eq("tenant_id", TENANT_ID)
     .eq("purpose", "bty_recording")
-    .in("opportunity_id", opportunityIds)
+    .in("organization_id", eligibleOrganizationIds)
     .in("event_status", ["tentative", "confirmed"])
     .order("starts_at", { ascending: true });
   if (meetingError) throw new Error(meetingError.message);
 
   const activeMeeting = (meetings ?? [])[0] ?? null;
-  let opportunity: OpportunityRecord | undefined;
-  if (activeMeeting) {
-    opportunity = btyOpportunities.find(
-      (row) => row.id === activeMeeting.opportunity_id,
-    );
-  } else {
-    opportunity = btyOpportunities.find(schedulerEnabled);
-  }
-  if (!opportunity) return null;
+  const organization =
+    eligibleOrganizations.find(
+      (row) => row.id === activeMeeting?.organization_id,
+    ) ?? eligibleOrganizations[0];
 
-  const { data: organization, error: organizationError } = await admin
-    .from("relationship_organizations")
-    .select("id,name")
+  const { data: opportunities, error: opportunityError } = await admin
+    .from("relationship_opportunities")
+    .select("id,organization_id,qualification,metadata,updated_at")
     .eq("tenant_id", TENANT_ID)
-    .eq("id", opportunity.organization_id)
-    .maybeSingle();
-  if (organizationError) throw new Error(organizationError.message);
-  if (!organization) return null;
+    .eq("organization_id", organization.id)
+    .order("updated_at", { ascending: false });
+  if (opportunityError) throw new Error(opportunityError.message);
+  const opportunity = ((opportunities ?? []) as OpportunityRecord[]).find(
+    isBtyOpportunity,
+  ) ?? null;
 
   return {
     contact,
@@ -322,16 +333,12 @@ async function revalidateSession(
   if (!context) throw new Error("This scheduling invitation is no longer active.");
   if (
     context.contact.id !== session.contactId ||
-    context.organization.id !== session.organizationId ||
-    context.opportunity.id !== session.opportunityId
+    context.organization.id !== session.organizationId
   ) {
     throw new Error("This scheduling invitation is no longer active.");
   }
   if (context.activeMeeting) {
     return { ...context, state: "booked" as const };
-  }
-  if (!schedulerEnabled(context.opportunity)) {
-    throw new Error("This scheduling invitation is no longer active.");
   }
   return { ...context, state: "ready" as const };
 }
@@ -731,7 +738,8 @@ async function createGoogleEvent(
     guestName: string;
     organizationName: string;
     guestEmail: string;
-    opportunityId: string;
+    opportunityId: string | null;
+    organizationId: string;
   },
 ) {
   const write = await calendarWriteAccess(admin);
@@ -756,7 +764,10 @@ async function createGoogleEvent(
     extendedProperties: {
       private: {
         source: "bty_public_scheduler",
-        relationshipOpportunityId: input.opportunityId,
+        relationshipOrganizationId: input.organizationId,
+        ...(input.opportunityId
+          ? { relationshipOpportunityId: input.opportunityId }
+          : {}),
       },
     },
   };
@@ -817,12 +828,10 @@ async function handleValidate(
       },
     });
   }
-  if (!schedulerEnabled(context.opportunity)) return json({ eligible: false });
-
   const sessionToken = await issueSession({
     contactId: context.contact.id,
     organizationId: context.organization.id,
-    opportunityId: context.opportunity.id,
+    opportunityId: context.opportunity?.id ?? null,
     email,
   });
   return json({
@@ -912,7 +921,7 @@ async function handleBook(
     .from("relationship_meetings")
     .insert({
       tenant_id: TENANT_ID,
-      opportunity_id: context.opportunity.id,
+      opportunity_id: context.opportunity?.id ?? null,
       organization_id: context.organization.id,
       contact_id: context.contact.id,
       purpose: "bty_recording",
@@ -977,7 +986,8 @@ async function handleBook(
       guestName: displayName(context.contact),
       organizationName: String(context.organization.name),
       guestEmail: session.email,
-      opportunityId: context.opportunity.id,
+      opportunityId: context.opportunity?.id ?? null,
+      organizationId: context.organization.id,
     });
 
     const confirmedAt = new Date().toISOString();
@@ -1001,27 +1011,6 @@ async function handleBook(
       console.error("BTY scheduler meeting confirmation update failed", {
         reservationId: reservation.id,
         error: meetingUpdateError,
-      });
-    }
-
-    const existingMetadata = context.opportunity.metadata ?? {};
-    const { error: opportunityUpdateError } = await admin
-      .from("relationship_opportunities")
-      .update({
-        metadata: {
-          ...existingMetadata,
-          scheduler_enabled: false,
-          scheduler_booked_at: confirmedAt,
-          scheduler_contact_id: context.contact.id,
-          scheduler_calendar_event_id: String(event.id),
-        },
-      })
-      .eq("tenant_id", TENANT_ID)
-      .eq("id", context.opportunity.id);
-    if (opportunityUpdateError) {
-      console.error("BTY scheduler opportunity metadata update failed", {
-        opportunityId: context.opportunity.id,
-        error: opportunityUpdateError,
       });
     }
 

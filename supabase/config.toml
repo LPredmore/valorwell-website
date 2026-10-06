@@ -10,3 +10,6 @@ verify_jwt = false
 
 [functions.register-clinician-interest]
 verify_jwt = false
+
+[functions.bty-scheduler]
+verify_jwt = false

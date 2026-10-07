@@ -138,6 +138,20 @@ type OpportunityRecord = {
 
 const validateBuckets = new Map<string, { count: number; resetAt: number }>();
 
+type AccessTokenCacheEntry = {
+  token: string;
+  expiresAt: number;
+};
+
+const relationshipTokenCache = new Map<string, AccessTokenCacheEntry>();
+let relationshipConnectionsCache:
+  | { connections: RelationshipCalendarConnection[]; expiresAt: number }
+  | null = null;
+let writeTokenCache:
+  | { connectionId: string; token: string; calendarId: string; expiresAt: number }
+  | null = null;
+
+
 function adminClient(): SupabaseClient {
   const url = Deno.env.get("SUPABASE_URL") ?? "";
   const serviceRole = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
@@ -418,21 +432,14 @@ async function resolveContactContext(admin: SupabaseClient, email: string) {
       (meeting) => meeting.purpose === "bty_preinterview",
     ) ?? null;
 
-  if (!btyInterview) {
-    btyInterview = await findExistingCalendarBooking(
+  if (!btyInterview || !preInterview) {
+    const calendarBookings = await findExistingCalendarBookings(
       admin,
       organization,
       email,
-      "bty_interview",
     );
-  }
-  if (!preInterview) {
-    preInterview = await findExistingCalendarBooking(
-      admin,
-      organization,
-      email,
-      "pre_interview",
-    );
+    if (!btyInterview) btyInterview = calendarBookings.btyInterview;
+    if (!preInterview) preInterview = calendarBookings.preInterview;
   }
 
   const { data: opportunities, error: opportunityError } = await admin
@@ -473,6 +480,14 @@ async function revalidateSession(
 }
 
 async function relationshipCalendarConnections(admin: SupabaseClient) {
+  const now = Date.now();
+  if (
+    relationshipConnectionsCache &&
+    relationshipConnectionsCache.expiresAt > now
+  ) {
+    return relationshipConnectionsCache.connections;
+  }
+
   const { data, error } = await admin.rpc(
     "list_bty_scheduler_calendar_connections",
   );
@@ -484,6 +499,11 @@ async function relationshipCalendarConnections(admin: SupabaseClient) {
       throw new Error("Calendar availability is temporarily unavailable.");
     }
   }
+
+  relationshipConnectionsCache = {
+    connections,
+    expiresAt: now + 30_000,
+  };
   return connections;
 }
 
@@ -491,6 +511,11 @@ async function relationshipAccessToken(
   admin: SupabaseClient,
   connectionId: string,
 ) {
+  const cached = relationshipTokenCache.get(connectionId);
+  if (cached && cached.expiresAt > Date.now() + 60_000) {
+    return cached.token;
+  }
+
   const { data, error } = await admin.rpc(
     "get_relationship_google_connection_runtime",
     {
@@ -519,9 +544,20 @@ async function relationshipAccessToken(
   });
   const body = await response.json().catch(() => ({})) as Record<string, unknown>;
   if (!response.ok || typeof body.access_token !== "string") {
+    relationshipTokenCache.delete(connectionId);
     throw new Error("Calendar availability is temporarily unavailable.");
   }
-  return body.access_token;
+
+  const expiresInSeconds =
+    typeof body.expires_in === "number" && Number.isFinite(body.expires_in)
+      ? body.expires_in
+      : 3600;
+  const entry = {
+    token: body.access_token,
+    expiresAt: Date.now() + Math.max(60, expiresInSeconds - 60) * 1000,
+  };
+  relationshipTokenCache.set(connectionId, entry);
+  return entry.token;
 }
 
 function calendarsForAccount(email: string) {
@@ -645,11 +681,10 @@ function comparableText(value: unknown) {
     .replace(/\s+/g, " ");
 }
 
-async function findExistingCalendarBooking(
+async function findExistingCalendarBookings(
   admin: SupabaseClient,
   organization: OrganizationRecord,
   contactEmail: string,
-  meetingType: MeetingType,
 ) {
   const connections = await relationshipCalendarConnections(admin);
   const infoConnection = connections.find(
@@ -669,16 +704,12 @@ async function findExistingCalendarBooking(
   );
   const organizationNeedle = comparableText(organization.name);
   const normalizedEmail = normalizeEmail(contactEmail);
+  let preInterview: Record<string, unknown> | null = null;
+  let btyInterview: Record<string, unknown> | null = null;
 
   for (const event of events) {
     const normalized = normalizeCalendarEvent(event);
     if (!normalized || normalized.end < now) continue;
-
-    const typeMatches =
-      meetingType === "pre_interview"
-        ? normalized.isPreInterview
-        : normalized.isBtyRecording;
-    if (!typeMatches) continue;
 
     const attendeeEmails = (event.attendees ?? [])
       .map((attendee) => normalizeEmail(attendee.email))
@@ -687,10 +718,16 @@ async function findExistingCalendarBooking(
     const matchesEmail = attendeeEmails.includes(normalizedEmail);
     const matchesOrganization =
       organizationNeedle.length >= 4 && summary.includes(organizationNeedle);
-
     if (!matchesEmail && !matchesOrganization) continue;
 
-    return {
+    const meetingType: MeetingType | null = normalized.isPreInterview
+      ? "pre_interview"
+      : normalized.isBtyRecording
+        ? "bty_interview"
+        : null;
+    if (!meetingType) continue;
+
+    const booking = {
       id: null,
       purpose: meetingPurpose(meetingType),
       opportunity_id: null,
@@ -708,9 +745,17 @@ async function findExistingCalendarBooking(
       external_event_id: event.id ?? null,
       metadata: {},
     };
+
+    if (meetingType === "pre_interview" && !preInterview) {
+      preInterview = booking;
+    } else if (meetingType === "bty_interview" && !btyInterview) {
+      btyInterview = booking;
+    }
+
+    if (preInterview && btyInterview) break;
   }
 
-  return null;
+  return { preInterview, btyInterview };
 }
 
 async function collectBusyEvents(
@@ -720,40 +765,65 @@ async function collectBusyEvents(
   excludeMeetingId?: string,
 ) {
   const connections = await relationshipCalendarConnections(admin);
+  const timeMin = rangeStart.toUTC().toISO()!;
+  const timeMax = rangeEnd.toUTC().toISO()!;
+
+  const calendarReadsPromise = Promise.all(
+    connections.map(async (connection) => ({
+      connection,
+      accessToken: await relationshipAccessToken(admin, connection.id),
+    })),
+  ).then((authorizedConnections) =>
+    Promise.all(
+      authorizedConnections.flatMap(({ connection, accessToken }) =>
+        calendarsForAccount(connection.google_account_email).map(
+          async (calendarId) => ({
+            calendarId,
+            events: await googleEvents(
+              accessToken,
+              calendarId,
+              timeMin,
+              timeMax,
+            ),
+          }),
+        ),
+      ),
+    ),
+  );
+
+  const meetingsPromise = (async () => {
+    let meetingsQuery = admin
+      .from("relationship_meetings")
+      .select("id,purpose,starts_at,ends_at,external_event_id")
+      .eq("tenant_id", TENANT_ID)
+      .in("purpose", ["bty_recording", "bty_preinterview"])
+      .in("event_status", ["tentative", "confirmed"])
+      .not("starts_at", "is", null)
+      .not("ends_at", "is", null)
+      .lt("starts_at", timeMax)
+      .gt("ends_at", timeMin);
+    if (excludeMeetingId) {
+      meetingsQuery = meetingsQuery.neq("id", excludeMeetingId);
+    }
+    const { data, error } = await meetingsQuery;
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  })();
+
+  const [calendarReads, meetings] = await Promise.all([
+    calendarReadsPromise,
+    meetingsPromise,
+  ]);
+
   const busy: BusyEvent[] = [];
-  for (const connection of connections) {
-    const accessToken = await relationshipAccessToken(admin, connection.id);
-    for (const calendarId of calendarsForAccount(connection.google_account_email)) {
-      const events = await googleEvents(
-        accessToken,
-        calendarId,
-        rangeStart.toUTC().toISO()!,
-        rangeEnd.toUTC().toISO()!,
-      );
-      for (const event of events) {
-        const normalized = normalizeCalendarEvent(event);
-        if (normalized) busy.push(normalized);
-      }
+  for (const { events } of calendarReads) {
+    for (const event of events) {
+      const normalized = normalizeCalendarEvent(event);
+      if (normalized) busy.push(normalized);
     }
   }
 
-  let meetingsQuery = admin
-    .from("relationship_meetings")
-    .select("id,purpose,starts_at,ends_at,external_event_id")
-    .eq("tenant_id", TENANT_ID)
-    .in("purpose", ["bty_recording", "bty_preinterview"])
-    .in("event_status", ["tentative", "confirmed"])
-    .not("starts_at", "is", null)
-    .not("ends_at", "is", null)
-    .lt("starts_at", rangeEnd.toUTC().toISO()!)
-    .gt("ends_at", rangeStart.toUTC().toISO()!);
-  if (excludeMeetingId) {
-    meetingsQuery = meetingsQuery.neq("id", excludeMeetingId);
-  }
-  const { data: meetings, error: meetingsError } = await meetingsQuery;
-  if (meetingsError) throw new Error(meetingsError.message);
-
-  for (const meeting of meetings ?? []) {
+  for (const meeting of meetings) {
     const start = DateTime.fromISO(String(meeting.starts_at));
     const end = DateTime.fromISO(String(meeting.ends_at));
     if (!start.isValid || !end.isValid) continue;
@@ -875,28 +945,27 @@ async function computeAvailability(
   const config = MEETING_CONFIG[meetingType];
   const firstDay = firstBookableMonday();
   const rangeEnd = firstDay.plus({ weeks: AVAILABILITY_WEEKS });
-  const busy = await collectBusyEvents(
-    admin,
-    firstDay.minus({ hours: 3 }),
-    rangeEnd.plus({ hours: 3 }),
-  );
-  const btyCounts = await activeMeetingCountsByDate(
-    admin,
-    "bty_recording",
-    firstDay,
-    rangeEnd,
-  );
-  const preCounts = await activeMeetingCountsByDate(
-    admin,
-    "bty_preinterview",
-    firstDay,
-    rangeEnd,
-  );
+  const purpose = meetingPurpose(meetingType);
+  const [busy, activeCounts] = await Promise.all([
+    collectBusyEvents(
+      admin,
+      firstDay.minus({ hours: 3 }),
+      rangeEnd.plus({ hours: 3 }),
+    ),
+    activeMeetingCountsByDate(
+      admin,
+      purpose,
+      firstDay,
+      rangeEnd,
+    ),
+  ]);
 
   const blockedBtyDates = new Set(
-    [...btyCounts.entries()]
-      .filter(([, count]) => count >= 1)
-      .map(([date]) => date),
+    meetingType === "bty_interview"
+      ? [...activeCounts.entries()]
+          .filter(([, count]) => count >= 1)
+          .map(([date]) => date)
+      : [],
   );
   for (const event of busy) {
     if (event.source === "google" && event.isBtyRecording) {
@@ -925,7 +994,7 @@ async function computeAvailability(
     }
     if (
       meetingType === "pre_interview" &&
-      (preCounts.get(dateKey) ?? 0) >= 2
+      (activeCounts.get(dateKey) ?? 0) >= 2
     ) {
       continue;
     }
@@ -989,23 +1058,24 @@ async function selectedSlotAvailable(
   const dayStart = start.startOf("day");
   const dayEnd = dayStart.plus({ days: 1 });
   const purpose = meetingPurpose(meetingType);
-  const counts = await activeMeetingCountsByDate(
-    admin,
-    purpose,
-    dayStart,
-    dayEnd,
-  );
+  const [counts, busy] = await Promise.all([
+    activeMeetingCountsByDate(
+      admin,
+      purpose,
+      dayStart,
+      dayEnd,
+    ),
+    collectBusyEvents(
+      admin,
+      dayStart.minus({ hours: 3 }),
+      dayEnd.plus({ hours: 3 }),
+      excludeMeetingId,
+    ),
+  ]);
   const count = counts.get(centralDateKey(start)) ?? 0;
 
   if (meetingType === "bty_interview" && count >= 1) return false;
   if (meetingType === "pre_interview" && count >= 2) return false;
-
-  const busy = await collectBusyEvents(
-    admin,
-    dayStart.minus({ hours: 3 }),
-    dayEnd.plus({ hours: 3 }),
-    excludeMeetingId,
-  );
 
   if (
     meetingType === "bty_interview" &&
@@ -1067,6 +1137,18 @@ async function calendarWriteAccess(admin: SupabaseClient) {
     throw new Error("Calendar booking is temporarily unavailable.");
   }
 
+  if (
+    writeTokenCache &&
+    writeTokenCache.connectionId === connection.id &&
+    writeTokenCache.calendarId === connection.selected_calendar_id &&
+    writeTokenCache.expiresAt > Date.now() + 60_000
+  ) {
+    return {
+      accessToken: writeTokenCache.token,
+      calendarId: writeTokenCache.calendarId,
+    };
+  }
+
   const encryptionKey = Deno.env.get("TOKEN_ENCRYPTION_KEY") ?? "";
   const clientId = Deno.env.get("GOOGLE_CLIENT_ID") ?? "";
   const clientSecret = Deno.env.get("GOOGLE_CLIENT_SECRET") ?? "";
@@ -1089,6 +1171,7 @@ async function calendarWriteAccess(admin: SupabaseClient) {
   });
   const body = await response.json().catch(() => ({})) as Record<string, unknown>;
   if (!response.ok || typeof body.access_token !== "string") {
+    writeTokenCache = null;
     await admin
       .from("staff_calendar_connections")
       .update({
@@ -1098,9 +1181,21 @@ async function calendarWriteAccess(admin: SupabaseClient) {
       .eq("id", connection.id);
     throw new Error("Calendar booking is temporarily unavailable.");
   }
-  return {
-    accessToken: body.access_token,
+
+  const expiresInSeconds =
+    typeof body.expires_in === "number" && Number.isFinite(body.expires_in)
+      ? body.expires_in
+      : 3600;
+  writeTokenCache = {
+    connectionId: connection.id,
+    token: body.access_token,
     calendarId: connection.selected_calendar_id,
+    expiresAt: Date.now() + Math.max(60, expiresInSeconds - 60) * 1000,
+  };
+
+  return {
+    accessToken: writeTokenCache.token,
+    calendarId: writeTokenCache.calendarId,
   };
 }
 

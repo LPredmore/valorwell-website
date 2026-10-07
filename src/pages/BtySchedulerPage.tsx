@@ -85,17 +85,17 @@ const meetingTypeContent: Record<
   }
 > = {
   pre_interview: {
-    title: "Pre-Interview",
+    title: "Talk With Us First",
     shortTitle: "Pre-Interview",
     description:
-      "Schedule a brief conversation with ValorWell before your Beyond The Yellow interview.",
+      "I'm not ready to be on Beyond The Yellow yet, but I'd like to talk about it and see what it's all about.",
     duration: "30 minutes",
   },
   bty_interview: {
-    title: "Beyond The Yellow Interview",
+    title: "I'm Ready for Beyond The Yellow",
     shortTitle: "BTY Interview",
     description:
-      "Schedule your full Beyond The Yellow recorded conversation.",
+      "I know what Beyond The Yellow is, and I'm ready to be featured. Let's do it.",
     duration: "60 minutes",
   },
 };

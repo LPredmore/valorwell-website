@@ -187,16 +187,25 @@ function meetingUrlFromCalendarEvent(event: CalendarEvent) {
 }
 
 function serializeBooking(
-  meeting: Record<string, any> | null,
+  meeting: {
+    starts_at?: string | null;
+    ends_at?: string | null;
+    streamyard_url?: string | null;
+    meeting_url?: string | null;
+    metadata?: Record<string, unknown> | null;
+    external_event_id?: string | null;
+  } | null,
   meetingType: MeetingType,
 ) {
   if (!meeting) return null;
+  const metadataMeetUrl =
+    typeof meeting.metadata?.google_meet_url === "string"
+      ? meeting.metadata.google_meet_url
+      : null;
   const meetingUrl =
     meetingType === "bty_interview"
       ? meeting.streamyard_url ?? STREAMYARD_URL
-      : meeting.meeting_url ??
-        meeting.metadata?.google_meet_url ??
-        null;
+      : meeting.meeting_url ?? metadataMeetUrl;
   return {
     meetingType,
     startUtc: meeting.starts_at,

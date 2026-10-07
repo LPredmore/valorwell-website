@@ -14,8 +14,25 @@ const OWL_CALENDAR =
 const FAMILY_CALENDAR =
   "family04728270701916614416@group.calendar.google.com";
 const BTY_STAFF_ID = "af790579-5d4c-4aed-9d2e-77d72908ed85";
-const SESSION_MINUTES = 60;
-const SLOT_HOURS = [9, 10, 11, 12, 13];
+type MeetingType = "pre_interview" | "bty_interview";
+
+const MEETING_CONFIG = {
+  pre_interview: {
+    purpose: "bty_preinterview",
+    durationMinutes: 30,
+    postBufferMinutes: 30,
+    slotStepMinutes: 30,
+  },
+  bty_interview: {
+    purpose: "bty_recording",
+    durationMinutes: 60,
+    postBufferMinutes: 60,
+    slotStepMinutes: 60,
+  },
+} as const;
+
+const DAY_START_MINUTES = 9 * 60;
+const DAY_END_MINUTES = 14 * 60;
 const SESSION_TTL_SECONDS = 30 * 60;
 const AVAILABILITY_WEEKS = 8;
 const VALIDATE_LIMIT = 12;
@@ -73,6 +90,16 @@ type CalendarEvent = {
   start?: { dateTime?: string; date?: string };
   end?: { dateTime?: string; date?: string };
   attendees?: Array<{ email?: string }>;
+  hangoutLink?: string;
+  conferenceData?: {
+    createRequest?: {
+      status?: { statusCode?: string };
+    };
+    entryPoints?: Array<{ entryPointType?: string; uri?: string }>;
+  };
+  extendedProperties?: {
+    private?: Record<string, string>;
+  };
 };
 
 type BusyEvent = {
@@ -80,7 +107,10 @@ type BusyEvent = {
   end: DateTime;
   allDay: boolean;
   physical: boolean;
-  isBty: boolean;
+  isBtyRecording: boolean;
+  isPreInterview: boolean;
+  source: "google" | "database";
+  sourceId?: string | null;
 };
 
 type ContactRecord = {
@@ -119,6 +149,65 @@ function adminClient(): SupabaseClient {
 
 function normalizeEmail(value: unknown) {
   return String(value ?? "").trim().toLowerCase();
+}
+
+function parseMeetingType(value: unknown): MeetingType | null {
+  return value === "pre_interview" || value === "bty_interview"
+    ? value
+    : null;
+}
+
+function meetingPurpose(meetingType: MeetingType) {
+  return MEETING_CONFIG[meetingType].purpose;
+}
+
+function meetingForType(
+  context: {
+    bookings: {
+      preInterview: Record<string, unknown> | null;
+      btyInterview: Record<string, unknown> | null;
+    };
+  },
+  meetingType: MeetingType,
+) {
+  return meetingType === "pre_interview"
+    ? context.bookings.preInterview
+    : context.bookings.btyInterview;
+}
+
+function meetingUrlFromCalendarEvent(event: CalendarEvent) {
+  if (typeof event.hangoutLink === "string" && event.hangoutLink) {
+    return event.hangoutLink;
+  }
+  return (
+    event.conferenceData?.entryPoints?.find(
+      (entry) => entry.entryPointType === "video" && entry.uri,
+    )?.uri ?? null
+  );
+}
+
+function serializeBooking(
+  meeting: Record<string, any> | null,
+  meetingType: MeetingType,
+) {
+  if (!meeting) return null;
+  const meetingUrl =
+    meetingType === "bty_interview"
+      ? meeting.streamyard_url ?? STREAMYARD_URL
+      : meeting.meeting_url ??
+        meeting.metadata?.google_meet_url ??
+        null;
+  return {
+    meetingType,
+    startUtc: meeting.starts_at,
+    endUtc: meeting.ends_at,
+    meetingUrl,
+    streamyardUrl:
+      meetingType === "bty_interview"
+        ? meeting.streamyard_url ?? STREAMYARD_URL
+        : null,
+    calendarEventId: meeting.external_event_id ?? null,
+  };
 }
 
 function displayName(contact: ContactRecord) {
@@ -289,29 +378,51 @@ async function resolveContactContext(admin: SupabaseClient, email: string) {
   if (!eligibleOrganizations.length) return null;
 
   const eligibleOrganizationIds = eligibleOrganizations.map((row) => row.id);
-  const { data: meetings, error: meetingError } = await admin
+  const { data: activeMeetings, error: meetingError } = await admin
     .from("relationship_meetings")
     .select(
-      "id,opportunity_id,organization_id,contact_id,starts_at,ends_at,event_status,streamyard_url,external_event_id",
+      "id,purpose,opportunity_id,organization_id,contact_id,starts_at,ends_at,event_status,streamyard_url,external_event_id,metadata",
     )
     .eq("tenant_id", TENANT_ID)
-    .eq("purpose", "bty_recording")
+    .in("purpose", ["bty_recording", "bty_preinterview"])
     .in("organization_id", eligibleOrganizationIds)
     .in("event_status", ["tentative", "confirmed"])
     .order("starts_at", { ascending: true });
   if (meetingError) throw new Error(meetingError.message);
 
-  let activeMeeting = (meetings ?? [])[0] ?? null;
   const organization =
-    eligibleOrganizations.find(
-      (row) => row.id === activeMeeting?.organization_id,
+    eligibleOrganizations.find((row) =>
+      (activeMeetings ?? []).some(
+        (meeting) => meeting.organization_id === row.id,
+      )
     ) ?? eligibleOrganizations[0];
 
-  if (!activeMeeting) {
-    activeMeeting = await findExistingCalendarBooking(
+  const organizationMeetings = (activeMeetings ?? []).filter(
+    (meeting) => meeting.organization_id === organization.id,
+  );
+  let btyInterview =
+    organizationMeetings.find(
+      (meeting) => meeting.purpose === "bty_recording",
+    ) ?? null;
+  let preInterview =
+    organizationMeetings.find(
+      (meeting) => meeting.purpose === "bty_preinterview",
+    ) ?? null;
+
+  if (!btyInterview) {
+    btyInterview = await findExistingCalendarBooking(
       admin,
       organization,
       email,
+      "bty_interview",
+    );
+  }
+  if (!preInterview) {
+    preInterview = await findExistingCalendarBooking(
+      admin,
+      organization,
+      email,
+      "pre_interview",
     );
   }
 
@@ -330,7 +441,10 @@ async function resolveContactContext(admin: SupabaseClient, email: string) {
     contact,
     organization,
     opportunity,
-    activeMeeting,
+    bookings: {
+      preInterview,
+      btyInterview,
+    },
   };
 }
 
@@ -346,10 +460,7 @@ async function revalidateSession(
   ) {
     throw new Error("This scheduling invitation is no longer active.");
   }
-  if (context.activeMeeting) {
-    return { ...context, state: "booked" as const };
-  }
-  return { ...context, state: "ready" as const };
+  return context;
 }
 
 async function relationshipCalendarConnections(admin: SupabaseClient) {
@@ -493,13 +604,27 @@ function normalizeCalendarEvent(event: CalendarEvent): BusyEvent | null {
   const bounds = eventBounds(event);
   if (!bounds) return null;
   const location = String(event.location ?? "").trim();
-  const serialized = `${event.summary ?? ""} ${event.description ?? ""} ${location}`;
+  const summary = String(event.summary ?? "");
+  const serialized = `${summary} ${event.description ?? ""} ${location}`;
+  const privateProps = event.extendedProperties?.private ?? {};
+  const isPreInterview =
+    privateProps.meetingType === "pre_interview" ||
+    /beyond\s+the\s+yellow\s+pre[- ]interview/i.test(summary);
+  const isBtyRecording =
+    !isPreInterview &&
+    (
+      privateProps.meetingType === "bty_interview" ||
+      serialized.includes(STREAMYARD_URL) ||
+      /beyond\s+the\s+yellow/i.test(summary)
+    );
+
   return {
     ...bounds,
     physical: Boolean(location) && !isVirtualLocation(location),
-    isBty:
-      /beyond\s+the\s+yellow/i.test(String(event.summary ?? "")) ||
-      serialized.includes(STREAMYARD_URL),
+    isBtyRecording,
+    isPreInterview,
+    source: "google",
+    sourceId: event.id ?? null,
   };
 }
 
@@ -515,6 +640,7 @@ async function findExistingCalendarBooking(
   admin: SupabaseClient,
   organization: OrganizationRecord,
   contactEmail: string,
+  meetingType: MeetingType,
 ) {
   const connections = await relationshipCalendarConnections(admin);
   const infoConnection = connections.find(
@@ -537,7 +663,13 @@ async function findExistingCalendarBooking(
 
   for (const event of events) {
     const normalized = normalizeCalendarEvent(event);
-    if (!normalized?.isBty || normalized.end < now) continue;
+    if (!normalized || normalized.end < now) continue;
+
+    const typeMatches =
+      meetingType === "pre_interview"
+        ? normalized.isPreInterview
+        : normalized.isBtyRecording;
+    if (!typeMatches) continue;
 
     const attendeeEmails = (event.attendees ?? [])
       .map((attendee) => normalizeEmail(attendee.email))
@@ -551,14 +683,21 @@ async function findExistingCalendarBooking(
 
     return {
       id: null,
+      purpose: meetingPurpose(meetingType),
       opportunity_id: null,
       organization_id: organization.id,
       contact_id: null,
       starts_at: normalized.start.toUTC().toISO(),
       ends_at: normalized.end.toUTC().toISO(),
       event_status: "confirmed",
-      streamyard_url: STREAMYARD_URL,
+      streamyard_url:
+        meetingType === "bty_interview" ? STREAMYARD_URL : null,
+      meeting_url:
+        meetingType === "pre_interview"
+          ? meetingUrlFromCalendarEvent(event)
+          : STREAMYARD_URL,
       external_event_id: event.id ?? null,
+      metadata: {},
     };
   }
 
@@ -569,6 +708,7 @@ async function collectBusyEvents(
   admin: SupabaseClient,
   rangeStart: DateTime,
   rangeEnd: DateTime,
+  excludeMeetingId?: string,
 ) {
   const connections = await relationshipCalendarConnections(admin);
   const busy: BusyEvent[] = [];
@@ -587,6 +727,39 @@ async function collectBusyEvents(
       }
     }
   }
+
+  let meetingsQuery = admin
+    .from("relationship_meetings")
+    .select("id,purpose,starts_at,ends_at,external_event_id")
+    .eq("tenant_id", TENANT_ID)
+    .in("purpose", ["bty_recording", "bty_preinterview"])
+    .in("event_status", ["tentative", "confirmed"])
+    .not("starts_at", "is", null)
+    .not("ends_at", "is", null)
+    .lt("starts_at", rangeEnd.toUTC().toISO()!)
+    .gt("ends_at", rangeStart.toUTC().toISO()!);
+  if (excludeMeetingId) {
+    meetingsQuery = meetingsQuery.neq("id", excludeMeetingId);
+  }
+  const { data: meetings, error: meetingsError } = await meetingsQuery;
+  if (meetingsError) throw new Error(meetingsError.message);
+
+  for (const meeting of meetings ?? []) {
+    const start = DateTime.fromISO(String(meeting.starts_at));
+    const end = DateTime.fromISO(String(meeting.ends_at));
+    if (!start.isValid || !end.isValid) continue;
+    busy.push({
+      start,
+      end,
+      allDay: false,
+      physical: false,
+      isBtyRecording: meeting.purpose === "bty_recording",
+      isPreInterview: meeting.purpose === "bty_preinterview",
+      source: "database",
+      sourceId: meeting.external_event_id ?? meeting.id,
+    });
+  }
+
   return busy;
 }
 
@@ -597,7 +770,7 @@ function firstBookableMonday(now = DateTime.now().setZone(CENTRAL_ZONE)) {
     : threshold.plus({ days: 8 - threshold.weekday }).startOf("day");
 }
 
-function slotConflicts(
+function btyInterviewSlotConflicts(
   slotStart: DateTime,
   slotEnd: DateTime,
   event: BusyEvent,
@@ -608,12 +781,52 @@ function slotConflicts(
   return slotStart < blockedEnd && slotEnd > blockedStart;
 }
 
+function preInterviewSlotConflicts(
+  slotStart: DateTime,
+  slotEnd: DateTime,
+  event: BusyEvent,
+) {
+  const candidateEnd = slotEnd.plus({
+    minutes: MEETING_CONFIG.pre_interview.postBufferMinutes,
+  });
+
+  let blockedStart = event.start;
+  let blockedEnd = event.end;
+
+  if (event.isBtyRecording) {
+    blockedStart = event.start.minus({
+      minutes: MEETING_CONFIG.bty_interview.postBufferMinutes,
+    });
+    blockedEnd = event.end.plus({
+      minutes: MEETING_CONFIG.bty_interview.postBufferMinutes,
+    });
+  } else if (event.isPreInterview) {
+    blockedEnd = event.end.plus({
+      minutes: MEETING_CONFIG.pre_interview.postBufferMinutes,
+    });
+  }
+
+  return slotStart < blockedEnd && candidateEnd > blockedStart;
+}
+
+function meetingTypeConflicts(
+  meetingType: MeetingType,
+  slotStart: DateTime,
+  slotEnd: DateTime,
+  event: BusyEvent,
+) {
+  return meetingType === "pre_interview"
+    ? preInterviewSlotConflicts(slotStart, slotEnd, event)
+    : btyInterviewSlotConflicts(slotStart, slotEnd, event);
+}
+
 function centralDateKey(value: DateTime) {
   return value.setZone(CENTRAL_ZONE).toFormat("yyyy-MM-dd");
 }
 
-async function blockedMeetingDates(
+async function activeMeetingCountsByDate(
   admin: SupabaseClient,
+  purpose: "bty_recording" | "bty_preinterview",
   rangeStart: DateTime,
   rangeEnd: DateTime,
 ) {
@@ -621,20 +834,36 @@ async function blockedMeetingDates(
     .from("relationship_meetings")
     .select("starts_at")
     .eq("tenant_id", TENANT_ID)
-    .eq("purpose", "bty_recording")
+    .eq("purpose", purpose)
     .in("event_status", ["tentative", "confirmed"])
     .gte("starts_at", rangeStart.toUTC().toISO()!)
     .lt("starts_at", rangeEnd.toUTC().toISO()!);
   if (error) throw new Error(error.message);
-  return new Set(
-    (data ?? [])
-      .map((row) => DateTime.fromISO(String(row.starts_at)))
-      .filter((date) => date.isValid)
-      .map(centralDateKey),
-  );
+
+  const counts = new Map<string, number>();
+  for (const row of data ?? []) {
+    const start = DateTime.fromISO(String(row.starts_at));
+    if (!start.isValid) continue;
+    const key = centralDateKey(start);
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+  return counts;
 }
 
-async function computeAvailability(admin: SupabaseClient) {
+function slotStartForDay(day: DateTime, minutesFromMidnight: number) {
+  return day.set({
+    hour: Math.floor(minutesFromMidnight / 60),
+    minute: minutesFromMidnight % 60,
+    second: 0,
+    millisecond: 0,
+  });
+}
+
+async function computeAvailability(
+  admin: SupabaseClient,
+  meetingType: MeetingType,
+) {
+  const config = MEETING_CONFIG[meetingType];
   const firstDay = firstBookableMonday();
   const rangeEnd = firstDay.plus({ weeks: AVAILABILITY_WEEKS });
   const busy = await collectBusyEvents(
@@ -642,10 +871,28 @@ async function computeAvailability(admin: SupabaseClient) {
     firstDay.minus({ hours: 3 }),
     rangeEnd.plus({ hours: 3 }),
   );
-  const blockedByMeeting = await blockedMeetingDates(admin, firstDay, rangeEnd);
-  const blockedBtyDates = new Set(blockedByMeeting);
+  const btyCounts = await activeMeetingCountsByDate(
+    admin,
+    "bty_recording",
+    firstDay,
+    rangeEnd,
+  );
+  const preCounts = await activeMeetingCountsByDate(
+    admin,
+    "bty_preinterview",
+    firstDay,
+    rangeEnd,
+  );
+
+  const blockedBtyDates = new Set(
+    [...btyCounts.entries()]
+      .filter(([, count]) => count >= 1)
+      .map(([date]) => date),
+  );
   for (const event of busy) {
-    if (event.isBty) blockedBtyDates.add(centralDateKey(event.start));
+    if (event.source === "google" && event.isBtyRecording) {
+      blockedBtyDates.add(centralDateKey(event.start));
+    }
   }
 
   const days: Array<{
@@ -660,12 +907,35 @@ async function computeAvailability(admin: SupabaseClient) {
   ) {
     if (day.weekday > 5) continue;
     const dateKey = day.toFormat("yyyy-MM-dd");
-    if (blockedBtyDates.has(dateKey)) continue;
+
+    if (
+      meetingType === "bty_interview" &&
+      blockedBtyDates.has(dateKey)
+    ) {
+      continue;
+    }
+    if (
+      meetingType === "pre_interview" &&
+      (preCounts.get(dateKey) ?? 0) >= 2
+    ) {
+      continue;
+    }
+
     const slots: Array<{ startUtc: string; endUtc: string }> = [];
-    for (const hour of SLOT_HOURS) {
-      const start = day.set({ hour, minute: 0, second: 0, millisecond: 0 });
-      const end = start.plus({ minutes: SESSION_MINUTES });
-      if (busy.some((event) => slotConflicts(start, end, event))) continue;
+    for (
+      let minutes = DAY_START_MINUTES;
+      minutes + config.durationMinutes <= DAY_END_MINUTES;
+      minutes += config.slotStepMinutes
+    ) {
+      const start = slotStartForDay(day, minutes);
+      const end = start.plus({ minutes: config.durationMinutes });
+      if (
+        busy.some((event) =>
+          meetingTypeConflicts(meetingType, start, end, event)
+        )
+      ) {
+        continue;
+      }
       slots.push({
         startUtc: start.toUTC().toISO()!,
         endUtc: end.toUTC().toISO()!,
@@ -675,6 +945,7 @@ async function computeAvailability(admin: SupabaseClient) {
   }
 
   return {
+    meetingType,
     timezone: CENTRAL_ZONE,
     firstBookableDate: firstDay.toFormat("yyyy-MM-dd"),
     lastBookableDate: rangeEnd.minus({ days: 1 }).toFormat("yyyy-MM-dd"),
@@ -684,41 +955,64 @@ async function computeAvailability(admin: SupabaseClient) {
 
 async function selectedSlotAvailable(
   admin: SupabaseClient,
+  meetingType: MeetingType,
   start: DateTime,
   end: DateTime,
+  excludeMeetingId?: string,
 ) {
+  const config = MEETING_CONFIG[meetingType];
   const firstDay = firstBookableMonday();
   const finalDay = firstDay.plus({ weeks: AVAILABILITY_WEEKS });
+  const minutesFromMidnight = start.hour * 60 + start.minute;
+
   if (
     start < firstDay ||
     start >= finalDay ||
     start.weekday > 5 ||
-    start.minute !== 0 ||
     start.second !== 0 ||
-    !SLOT_HOURS.includes(start.hour)
+    minutesFromMidnight < DAY_START_MINUTES ||
+    minutesFromMidnight + config.durationMinutes > DAY_END_MINUTES ||
+    (minutesFromMidnight - DAY_START_MINUTES) % config.slotStepMinutes !== 0
   ) {
     return false;
   }
+
   const dayStart = start.startOf("day");
   const dayEnd = dayStart.plus({ days: 1 });
+  const purpose = meetingPurpose(meetingType);
+  const counts = await activeMeetingCountsByDate(
+    admin,
+    purpose,
+    dayStart,
+    dayEnd,
+  );
+  const count = counts.get(centralDateKey(start)) ?? 0;
 
-  const blocked = await blockedMeetingDates(admin, dayStart, dayEnd);
-  if (blocked.has(centralDateKey(start))) return false;
+  if (meetingType === "bty_interview" && count >= 1) return false;
+  if (meetingType === "pre_interview" && count >= 2) return false;
 
   const busy = await collectBusyEvents(
     admin,
     dayStart.minus({ hours: 3 }),
     dayEnd.plus({ hours: 3 }),
+    excludeMeetingId,
   );
+
   if (
+    meetingType === "bty_interview" &&
     busy.some(
       (event) =>
-        event.isBty && centralDateKey(event.start) === centralDateKey(start),
+        event.source === "google" &&
+        event.isBtyRecording &&
+        centralDateKey(event.start) === centralDateKey(start),
     )
   ) {
     return false;
   }
-  return !busy.some((event) => slotConflicts(start, end, event));
+
+  return !busy.some((event) =>
+    meetingTypeConflicts(meetingType, start, end, event)
+  );
 }
 
 function hexToBytes(hex: string): Uint8Array {
@@ -801,9 +1095,23 @@ async function calendarWriteAccess(admin: SupabaseClient) {
   };
 }
 
+async function readGoogleEvent(
+  accessToken: string,
+  calendarId: string,
+  eventId: string,
+) {
+  const response = await fetch(
+    `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}?conferenceDataVersion=1`,
+    { headers: { authorization: `Bearer ${accessToken}` } },
+  );
+  if (!response.ok) return null;
+  return await response.json().catch(() => null) as CalendarEvent | null;
+}
+
 async function createGoogleEvent(
   admin: SupabaseClient,
   input: {
+    meetingType: MeetingType;
     start: DateTime;
     end: DateTime;
     guestName: string;
@@ -814,14 +1122,20 @@ async function createGoogleEvent(
   },
 ) {
   const write = await calendarWriteAccess(admin);
+  const isPreInterview = input.meetingType === "pre_interview";
+  const summaryBase = isPreInterview
+    ? "Beyond The Yellow Pre-Interview"
+    : "Beyond The Yellow";
   const summary = input.guestName
-    ? `Beyond The Yellow | ${input.guestName} | ${input.organizationName}`
-    : `Beyond The Yellow | ${input.organizationName}`;
-  const body = {
+    ? `${summaryBase} | ${input.guestName} | ${input.organizationName}`
+    : `${summaryBase} | ${input.organizationName}`;
+
+  const body: Record<string, unknown> = {
     summary,
-    description:
-      `Beyond The Yellow prerecorded conversation with ValorWell.\n\nJoin the recording: ${STREAMYARD_URL}\n\nScheduled in Central Time.`,
-    location: STREAMYARD_URL,
+    description: isPreInterview
+      ? "Beyond The Yellow pre-interview with ValorWell.\n\nScheduled in Central Time."
+      : `Beyond The Yellow prerecorded conversation with ValorWell.\n\nJoin the recording: ${STREAMYARD_URL}\n\nScheduled in Central Time.`,
+    ...(isPreInterview ? {} : { location: STREAMYARD_URL }),
     start: {
       dateTime: input.start.toISO({ suppressMilliseconds: true }),
       timeZone: CENTRAL_ZONE,
@@ -835,15 +1149,30 @@ async function createGoogleEvent(
     extendedProperties: {
       private: {
         source: "bty_public_scheduler",
+        meetingType: input.meetingType,
         relationshipOrganizationId: input.organizationId,
         ...(input.opportunityId
           ? { relationshipOpportunityId: input.opportunityId }
           : {}),
       },
     },
+    ...(isPreInterview
+      ? {
+          conferenceData: {
+            createRequest: {
+              requestId: crypto.randomUUID(),
+              conferenceSolutionKey: { type: "hangoutsMeet" },
+            },
+          },
+        }
+      : {}),
   };
+
+  const params = new URLSearchParams({ sendUpdates: "all" });
+  if (isPreInterview) params.set("conferenceDataVersion", "1");
+
   const response = await fetch(
-    `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(write.calendarId)}/events?sendUpdates=all`,
+    `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(write.calendarId)}/events?${params}`,
     {
       method: "POST",
       headers: {
@@ -853,15 +1182,60 @@ async function createGoogleEvent(
       body: JSON.stringify(body),
     },
   );
-  const event = await response.json().catch(() => ({})) as Record<string, unknown>;
+  let event = await response.json().catch(() => ({})) as CalendarEvent & Record<string, unknown>;
   if (!response.ok || typeof event.id !== "string") {
     console.error("BTY scheduler Google event creation failed", {
+      meetingType: input.meetingType,
       status: response.status,
       event,
     });
     throw new Error("The calendar invitation could not be created.");
   }
-  return event;
+
+  if (isPreInterview) {
+    let meetUrl = meetingUrlFromCalendarEvent(event);
+    let conferenceStatus =
+      event.conferenceData?.createRequest?.status?.statusCode ?? null;
+
+    for (
+      let attempt = 0;
+      !meetUrl && conferenceStatus !== "failure" && attempt < 6;
+      attempt += 1
+    ) {
+      await new Promise((resolve) => setTimeout(resolve, 350 + attempt * 150));
+      const refreshed = await readGoogleEvent(
+        write.accessToken,
+        write.calendarId,
+        event.id,
+      );
+      if (!refreshed) continue;
+      event = { ...event, ...refreshed };
+      meetUrl = meetingUrlFromCalendarEvent(event);
+      conferenceStatus =
+        event.conferenceData?.createRequest?.status?.statusCode ?? null;
+    }
+
+    if (conferenceStatus === "failure") {
+      await fetch(
+        `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(write.calendarId)}/events/${encodeURIComponent(event.id)}?sendUpdates=all`,
+        {
+          method: "DELETE",
+          headers: { authorization: `Bearer ${write.accessToken}` },
+        },
+      ).catch(() => undefined);
+      throw new Error("The Google Meet link could not be created.");
+    }
+
+    return {
+      ...event,
+      schedulerMeetingUrl: meetUrl,
+    };
+  }
+
+  return {
+    ...event,
+    schedulerMeetingUrl: STREAMYARD_URL,
+  };
 }
 
 async function handleValidate(
@@ -883,28 +1257,13 @@ async function handleValidate(
   if (!context) return json({ eligible: false });
 
   const contactName = displayName(context.contact);
-  if (context.activeMeeting) {
-    return json({
-      eligible: true,
-      state: "booked",
-      contact: { name: contactName, email },
-      organization: {
-        id: context.organization.id,
-        name: context.organization.name,
-      },
-      booking: {
-        startUtc: context.activeMeeting.starts_at,
-        endUtc: context.activeMeeting.ends_at,
-        streamyardUrl: context.activeMeeting.streamyard_url,
-      },
-    });
-  }
   const sessionToken = await issueSession({
     contactId: context.contact.id,
     organizationId: context.organization.id,
     opportunityId: context.opportunity?.id ?? null,
     email,
   });
+
   return json({
     eligible: true,
     state: "ready",
@@ -915,6 +1274,16 @@ async function handleValidate(
       id: context.organization.id,
       name: context.organization.name,
     },
+    bookings: {
+      preInterview: serializeBooking(
+        context.bookings.preInterview,
+        "pre_interview",
+      ),
+      btyInterview: serializeBooking(
+        context.bookings.btyInterview,
+        "bty_interview",
+      ),
+    },
   });
 }
 
@@ -922,43 +1291,58 @@ async function handleAvailability(
   admin: SupabaseClient,
   input: Record<string, unknown>,
 ) {
+  const meetingType = parseMeetingType(input.meetingType);
+  if (!meetingType) {
+    return json({ error: "A valid meeting type is required." }, 400);
+  }
+
   const session = await verifySession(input.sessionToken);
   const context = await revalidateSession(admin, session);
-  if (context.state === "booked") {
+  const existing = meetingForType(context, meetingType);
+
+  if (existing) {
     return json(
       {
         state: "booked",
-        booking: {
-          startUtc: context.activeMeeting.starts_at,
-          endUtc: context.activeMeeting.ends_at,
-          streamyardUrl: context.activeMeeting.streamyard_url,
-        },
+        booking: serializeBooking(existing, meetingType),
       },
       409,
     );
   }
-  return json({ state: "ready", ...(await computeAvailability(admin)) });
+
+  return json({
+    state: "ready",
+    ...(await computeAvailability(admin, meetingType)),
+  });
 }
 
 async function handleBook(
   admin: SupabaseClient,
   input: Record<string, unknown>,
 ) {
+  const meetingType = parseMeetingType(input.meetingType);
+  if (!meetingType) {
+    return json({ booked: false, error: "A valid meeting type is required." }, 400);
+  }
+
   const session = await verifySession(input.sessionToken);
   const context = await revalidateSession(admin, session);
-  if (context.state === "booked") {
-    return json(
-      {
-        booked: true,
-        alreadyBooked: true,
-        booking: {
-          startUtc: context.activeMeeting.starts_at,
-          endUtc: context.activeMeeting.ends_at,
-          streamyardUrl: context.activeMeeting.streamyard_url,
-        },
+  const existing = meetingForType(context, meetingType);
+
+  if (existing) {
+    return json({
+      booked: true,
+      alreadyBooked: true,
+      booking: serializeBooking(existing, meetingType),
+      contact: {
+        name: displayName(context.contact),
+        email: session.email,
       },
-      200,
-    );
+      organization: {
+        id: context.organization.id,
+        name: context.organization.name,
+      },
+    });
   }
 
   const startUtc = String(input.startUtc ?? "");
@@ -966,9 +1350,12 @@ async function handleBook(
   if (!parsedStart.isValid) {
     return json({ booked: false, error: "That time is invalid." }, 400);
   }
+
+  const config = MEETING_CONFIG[meetingType];
   const start = parsedStart.setZone(CENTRAL_ZONE);
-  const end = start.plus({ minutes: SESSION_MINUTES });
-  if (!(await selectedSlotAvailable(admin, start, end))) {
+  const end = start.plus({ minutes: config.durationMinutes });
+
+  if (!(await selectedSlotAvailable(admin, meetingType, start, end))) {
     return json(
       {
         booked: false,
@@ -995,7 +1382,7 @@ async function handleBook(
       opportunity_id: context.opportunity?.id ?? null,
       organization_id: context.organization.id,
       contact_id: context.contact.id,
-      purpose: "bty_recording",
+      purpose: meetingPurpose(meetingType),
       connection_id: infoConnection.id,
       calendar_id: INFO_CALENDAR,
       external_event_id: reservationExternalId,
@@ -1003,10 +1390,12 @@ async function handleBook(
       starts_at: start.toUTC().toISO(),
       ends_at: end.toUTC().toISO(),
       event_status: "tentative",
-      streamyard_url: STREAMYARD_URL,
+      streamyard_url:
+        meetingType === "bty_interview" ? STREAMYARD_URL : null,
       last_synced_at: now,
       metadata: {
         source: "bty_public_scheduler",
+        meeting_type: meetingType,
         booking_state: "reserving",
         booked_by_email: session.email,
       },
@@ -1019,7 +1408,10 @@ async function handleBook(
       return json(
         {
           booked: false,
-          error: "That day is no longer available. Please choose another day.",
+          error:
+            meetingType === "pre_interview"
+              ? "That pre-interview day or invitation is no longer available. Please choose another time."
+              : "That day is no longer available. Please choose another day.",
         },
         409,
       );
@@ -1028,19 +1420,15 @@ async function handleBook(
   }
 
   try {
-    // Recheck live Google calendars after the database reservation has locked the day.
-    const dayStart = start.startOf("day");
-    const busy = await collectBusyEvents(
-      admin,
-      dayStart.minus({ hours: 3 }),
-      dayStart.plus({ days: 1, hours: 3 }),
-    );
-    const googleConflict =
-      busy.some(
-        (event) =>
-          event.isBty && centralDateKey(event.start) === centralDateKey(start),
-      ) || busy.some((event) => slotConflicts(start, end, event));
-    if (googleConflict) {
+    if (
+      !(await selectedSlotAvailable(
+        admin,
+        meetingType,
+        start,
+        end,
+        reservation.id,
+      ))
+    ) {
       await admin.from("relationship_meetings").delete().eq("id", reservation.id);
       return json(
         {
@@ -1052,6 +1440,7 @@ async function handleBook(
     }
 
     const event = await createGoogleEvent(admin, {
+      meetingType,
       start,
       end,
       guestName: displayName(context.contact),
@@ -1062,17 +1451,27 @@ async function handleBook(
     });
 
     const confirmedAt = new Date().toISOString();
+    const meetingUrl =
+      typeof event.schedulerMeetingUrl === "string"
+        ? event.schedulerMeetingUrl
+        : null;
+
     const { error: meetingUpdateError } = await admin
       .from("relationship_meetings")
       .update({
         external_event_id: String(event.id),
-        ical_uid: typeof event.iCalUID === "string" ? event.iCalUID : null,
+        ical_uid:
+          typeof event.iCalUID === "string" ? event.iCalUID : null,
         event_status: "confirmed",
         last_synced_at: confirmedAt,
         metadata: {
           source: "bty_public_scheduler",
+          meeting_type: meetingType,
           booking_state: "confirmed",
           booked_by_email: session.email,
+          ...(meetingType === "pre_interview"
+            ? { google_meet_url: meetingUrl }
+            : {}),
           google_html_link:
             typeof event.htmlLink === "string" ? event.htmlLink : null,
         },
@@ -1088,9 +1487,15 @@ async function handleBook(
     return json({
       booked: true,
       booking: {
+        meetingType,
         startUtc: start.toUTC().toISO(),
         endUtc: end.toUTC().toISO(),
-        streamyardUrl: STREAMYARD_URL,
+        meetingUrl:
+          meetingType === "bty_interview"
+            ? STREAMYARD_URL
+            : meetingUrl,
+        streamyardUrl:
+          meetingType === "bty_interview" ? STREAMYARD_URL : null,
         calendarEventId: event.id,
       },
       contact: {

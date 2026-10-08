@@ -24,7 +24,7 @@ const representativeBodyContent = new Map([
     [
       "The VA said our kids were covered. No one would take the coverage.",
       "No one else is fixing this from both sides",
-      "American Corporate Partners",
+      "Beyond The Yellow",
     ],
   ],
   [
@@ -88,7 +88,7 @@ const progressiveEnhancementContent = new Map([
       'href="/foundation"',
       'href="/partner"',
       'href="/clinicians"',
-      "JHuLEqw2yG8",
+      'href="/beyond-the-yellow"',
     ],
   ],
   [

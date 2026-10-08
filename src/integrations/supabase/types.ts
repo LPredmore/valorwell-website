@@ -13732,6 +13732,8 @@ export type Database = {
           owner_id: string | null
           priority: Database["public"]["Enums"]["crm_task_priority_enum"]
           recurrence: string | null
+          relationship_contact_id: string | null
+          relationship_organization_id: string | null
           staff_id: string | null
           start_at: string | null
           status: Database["public"]["Enums"]["crm_task_status_enum"]
@@ -13756,6 +13758,8 @@ export type Database = {
           owner_id?: string | null
           priority?: Database["public"]["Enums"]["crm_task_priority_enum"]
           recurrence?: string | null
+          relationship_contact_id?: string | null
+          relationship_organization_id?: string | null
           staff_id?: string | null
           start_at?: string | null
           status?: Database["public"]["Enums"]["crm_task_status_enum"]
@@ -13780,6 +13784,8 @@ export type Database = {
           owner_id?: string | null
           priority?: Database["public"]["Enums"]["crm_task_priority_enum"]
           recurrence?: string | null
+          relationship_contact_id?: string | null
+          relationship_organization_id?: string | null
           staff_id?: string | null
           start_at?: string | null
           status?: Database["public"]["Enums"]["crm_task_status_enum"]
@@ -13816,6 +13822,34 @@ export type Database = {
             columns: ["owner_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_tasks_relationship_contact_id_fkey"
+            columns: ["relationship_contact_id"]
+            isOneToOne: false
+            referencedRelation: "relationship_contact_directory_v"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_tasks_relationship_contact_id_fkey"
+            columns: ["relationship_contact_id"]
+            isOneToOne: false
+            referencedRelation: "relationship_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_tasks_relationship_organization_id_fkey"
+            columns: ["relationship_organization_id"]
+            isOneToOne: false
+            referencedRelation: "relationship_organization_directory_v"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_tasks_relationship_organization_id_fkey"
+            columns: ["relationship_organization_id"]
+            isOneToOne: false
+            referencedRelation: "relationship_organizations"
             referencedColumns: ["id"]
           },
         ]

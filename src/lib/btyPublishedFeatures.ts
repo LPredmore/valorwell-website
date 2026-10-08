@@ -56,6 +56,18 @@ export function normalizeFeature(row: Record<string, unknown>): PublishedFeature
   };
 }
 
+/** Returns the newest valid feature by publishedAt (nulls last), independent of input order. */
+export function selectLatestFeature(features: PublishedFeature[]): PublishedFeature | null {
+  const time = (f: PublishedFeature) => {
+    const t = f.publishedAt ? Date.parse(f.publishedAt) : NaN;
+    return Number.isNaN(t) ? -Infinity : t;
+  };
+  return features.reduce<PublishedFeature | null>(
+    (best, f) => (best === null || time(f) > time(best) ? f : best),
+    null,
+  );
+}
+
 export async function fetchPublishedFeatures(): Promise<PublishedFeature[]> {
   const { data, error } = await billingHubSupabase
     .from("bty_published_features" as never)

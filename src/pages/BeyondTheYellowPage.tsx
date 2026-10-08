@@ -18,6 +18,7 @@ import {
 import { BtyNominationForm } from "@/components/intake/BtyNominationForm";
 import { UnifiedBtyForm } from "@/components/intake/UnifiedBtyForm";
 import { trackHomeEvent } from "@/lib/tracking";
+import { LatestBtyFeatureCard } from "@/components/bty/LatestBtyFeatureCard";
 import btyHeroAsset from "@/assets/bty-hero.png.asset.json";
 
 const btyOgImage = `https://www.valorwell.org${btyHeroAsset.url}`;
@@ -251,6 +252,9 @@ export default function BeyondTheYellowPage() {
                 Watch the Stories
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
+              <div className="mx-auto mt-10 max-w-2xl">
+                <LatestBtyFeatureCard onTrack={track} eventPrefix="bty" />
+              </div>
             </div>
           </section>
 

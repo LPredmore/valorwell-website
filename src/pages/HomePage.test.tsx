@@ -1,11 +1,31 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import HomePage from "./HomePage";
 
-const { rpcMock } = vi.hoisted(() => ({
+const { rpcMock, fetchFeaturesMock } = vi.hoisted(() => ({
   rpcMock: vi.fn(),
+  fetchFeaturesMock: vi.fn(),
 }));
+
+vi.mock("@/lib/btyPublishedFeatures", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/btyPublishedFeatures")>()),
+  fetchPublishedFeatures: fetchFeaturesMock,
+}));
+
+const latestFeature = {
+  id: "sdod",
+  name: "Newest Org",
+  summary: "Newest summary.",
+  internalPath: "/newest-org",
+  featureUrl: "https://www.valorwell.org/newest-org",
+  imageUrl: "https://i.ytimg.com/vi/abcdefghijk/maxresdefault.jpg",
+  fallbackImageUrl: "https://i.ytimg.com/vi/abcdefghijk/hqdefault.jpg",
+  videoUrl: "https://www.youtube.com/watch?v=abcdefghijk",
+  publishedAt: "2026-10-05T00:00:00Z",
+};
+const olderFeature = { ...latestFeature, id: "old", name: "Older Org", internalPath: "/older", publishedAt: "2026-09-08T00:00:00Z" };
 
 class ResizeObserverMock {
   observe() {}
@@ -45,16 +65,21 @@ vi.mock("@/lib/tracking", () => ({
 }));
 
 function renderHome() {
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
-    <MemoryRouter initialEntries={["/"]}>
-      <HomePage />
-    </MemoryRouter>,
+    <QueryClientProvider client={client}>
+      <MemoryRouter initialEntries={["/"]}>
+        <HomePage />
+      </MemoryRouter>
+    </QueryClientProvider>,
   );
 }
 
 describe("ValorWell homepage", () => {
   beforeEach(() => {
     rpcMock.mockReset();
+    fetchFeaturesMock.mockReset();
+    fetchFeaturesMock.mockResolvedValue([olderFeature, latestFeature]);
     rpcMock.mockResolvedValue({
       data: [
         {
@@ -127,17 +152,28 @@ describe("ValorWell homepage", () => {
     expect(screen.queryByText("Sep 2025: 45.")).not.toBeInTheDocument();
   });
 
-  it("features the current American Corporate Partners episode", () => {
+  it("shows the newest published BTY feature from the catalog", async () => {
     renderHome();
+    expect(await screen.findByText("Newest Org")).toBeInTheDocument();
+    expect(screen.getByText("Latest featured organization")).toBeInTheDocument();
+    expect(screen.queryByText("Older Org")).not.toBeInTheDocument();
+    expect(screen.queryByText(/Current episode/i)).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Read about Newest Org/ })).toHaveAttribute("href", "/newest-org");
+    expect(screen.getByRole("link", { name: /Watch video/ })).toHaveAttribute("href", latestFeature.videoUrl);
+  });
 
-    const episode = screen.getByRole("link", {
-      name: /American Corporate Partners Beyond The Yellow conversation/i,
-    });
-    expect(episode).toHaveAttribute(
-      "href",
-      "https://www.youtube.com/watch?v=JHuLEqw2yG8",
-    );
-    expect(screen.queryByText("Veterans Breakfast Club")).not.toBeInTheDocument();
+  it("omits the video link when the feature has no video", async () => {
+    fetchFeaturesMock.mockResolvedValueOnce([{ ...latestFeature, videoUrl: null }]);
+    renderHome();
+    expect(await screen.findByText("Newest Org")).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /Watch video/ })).not.toBeInTheDocument();
+  });
+
+  it("falls back to the archive link when the catalog is empty or fails", async () => {
+    fetchFeaturesMock.mockRejectedValue(new Error("down"));
+    renderHome();
+    expect(await screen.findByRole("link", { name: /See featured organizations/ }, { timeout: 5000 })).toHaveAttribute("href", "/network");
+    expect(screen.queryByText("American Corporate Partners")).not.toBeInTheDocument();
   });
 
   it("routes every required homepage action to a canonical destination", () => {

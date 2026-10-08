@@ -1,4 +1,4 @@
-// Generated from public.website_resources. Do not edit by hand.
+// Generated from public.website_resources_public. Do not edit by hand.
 // scripts/generate-resource-content.mjs refreshes this file before production builds.
 
 export const generatedResourceRoutes = [
@@ -12,11 +12,38 @@ export const generatedResourceRoutes = [
     "sitemap": true
   },
   {
+    "path": "/resources/documentation/va-higher-level-review-rating-reduction",
+    "title": "Can a VA Higher-Level Review Affect Other Disability Ratings? Reviews and Reduction Protections | ValorWell",
+    "description": "Distinguish VA disability Higher-Level Reviews from rating reductions, severance, and correction of error; understand notices, protection rules and next steps.",
+    "h1": "Can a VA Higher-Level Review Affect Other Disability Ratings? Reviews and Reduction Protections",
+    "lead": "Distinguish VA disability Higher-Level Reviews from rating reductions, severance, and correction of error; understand notices, protection rules and next steps.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
     "path": "/resources/champva/accidents-third-party-liability",
     "title": "CHAMPVA After an Accident: Third-Party Liability, Claims, and VA Recovery | ValorWell",
     "description": "After an accident, CHAMPVA generally expects the applicable auto, homeowner, or other liability insurance to process the medical claim first. This guide explains third-party liability, VA Form 10-7959D, CHAMPVA claim handling after the insurer issues an EOB, and VA medical-care cost recovery.",
     "h1": "CHAMPVA After an Accident: Third-Party Liability, Claims, and VA Recovery",
     "lead": "After an accident, CHAMPVA generally expects the applicable auto, homeowner, or other liability insurance to process the medical claim first. This guide explains third-party liability, VA Form 10-7959D, CHAMPVA claim handling after the insurer issues an EOB, and VA medical-care cost recovery.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/champva/ambulance-medical-transportation",
+    "title": "CHAMPVA Ambulance and Medical Transportation Coverage | ValorWell",
+    "description": "CHAMPVA generally excludes routine transportation but can cover specialized medically necessary transportation with life-sustaining equipment. This guide explains ground and air ambulance rules, payment methodology, cost sharing, and ambulance claim documentation.",
+    "h1": "CHAMPVA Ambulance and Medical Transportation Coverage",
+    "lead": "CHAMPVA generally excludes routine transportation but can cover specialized medically necessary transportation with life-sustaining equipment. This guide explains ground and air ambulance rules, payment methodology, cost sharing, and ambulance claim documentation.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/champva/ambulatory-surgery-centers",
+    "title": "CHAMPVA Ambulatory Surgery: Coverage and Surgical Center Billing | ValorWell",
+    "description": "CHAMPVA can cover medically necessary ambulatory surgery from authorized providers. Freestanding ambulatory surgery center facility charges use a prospective payment method, professional fees are billed separately, and VA guidance says ASC services have no deductible but generally retain the 25% cost share when CHAMPVA is primary.",
+    "h1": "CHAMPVA Ambulatory Surgery: Coverage and Surgical Center Billing",
+    "lead": "CHAMPVA can cover medically necessary ambulatory surgery from authorized providers. Freestanding ambulatory surgery center facility charges use a prospective payment method, professional fees are billed separately, and VA guidance says ASC services have no deductible but generally retain the 25% cost share when CHAMPVA is primary.",
     "indexable": true,
     "sitemap": true
   },
@@ -75,6 +102,15 @@ export const generatedResourceRoutes = [
     "sitemap": true
   },
   {
+    "path": "/resources/military-health-benefits/champva-tricare-retired-reserve-gray-area",
+    "title": "CHAMPVA and TRICARE Retired Reserve for Gray-Area Retirees | ValorWell",
+    "description": "A guide to gray-area Reserve retirement, the difference between retirement status and retired-pay timing, reduced-age retired pay, TRICARE Retired Reserve, and CHAMPVA eligibility before and after age 60.",
+    "h1": "CHAMPVA and TRICARE Retired Reserve for Gray-Area Retirees",
+    "lead": "A guide to gray-area Reserve retirement, the difference between retirement status and retired-pay timing, reduced-age retired pay, TRICARE Retired Reserve, and CHAMPVA eligibility before and after age 60.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
     "path": "/resources/champva/appeal-review-deadlines",
     "title": "CHAMPVA Appeal and Decision Review Deadlines | ValorWell",
     "description": "CHAMPVA deadlines depend on the review path. Higher-Level Review and Board Appeal requests generally use a one-year clock, Supplemental Claims may be filed anytime, and the current CHAMPVA Guidebook gives prospective preauthorization appeals one year from the VA notice. The older 90-day rule in 38 CFR § 17.277 applies only to legacy claims.",
@@ -102,11 +138,29 @@ export const generatedResourceRoutes = [
     "sitemap": true
   },
   {
+    "path": "/resources/champva/family-planning-contraceptives",
+    "title": "CHAMPVA Birth Control and Family Planning Coverage | ValorWell",
+    "description": "CHAMPVA covers many family-planning services and contraceptive methods, including prescription contraceptives, IUDs, implants, injectable contraceptives, diaphragms, emergency contraception, vasectomy, and tubal ligation. Most nonprescription contraceptives are excluded unless used as emergency contraception, and the services specifically listed in 38 CFR § 17.274(f) are exempt from CHAMPVA’s annual deductible and beneficiary cost share.",
+    "h1": "CHAMPVA Birth Control and Family Planning Coverage",
+    "lead": "CHAMPVA covers many family-planning services and contraceptive methods, including prescription contraceptives, IUDs, implants, injectable contraceptives, diaphragms, emergency contraception, vasectomy, and tubal ligation. Most nonprescription contraceptives are excluded unless used as emergency contraception, and the services specifically listed in 38 CFR § 17.274(f) are exempt from CHAMPVA’s annual deductible and beneficiary cost share.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
     "path": "/resources/champva/board-appeal",
     "title": "CHAMPVA Board Appeals: How to Use VA Form 10182 | ValorWell",
     "description": "A CHAMPVA Board appeal uses VA Form 10182 to ask a Veterans Law Judge to review a Board-reviewable VA decision. The critical issue is jurisdiction: legal and adjudicative questions—including CHAMPVA legal eligibility—can be reviewable, while pure medical judgments about the need for or appropriateness of treatment are outside the Board’s jurisdiction. This guide explains the current form, deadline, three Board lanes, filing steps, and the legacy-rule trap in 38 CFR § 17.277.",
     "h1": "CHAMPVA Board Appeals: How to Use VA Form 10182",
     "lead": "A CHAMPVA Board appeal uses VA Form 10182 to ask a Veterans Law Judge to review a Board-reviewable VA decision. The critical issue is jurisdiction: legal and adjudicative questions—including CHAMPVA legal eligibility—can be reviewable, while pure medical judgments about the need for or appropriateness of treatment are outside the Board’s jurisdiction. This guide explains the current form, deadline, three Board lanes, filing steps, and the legacy-rule trap in 38 CFR § 17.277.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/champva/family-household-member-services",
+    "title": "CHAMPVA Care From Family or Household Members: What the Exclusion Means | ValorWell",
+    "description": "CHAMPVA rules specifically exclude services or supplies prescribed or provided by an immediate family member of the beneficiary or by a person living in the beneficiary's or sponsor's household. This guide explains how that rule differs from otherwise-covered home health and skilled care, and what beneficiaries and providers should verify before expecting CHAMPVA payment.",
+    "h1": "CHAMPVA Care From Family or Household Members: What the Exclusion Means",
+    "lead": "CHAMPVA rules specifically exclude services or supplies prescribed or provided by an immediate family member of the beneficiary or by a person living in the beneficiary's or sponsor's household. This guide explains how that rule differs from otherwise-covered home health and skilled care, and what beneficiaries and providers should verify before expecting CHAMPVA payment.",
     "indexable": true,
     "sitemap": true
   },
@@ -125,6 +179,15 @@ export const generatedResourceRoutes = [
     "description": "CHAMPVA CITI may let eligible CHAMPVA beneficiaries receive care at participating VA health facilities when space and resources are available. Learn the Medicare restriction, cost rules, local-service limits, and how to check a facility before scheduling.",
     "h1": "CHAMPVA CITI: How to Get Care at a VA Medical Facility",
     "lead": "CHAMPVA CITI may let eligible CHAMPVA beneficiaries receive care at participating VA health facilities when space and resources are available. Learn the Medicare restriction, cost rules, local-service limits, and how to check a facility before scheduling.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/champva/provider-claim-data-checklist",
+    "title": "CHAMPVA Claim Data Checklist for Provider Billing Staff | ValorWell",
+    "description": "A reusable CHAMPVA pre-submission checklist for provider billing teams covering beneficiary and provider identifiers, diagnosis and procedure coding, POS and modifier checks, professional versus facility billing, other-insurance EOBs, filing deadlines, and preventable denials.",
+    "h1": "CHAMPVA Claim Data Checklist for Provider Billing Staff",
+    "lead": "A reusable CHAMPVA pre-submission checklist for provider billing teams covering beneficiary and provider identifiers, diagnosis and procedure coding, POS and modifier checks, professional versus facility billing, other-insurance EOBs, filing deadlines, and preventable denials.",
     "indexable": true,
     "sitemap": true
   },
@@ -152,6 +215,15 @@ export const generatedResourceRoutes = [
     "description": "CHAMPVA's usual beneficiary cost share is 25% of the CHAMPVA allowable amount after any applicable outpatient deductible. Learn how the calculation works, why the billed charge is different from the allowable amount, and when other insurance, waived cost sharing, inpatient rules, or the catastrophic cap change what you owe.",
     "h1": "CHAMPVA Cost Share: How the Usual 25% Works",
     "lead": "CHAMPVA's usual beneficiary cost share is 25% of the CHAMPVA allowable amount after any applicable outpatient deductible. Learn how the calculation works, why the billed charge is different from the allowable amount, and when other insurance, waived cost sharing, inpatient rules, or the catastrophic cap change what you owe.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/champva/nutrition-products-vitamins-medical-foods",
+    "title": "CHAMPVA Coverage for Nutrition Products, Vitamins, and Medical Foods | ValorWell",
+    "description": "CHAMPVA generally excludes food, food substitutes, vitamins, and other nutritional supplements, even when medically recommended. This guide explains the prenatal-vitamin exception, VA pharmacy guidance for certain prescription vitamin formulations, and how to evaluate products marketed as medical foods.",
+    "h1": "CHAMPVA Coverage for Nutrition Products, Vitamins, and Medical Foods",
+    "lead": "CHAMPVA generally excludes food, food substitutes, vitamins, and other nutritional supplements, even when medically recommended. This guide explains the prenatal-vitamin exception, VA pharmacy guidance for certain prescription vitamin formulations, and how to evaluate products marketed as medical foods.",
     "indexable": true,
     "sitemap": true
   },
@@ -201,11 +273,29 @@ export const generatedResourceRoutes = [
     "sitemap": true
   },
   {
+    "path": "/resources/champva/provider-eft-enrollment",
+    "title": "CHAMPVA EFT for Providers: Enrollment, Payment Holds, and Updates | ValorWell",
+    "description": "CHAMPVA providers must enroll in Electronic Funds Transfer to receive VA claim payments. This guide explains the current VA-FSC enrollment and update process, VA Form 10091, processing and support, and how to fix a CARC 299/RARC N24 payment hold without resubmitting the claim.",
+    "h1": "CHAMPVA EFT for Providers: Enrollment, Payment Holds, and Updates",
+    "lead": "CHAMPVA providers must enroll in Electronic Funds Transfer to receive VA claim payments. This guide explains the current VA-FSC enrollment and update process, VA Form 10091, processing and support, and how to fix a CARC 299/RARC N24 payment hold without resubmitting the claim.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
     "path": "/resources/champva/children-under-18",
     "title": "CHAMPVA Eligibility for Children Under 18 | ValorWell",
     "description": "A child under 18 may qualify for CHAMPVA when the sponsor and child-status rules are met and the child is not TRICARE-eligible. This guide also gives the current newborn enrollment sequence, documents to gather, and steps for handling medical bills received before enrollment is finished.",
     "h1": "CHAMPVA Eligibility for Children Under 18",
     "lead": "A child under 18 may qualify for CHAMPVA when the sponsor and child-status rules are met and the child is not TRICARE-eligible. This guide also gives the current newborn enrollment sequence, documents to gather, and steps for handling medical bills received before enrollment is finished.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/champva/experimental-investigational-research-services",
+    "title": "CHAMPVA Experimental, Investigational, and Research Services | ValorWell",
+    "description": "CHAMPVA excludes services and supplies furnished as part of a scientific or medical study, grant, or research program and services outside accepted professional medical standards or related to experimental or investigational procedures or treatment regimens. This guide explains how those exclusions differ from medical necessity, what to verify before care, and what to do if a claim is denied.",
+    "h1": "CHAMPVA Experimental, Investigational, and Research Services",
+    "lead": "CHAMPVA excludes services and supplies furnished as part of a scientific or medical study, grant, or research program and services outside accepted professional medical standards or related to experimental or investigational procedures or treatment regimens. This guide explains how those exclusions differ from medical necessity, what to verify before care, and what to do if a claim is denied.",
     "indexable": true,
     "sitemap": true
   },
@@ -273,6 +363,24 @@ export const generatedResourceRoutes = [
     "sitemap": true
   },
   {
+    "path": "/resources/champva/fraud-waste-abuse",
+    "title": "CHAMPVA Fraud, Waste, and Abuse: Warning Signs and How to Report It | ValorWell",
+    "description": "A practical guide to reviewing suspicious CHAMPVA claims, distinguishing errors from potential fraud, documenting what happened, and using current CHAMPVA, VHA compliance, and VA OIG reporting channels.",
+    "h1": "CHAMPVA Fraud, Waste, and Abuse: Warning Signs and How to Report It",
+    "lead": "A practical guide to reviewing suspicious CHAMPVA claims, distinguishing errors from potential fraud, documenting what happened, and using current CHAMPVA, VHA compliance, and VA OIG reporting channels.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/champva/genetic-chromosome-testing",
+    "title": "CHAMPVA Genetic and Chromosome Testing: What’s Covered | ValorWell",
+    "description": "CHAMPVA can cover medically necessary genetic testing and counseling, and federal rules specifically allow chromosome analysis in certain infertility or pregnancy-loss cases. VA guidance excludes routine or demand genetic testing and tests performed to establish paternity or determine fetal sex, so the medical purpose and documentation matter.",
+    "h1": "CHAMPVA Genetic and Chromosome Testing: What’s Covered",
+    "lead": "CHAMPVA can cover medically necessary genetic testing and counseling, and federal rules specifically allow chromosome analysis in certain infertility or pregnancy-loss cases. VA guidance excludes routine or demand genetic testing and tests performed to establish paternity or determine fetal sex, so the medical purpose and documentation matter.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
     "path": "/resources/champva/glp-1-medication-coverage",
     "title": "CHAMPVA GLP-1 Coverage: Ozempic, Mounjaro, Wegovy, Zepbound, and More | ValorWell",
     "description": "CHAMPVA GLP-1 coverage is diagnosis-specific. Current VA guidance lists certain products for type 2 diabetes, Zepbound for qualifying obstructive sleep apnea, and Wegovy for MASH or prevention of major adverse cardiovascular events, while excluding GLP-1 use solely for weight loss. This guide explains the current prior-authorization rules and a VA source discrepancy involving Rybelsus.",
@@ -282,11 +390,56 @@ export const generatedResourceRoutes = [
     "sitemap": true
   },
   {
+    "path": "/resources/champva/hearing-care-hearing-aids",
+    "title": "CHAMPVA Hearing Care and Hearing Aids: What's Covered | ValorWell",
+    "description": "CHAMPVA generally excludes routine hearing exams and ordinary non-implanted hearing aids. Hearing exams may be covered when connected to medical or surgical treatment of a covered illness or injury or qualifying well-child care, and VA's current Guidebook says cochlear implants and bone-anchored hearing aids are covered.",
+    "h1": "CHAMPVA Hearing Care and Hearing Aids: What's Covered",
+    "lead": "CHAMPVA generally excludes routine hearing exams and ordinary non-implanted hearing aids. Hearing exams may be covered when connected to medical or surgical treatment of a covered illness or injury or qualifying well-child care, and VA's current Guidebook says cochlear implants and bone-anchored hearing aids are covered.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
     "path": "/resources/champva/higher-level-review",
     "title": "CHAMPVA Higher-Level Review: How to Use VA Form 20-0996 | ValorWell",
     "description": "A CHAMPVA Higher-Level Review asks a higher-level VA reviewer to reconsider a decision using the evidence that was already in the record. This guide explains when the review lane fits, the one-year deadline, the no-new-evidence rule, optional informal conferences, the CHAMPVA mailing route, and when another review option is more appropriate.",
     "h1": "CHAMPVA Higher-Level Review: How to Use VA Form 20-0996",
     "lead": "A CHAMPVA Higher-Level Review asks a higher-level VA reviewer to reconsider a decision using the evidence that was already in the record. This guide explains when the review lane fits, the one-year deadline, the no-new-evidence rule, optional informal conferences, the CHAMPVA mailing route, and when another review option is more appropriate.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/champva/home-health-homemaker-attendant-services",
+    "title": "CHAMPVA Home Health Care vs. Homemaker and Attendant Services | ValorWell",
+    "description": "CHAMPVA can cover limited intermittent skilled home health care for a homebound beneficiary when the care is medically necessary, physician-ordered, and furnished by qualifying nursing professionals. Homemaker, housekeeping, attendant, sitter, companion, and custodial care are different categories and are generally excluded.",
+    "h1": "CHAMPVA Home Health Care vs. Homemaker and Attendant Services",
+    "lead": "CHAMPVA can cover limited intermittent skilled home health care for a homebound beneficiary when the care is medically necessary, physician-ordered, and furnished by qualifying nursing professionals. Homemaker, housekeeping, attendant, sitter, companion, and custodial care are different categories and are generally excluded.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/champva/hospice-care",
+    "title": "CHAMPVA Hospice Care: Coverage, Costs, and Provider Billing | ValorWell",
+    "description": "CHAMPVA covers hospice care for terminally ill beneficiaries who have a life expectancy of six months or less. Hospice services have no CHAMPVA deductible or beneficiary cost share, and VA reimburses hospice care using Medicare per-diem hospice rates.",
+    "h1": "CHAMPVA Hospice Care: Coverage, Costs, and Provider Billing",
+    "lead": "CHAMPVA covers hospice care for terminally ill beneficiaries who have a life expectancy of six months or less. Hospice services have no CHAMPVA deductible or beneficiary cost share, and VA reimburses hospice care using Medicare per-diem hospice rates.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/champva/hospital-inpatient-care",
+    "title": "CHAMPVA Hospital Inpatient Care: Coverage, Costs, and Preauthorization | ValorWell",
+    "description": "CHAMPVA can cover medically necessary inpatient hospital care, but coverage, preauthorization, hospital payment, and patient cost sharing are separate questions. This guide explains the medical-necessity standard, DRG and non-DRG payment rules, the Medicare-participating hospital requirement, preauthorization exceptions, and how to review inpatient bills.",
+    "h1": "CHAMPVA Hospital Inpatient Care: Coverage, Costs, and Preauthorization",
+    "lead": "CHAMPVA can cover medically necessary inpatient hospital care, but coverage, preauthorization, hospital payment, and patient cost sharing are separate questions. This guide explains the medical-necessity standard, DRG and non-DRG payment rules, the Medicare-participating hospital requirement, preauthorization exceptions, and how to review inpatient bills.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/champva/infertility-treatment-ivf-art",
+    "title": "CHAMPVA Infertility Treatment and IVF: What’s Covered and Excluded | ValorWell",
+    "description": "CHAMPVA can cover medically necessary infertility evaluation and treatment aimed at identifying or correcting the cause of infertility, including diagnostic testing, surgery, and hormone therapy. Current federal rules separately exclude artificial insemination, IVF, GIFT, and other noncoital reproductive technologies, and VA guidance also lists embryo transfer as not covered.",
+    "h1": "CHAMPVA Infertility Treatment and IVF: What’s Covered and Excluded",
+    "lead": "CHAMPVA can cover medically necessary infertility evaluation and treatment aimed at identifying or correcting the cause of infertility, including diagnostic testing, surgery, and hormone therapy. Current federal rules separately exclude artificial insemination, IVF, GIFT, and other noncoital reproductive technologies, and VA guidance also lists embryo transfer as not covered.",
     "indexable": true,
     "sitemap": true
   },
@@ -309,11 +462,29 @@ export const generatedResourceRoutes = [
     "sitemap": true
   },
   {
+    "path": "/resources/champva/lab-radiology-diagnostic-testing",
+    "title": "CHAMPVA Lab Work, Radiology, and Diagnostic Testing: What’s Covered | ValorWell",
+    "description": "CHAMPVA can cover medically necessary lab, radiology, pathology, and machine diagnostic testing when it is related to a specific illness, injury, or definitive set of symptoms, with separate rules for preventive screening and certain excluded tests.",
+    "h1": "CHAMPVA Lab Work, Radiology, and Diagnostic Testing: What’s Covered",
+    "lead": "CHAMPVA can cover medically necessary lab, radiology, pathology, and machine diagnostic testing when it is related to a specific illness, injury, or definitive set of symptoms, with separate rules for preventive screening and certain excluded tests.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
     "path": "/resources/champva/life-changes-to-report",
     "title": "CHAMPVA Life Changes: What to Report and How | ValorWell",
     "description": "A practical CHAMPVA reporting checklist for marriage and divorce, student status, Medicare, other insurance, caregiver status, address and contact changes, TRICARE eligibility, and dependent changes, with current update routes.",
     "h1": "CHAMPVA Life Changes: What to Report and How",
     "lead": "A practical CHAMPVA reporting checklist for marriage and divorce, student status, Medicare, other insurance, caregiver status, address and contact changes, TRICARE eligibility, and dependent changes, with current update routes.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/champva/maternity-prenatal-care",
+    "title": "CHAMPVA Maternity and Prenatal Care: Pregnancy, Delivery, Postpartum, and Newborn Coverage | ValorWell",
+    "description": "CHAMPVA covers medically necessary prenatal, delivery, and postnatal care, including pregnancy complications. This guide explains pregnancy testing, delivery-stay rules, prescription prenatal vitamins, postpartum exclusions, and how newborn eligibility and enrollment affect separate claims.",
+    "h1": "CHAMPVA Maternity and Prenatal Care: Pregnancy, Delivery, Postpartum, and Newborn Coverage",
+    "lead": "CHAMPVA covers medically necessary prenatal, delivery, and postnatal care, including pregnancy complications. This guide explains pregnancy testing, delivery-stay rules, prescription prenatal vitamins, postpartum exclusions, and how newborn eligibility and enrollment affect separate claims.",
     "indexable": true,
     "sitemap": true
   },
@@ -327,11 +498,128 @@ export const generatedResourceRoutes = [
     "sitemap": true
   },
   {
+    "path": "/resources/champva/newborn-well-child-care",
+    "title": "CHAMPVA Newborn and Well-Child Care: What’s Covered Through Age 6 | ValorWell",
+    "description": "CHAMPVA covers a defined well-child benefit from birth to age 6, including newborn exams, hereditary and metabolic screening, newborn circumcision, routine physicals, immunizations, developmental assessments, vision and hearing screening, and specified laboratory screening. Qualifying well-child care is exempt from the CHAMPVA outpatient deductible and beneficiary cost share.",
+    "h1": "CHAMPVA Newborn and Well-Child Care: What’s Covered Through Age 6",
+    "lead": "CHAMPVA covers a defined well-child benefit from birth to age 6, including newborn exams, hereditary and metabolic screening, newborn circumcision, routine physicals, immunizations, developmental assessments, vision and hearing screening, and specified laboratory screening. Qualifying well-child care is exempt from the CHAMPVA outpatient deductible and beneficiary cost share.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/champva/obesity-weight-loss-coverage",
+    "title": "CHAMPVA Obesity and Weight-Loss Coverage: Medications, Programs, and Bariatric Surgery | ValorWell",
+    "description": "CHAMPVA generally excludes nonsurgical obesity treatment aimed at dietary control or weight reduction, including prescription weight-loss drugs, but medically necessary bariatric surgery can qualify under a limited exception. Current VA policy also covers certain GLP-1 medications for specified non-weight-loss diagnoses.",
+    "h1": "CHAMPVA Obesity and Weight-Loss Coverage: Medications, Programs, and Bariatric Surgery",
+    "lead": "CHAMPVA generally excludes nonsurgical obesity treatment aimed at dietary control or weight reduction, including prescription weight-loss drugs, but medically necessary bariatric surgery can qualify under a limited exception. Current VA policy also covers certain GLP-1 medications for specified non-weight-loss diagnoses.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/champva/organ-transplants",
+    "title": "CHAMPVA Organ Transplants: Coverage, Preauthorization, and Claims | ValorWell",
+    "description": "CHAMPVA can cover medically necessary organ, bone marrow, and related transplant services, but transplant care can require preauthorization. This guide explains current OHI and CITI exceptions, transplant-team documentation, covered transplant categories and donor costs, provider coordination, and claim steps.",
+    "h1": "CHAMPVA Organ Transplants: Coverage, Preauthorization, and Claims",
+    "lead": "CHAMPVA can cover medically necessary organ, bone marrow, and related transplant services, but transplant care can require preauthorization. This guide explains current OHI and CITI exceptions, transplant-team documentation, covered transplant categories and donor costs, provider coordination, and claim steps.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/champva/outpatient-office-care",
+    "title": "CHAMPVA Outpatient and Office Visits: Coverage, Costs, and Claims | ValorWell",
+    "description": "CHAMPVA covers most medically necessary outpatient and office-based care from authorized providers. This guide explains provider choice, referrals and preauthorization, diagnostic services, allowable amounts, typical outpatient costs, and how office claims are billed.",
+    "h1": "CHAMPVA Outpatient and Office Visits: Coverage, Costs, and Claims",
+    "lead": "CHAMPVA covers most medically necessary outpatient and office-based care from authorized providers. This guide explains provider choice, referrals and preauthorization, diagnostic services, allowable amounts, typical outpatient costs, and how office claims are billed.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/champva/physical-occupational-speech-therapy",
+    "title": "CHAMPVA Physical, Occupational, and Speech Therapy Coverage | ValorWell",
+    "description": "CHAMPVA can cover medically necessary physical, occupational, and speech therapy when the service treats a covered condition and meets provider and clinical requirements. This guide explains PT, OT, and speech-therapy rules, treatment-plan reviews, ordinary preauthorization, school-based speech therapy, costs, and exclusions for general exercise, education, equipment, health-club memberships, and similar services.",
+    "h1": "CHAMPVA Physical, Occupational, and Speech Therapy Coverage",
+    "lead": "CHAMPVA can cover medically necessary physical, occupational, and speech therapy when the service treats a covered condition and meets provider and clinical requirements. This guide explains PT, OT, and speech-therapy rules, treatment-plan reviews, ordinary preauthorization, school-based speech therapy, costs, and exclusions for general exercise, education, equipment, health-club memberships, and similar services.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/champva/podiatry-routine-foot-care",
+    "title": "CHAMPVA Podiatry and Routine Foot Care: What's Covered | ValorWell",
+    "description": "CHAMPVA generally excludes routine foot care such as toenail trimming and removal of corns or calluses. An exception applies when the care is required because a diagnosed systemic disease affects the lower limbs, with severe diabetes named in the regulation. VA also describes limited coverage for peripheral vascular, metabolic, or neurological disease.",
+    "h1": "CHAMPVA Podiatry and Routine Foot Care: What's Covered",
+    "lead": "CHAMPVA generally excludes routine foot care such as toenail trimming and removal of corns or calluses. An exception applies when the care is required because a diagnosed systemic disease affects the lower limbs, with severe diabetes named in the regulation. VA also describes limited coverage for peripheral vascular, metabolic, or neurological disease.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
     "path": "/resources/champva/prescription-drug-coverage",
     "title": "CHAMPVA Prescription Drug Coverage: Retail Pharmacies, Meds by Mail, and Costs | ValorWell",
     "description": "CHAMPVA prescription coverage can be used through OptumRx retail pharmacies, Meds by Mail when you have no other prescription coverage, or a non-network pharmacy with reimbursement. This guide explains current pharmacy routing, costs, how other prescription insurance pays first, pharmacy EOB and reimbursement steps, Medicare Part D, coverage limits, and medication-specific prior authorization.",
     "h1": "CHAMPVA Prescription Drug Coverage: Retail Pharmacies, Meds by Mail, and Costs",
     "lead": "CHAMPVA prescription coverage can be used through OptumRx retail pharmacies, Meds by Mail when you have no other prescription coverage, or a non-network pharmacy with reimbursement. This guide explains current pharmacy routing, costs, how other prescription insurance pays first, pharmacy EOB and reimbursement steps, Medicare Part D, coverage limits, and medication-specific prior authorization.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/champva/preventive-care",
+    "title": "CHAMPVA Preventive Care: What’s Covered | ValorWell",
+    "description": "CHAMPVA generally excludes routine preventive care unless an exception applies. This guide maps the current federal exceptions, VA’s published preventive-services guidance, the services with no deductible or cost share, and the difference between preventive screening and diagnostic follow-up.",
+    "h1": "CHAMPVA Preventive Care: What’s Covered",
+    "lead": "CHAMPVA generally excludes routine preventive care unless an exception applies. This guide maps the current federal exceptions, VA’s published preventive-services guidance, the services with no deductible or cost share, and the difference between preventive screening and diagnostic follow-up.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/champva/prosthetics-orthotics",
+    "title": "CHAMPVA Prosthetics and Orthotics: Coverage, Shoes, and Payment Rules | ValorWell",
+    "description": "CHAMPVA can cover medically necessary prostheses and orthotic devices, but foot-support items have narrower rules. This guide explains prosthetic exceptions, covered braces, when orthopedic or diabetic shoes qualify, and how DMEPOS allowable amounts and cost sharing work.",
+    "h1": "CHAMPVA Prosthetics and Orthotics: Coverage, Shoes, and Payment Rules",
+    "lead": "CHAMPVA can cover medically necessary prostheses and orthotic devices, but foot-support items have narrower rules. This guide explains prosthetic exceptions, covered braces, when orthopedic or diabetic shoes qualify, and how DMEPOS allowable amounts and cost sharing work.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/champva/provider-decision-review-appeals",
+    "title": "CHAMPVA Provider Appeals and Decision Reviews: Which Route to Use | ValorWell",
+    "description": "A provider-focused CHAMPVA decision tree for correcting claims versus challenging actual payment or eligibility decisions, selecting the right modern review option, preparing evidence, and navigating pre-service clinical appeals without relying on obsolete legacy deadlines.",
+    "h1": "CHAMPVA Provider Appeals and Decision Reviews: Which Route to Use",
+    "lead": "A provider-focused CHAMPVA decision tree for correcting claims versus challenging actual payment or eligibility decisions, selecting the right modern review option, preparing evidence, and navigating pre-service clinical appeals without relying on obsolete legacy deadlines.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/champva/provider-quick-start",
+    "title": "CHAMPVA Provider Quick-Start Guide | ValorWell",
+    "description": "A front-desk and billing checklist for CHAMPVA providers covering eligibility verification, network and assignment rules, payer IDs, other insurance, preauthorization, electronic and paper claims, EFT enrollment, and claim-status checks.",
+    "h1": "CHAMPVA Provider Quick-Start Guide",
+    "lead": "A front-desk and billing checklist for CHAMPVA providers covering eligibility verification, network and assignment rules, payer IDs, other insurance, preauthorization, electronic and paper claims, EFT enrollment, and claim-status checks.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/champva/reconstructive-vs-cosmetic-surgery",
+    "title": "CHAMPVA Reconstructive vs. Cosmetic Surgery: What May Be Covered | ValorWell",
+    "description": "CHAMPVA generally excludes surgery whose primary purpose is cosmetic, but limited reconstructive procedures may qualify when they correct or materially improve bodily function or address certain congenital defects, injuries, severe disfigurement, scarring, or post-mastectomy reconstruction. This guide explains the governing rule, VA examples, documentation, preauthorization, and an important source conflict involving panniculectomy.",
+    "h1": "CHAMPVA Reconstructive vs. Cosmetic Surgery: What May Be Covered",
+    "lead": "CHAMPVA generally excludes surgery whose primary purpose is cosmetic, but limited reconstructive procedures may qualify when they correct or materially improve bodily function or address certain congenital defects, injuries, severe disfigurement, scarring, or post-mastectomy reconstruction. This guide explains the governing rule, VA examples, documentation, preauthorization, and an important source conflict involving panniculectomy.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/champva/privacy-confidentiality-records",
+    "title": "CHAMPVA Records: Privacy, Requests, Releases, and Corrections | ValorWell",
+    "description": "A practical CHAMPVA records guide: protect privacy, obtain or release claim records, identify the right record holder, request formal corrections, track VA's response, and understand amendment-denial review.",
+    "h1": "CHAMPVA Records: Privacy, Requests, Releases, and Corrections",
+    "lead": "A practical CHAMPVA records guide: protect privacy, obtain or release claim records, identify the right record holder, request formal corrections, track VA's response, and understand amendment-denial review.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/champva/reproductive-sexual-health-exclusions",
+    "title": "CHAMPVA Reproductive and Sexual-Health Exclusions: Current CFR Rules | ValorWell",
+    "description": "Current CHAMPVA rules exclude specified gender-related services, sex therapy and sexual counseling, sterilization reversal, assisted reproductive technologies, most nonprescription contraceptives, paternity or fetal-sex testing, certain penile or testicular prosthesis procedures, abortions except for a physician-certified life-endangerment exception, and abortion counseling. This reference maps the governing CFR provisions, important exceptions, nearby covered care, and the 2026 abortion-rule change.",
+    "h1": "CHAMPVA Reproductive and Sexual-Health Exclusions: Current CFR Rules",
+    "lead": "Current CHAMPVA rules exclude specified gender-related services, sex therapy and sexual counseling, sterilization reversal, assisted reproductive technologies, most nonprescription contraceptives, paternity or fetal-sex testing, certain penile or testicular prosthesis procedures, abortions except for a physician-certified life-endangerment exception, and abortion counseling. This reference maps the governing CFR provisions, important exceptions, nearby covered care, and the 2026 abortion-rule change.",
     "indexable": true,
     "sitemap": true
   },
@@ -350,6 +638,15 @@ export const generatedResourceRoutes = [
     "description": "CHAMPVA waives the annual deductible, the usual beneficiary cost share, or both for specific services. This reference separates the rules for preventive care, hospice, CITI, Meds by Mail, inpatient care, ambulatory surgery facilities, partial psychiatric day programs, and certain contraceptive and family-planning services.",
     "h1": "CHAMPVA Services With No Deductible or Cost Share",
     "lead": "CHAMPVA waives the annual deductible, the usual beneficiary cost share, or both for specific services. This reference separates the rules for preventive care, hospice, CITI, Meds by Mail, inpatient care, ambulatory surgery facilities, partial psychiatric day programs, and certain contraceptive and family-planning services.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/champva/skilled-nursing-extended-care",
+    "title": "CHAMPVA Skilled Nursing and SNF Coverage: Extended Care Rules | ValorWell",
+    "description": "CHAMPVA can cover medically necessary skilled nursing and skilled nursing facility care, but skilled care is different from excluded custodial or domiciliary care. This guide explains the three-day inpatient-stay rule, medical review, beneficiary costs, the SNF payment methodology, and common extended-care exclusions.",
+    "h1": "CHAMPVA Skilled Nursing and SNF Coverage: Extended Care Rules",
+    "lead": "CHAMPVA can cover medically necessary skilled nursing and skilled nursing facility care, but skilled care is different from excluded custodial or domiciliary care. This guide explains the three-day inpatient-stay rule, medical review, beneficiary costs, the SNF payment methodology, and common extended-care exclusions.",
     "indexable": true,
     "sitemap": true
   },
@@ -381,6 +678,15 @@ export const generatedResourceRoutes = [
     "sitemap": true
   },
   {
+    "path": "/resources/champva/vision-eye-exams-glasses-contacts",
+    "title": "CHAMPVA Vision Coverage: Eye Exams, Glasses, and Contact Lenses | ValorWell",
+    "description": "CHAMPVA generally excludes routine eye exams, eyeglasses, contact lenses, and visual training, but federal regulations allow treatment-related and well-child eye-exam exceptions plus narrow optical-device exceptions for specific medical conditions.",
+    "h1": "CHAMPVA Vision Coverage: Eye Exams, Glasses, and Contact Lenses",
+    "lead": "CHAMPVA generally excludes routine eye exams, eyeglasses, contact lenses, and visual training, but federal regulations allow treatment-related and well-child eye-exam exceptions plus narrow optical-device exceptions for specific medical conditions.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
     "path": "/resources/champva/tricare-va-health-care-community-care",
     "title": "CHAMPVA vs. TRICARE vs. VA Health Care vs. VA Community Care | ValorWell",
     "description": "A plain-English comparison of CHAMPVA, TRICARE, VA health care, and VA Community Care: who each program serves, how care is accessed, and why TRICARE eligibility generally prevents CHAMPVA eligibility.",
@@ -408,6 +714,15 @@ export const generatedResourceRoutes = [
     "sitemap": true
   },
   {
+    "path": "/resources/champva/wigs-hairpieces",
+    "title": "CHAMPVA Wig and Hairpiece Coverage for Cancer-Related Hair Loss | ValorWell",
+    "description": "CHAMPVA generally excludes wigs and hairpieces, but federal rules allow a narrow one-per-lifetime exception when treatment of a malignant disease causes alopecia and the required physician and beneficiary certifications are met.",
+    "h1": "CHAMPVA Wig and Hairpiece Coverage for Cancer-Related Hair Loss",
+    "lead": "CHAMPVA generally excludes wigs and hairpieces, but federal rules allow a narrow one-per-lifetime exception when treatment of a malignant disease causes alopecia and the required physician and beneficiary certifications are met.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
     "path": "/resources/veteran-mental-health/changing-va-mental-health-provider",
     "title": "Changing VA Mental Health Providers When Therapy Is Not a Good Fit | ValorWell",
     "description": "A practical guide to separating therapeutic fit, care concerns, provider-change requests, and continuity-of-care problems within VA mental health care.",
@@ -422,6 +737,15 @@ export const generatedResourceRoutes = [
     "description": "Resources explaining treatment records, continuity of care, access to VA medical records, and the limits of clinical documentation in administrative decisions.",
     "h1": "Clinical Documentation Resources for Veterans",
     "lead": "Resources explaining treatment records, continuity of care, access to VA medical records, and the limits of clinical documentation in administrative decisions.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/family-systems/deployment-reunion-reintegration",
+    "title": "Coming Home From Deployment: Reunion and Reintegration for Military Families | ValorWell",
+    "description": "A practical guide to military homecoming and reintegration, including reunion expectations, changed routines and roles, communication, intimacy, children, finances, social reconnection, and when outside support may help.",
+    "h1": "Coming Home From Deployment: Reunion and Reintegration for Military Families",
+    "lead": "A practical guide to military homecoming and reintegration, including reunion expectations, changed routines and roles, communication, intimacy, children, finances, social reconnection, and when outside support may help.",
     "indexable": true,
     "sitemap": true
   },
@@ -444,11 +768,29 @@ export const generatedResourceRoutes = [
     "sitemap": true
   },
   {
+    "path": "/resources/champva/chiropractic-acupuncture-naturopathic-care",
+    "title": "Does CHAMPVA Cover Chiropractic, Acupuncture, or Naturopathic Care? | ValorWell",
+    "description": "Current CHAMPVA rules specifically exclude chiropractic and naturopathic services and acupuncture, including acupuncture used as an anesthetic. Those exclusions apply to the excluded services themselves; separately covered care for the same condition is evaluated under its own CHAMPVA rules.",
+    "h1": "Does CHAMPVA Cover Chiropractic, Acupuncture, or Naturopathic Care?",
+    "lead": "Current CHAMPVA rules specifically exclude chiropractic and naturopathic services and acupuncture, including acupuncture used as an anesthetic. Those exclusions apply to the excluded services themselves; separately covered care for the same condition is evaluated under its own CHAMPVA rules.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
     "path": "/resources/champva/provider-network",
     "title": "Does CHAMPVA Have a Provider Network? | ValorWell",
     "description": "CHAMPVA has no medical provider network. Learn what to say when an office says it does not take CHAMPVA, how assignment works, how staff can verify eligibility, which payer IDs to use, and what you may owe.",
     "h1": "Does CHAMPVA Have a Provider Network?",
     "lead": "CHAMPVA has no medical provider network. Learn what to say when an office says it does not take CHAMPVA, how assignment works, how staff can verify eligibility, which payer IDs to use, and what you may owe.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/family-systems/dual-military-family-career-parenting",
+    "title": "Dual-Military Families: Career, Parenting, and Family Care Planning | ValorWell",
+    "description": "A practical framework for couples weighing two military careers, including assignment uncertainty, career tradeoffs, child care, family care plans, support networks, and comparisons with civilian-career or stay-at-home options.",
+    "h1": "Dual-Military Families: Career, Parenting, and Family Care Planning",
+    "lead": "A practical framework for couples weighing two military careers, including assignment uncertainty, career tradeoffs, child care, family care plans, support networks, and comparisons with civilian-career or stay-at-home options.",
     "indexable": true,
     "sitemap": true
   },
@@ -471,11 +813,47 @@ export const generatedResourceRoutes = [
     "sitemap": true
   },
   {
+    "path": "/resources/family-systems/marriage-before-deployment",
+    "title": "Getting Married Before a Deployment: Benefits, Command Communication, and Practical Preparation | ValorWell",
+    "description": "A practical guide to separating the relationship decision from military administration, including DEERS and TRICARE, command-family communication, legal and financial preparation, and deployment planning.",
+    "h1": "Getting Married Before a Deployment: Benefits, Command Communication, and Practical Preparation",
+    "lead": "A practical guide to separating the relationship decision from military administration, including DEERS and TRICARE, command-family communication, legal and financial preparation, and deployment planning.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
     "path": "/resources/champva/other-health-insurance",
     "title": "How CHAMPVA Works With Other Health Insurance | ValorWell",
-    "description": "CHAMPVA is usually the secondary or last payer when you have other health insurance. Learn the four exceptions when CHAMPVA pays first, the correct claim order, which EOBs to send, what to do after a primary-plan denial, and why the explicit OHI-first appeal rule applies to legacy CHAMPVA claims.",
+    "description": "CHAMPVA usually pays after other health insurance, with four specified exceptions. Learn payer order, how providers reconcile EOBs and submit secondary claims, how payment and patient responsibility are determined, and when the legacy OHI appeal rule matters.",
     "h1": "How CHAMPVA Works With Other Health Insurance",
-    "lead": "CHAMPVA is usually the secondary or last payer when you have other health insurance. Learn the four exceptions when CHAMPVA pays first, the correct claim order, which EOBs to send, what to do after a primary-plan denial, and why the explicit OHI-first appeal rule applies to legacy CHAMPVA claims.",
+    "lead": "CHAMPVA usually pays after other health insurance, with four specified exceptions. Learn payer order, how providers reconcile EOBs and submit secondary claims, how payment and patient responsibility are determined, and when the legacy OHI appeal rule matters.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/champva/provider-claim-status",
+    "title": "How Providers Check CHAMPVA Claim Status | ValorWell",
+    "description": "Providers can check CHAMPVA medical claim status electronically through the VA clearinghouse using the HIPAA X12 276 claim-status inquiry and 277 response. This guide explains the workflow, the information to have ready, how claim status differs from eligibility and claim submission, and when to contact Optum Insight or VA.",
+    "h1": "How Providers Check CHAMPVA Claim Status",
+    "lead": "Providers can check CHAMPVA medical claim status electronically through the VA clearinghouse using the HIPAA X12 276 claim-status inquiry and 277 response. This guide explains the workflow, the information to have ready, how claim status differs from eligibility and claim submission, and when to contact Optum Insight or VA.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/champva/provider-corrected-resubmitted-claims",
+    "title": "How Providers Correct or Resubmit CHAMPVA Claims | ValorWell",
+    "description": "A practical CHAMPVA provider guide to resolving missing documents, diagnosis errors and OHI denials; using the correct submission route; avoiding duplicate claims; and distinguishing corrections from appeals.",
+    "h1": "How Providers Correct or Resubmit CHAMPVA Claims",
+    "lead": "A practical CHAMPVA provider guide to resolving missing documents, diagnosis errors and OHI denials; using the correct submission route; avoiding duplicate claims; and distinguishing corrections from appeals.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/champva/provider-paper-claims",
+    "title": "How Providers Submit Paper CHAMPVA Claims | ValorWell",
+    "description": "A current provider guide to CHAMPVA paper medical claims, including the Tampa mailing address, CMS-1500 and UB-04 requirements, required claim data, other-health-insurance EOB attachments, paper-form preparation, EFT, and filing deadlines.",
+    "h1": "How Providers Submit Paper CHAMPVA Claims",
+    "lead": "A current provider guide to CHAMPVA paper medical claims, including the Tampa mailing address, CMS-1500 and UB-04 requirements, required claim data, other-health-insurance EOB attachments, paper-form preparation, EFT, and filing deadlines.",
     "indexable": true,
     "sitemap": true
   },
@@ -580,10 +958,10 @@ export const generatedResourceRoutes = [
   },
   {
     "path": "/resources/veteran-mental-health/supporting-veteran-who-does-not-want-therapy",
-    "title": "How to Support a Veteran Who Does Not Want Mental Health Treatment | ValorWell",
-    "description": "Guidance for supporting a Veteran without taking over their decisions: how to raise concerns, understand barriers, offer practical help, set boundaries, find support for yourself, and recognize when a crisis requires urgent action.",
-    "h1": "How to Support a Veteran Who Does Not Want Mental Health Treatment",
-    "lead": "Guidance for supporting a Veteran without taking over their decisions: how to raise concerns, understand barriers, offer practical help, set boundaries, find support for yourself, and recognize when a crisis requires urgent action.",
+    "title": "How to Support a Veteran Who Is Struggling or Does Not Want Mental Health Treatment | ValorWell",
+    "description": "Guidance for supporting a Veteran through treatment reluctance, post-service adjustment, employment and access barriers, social isolation, and relationship strain while preserving autonomy, practical boundaries, and appropriate professional support.",
+    "h1": "How to Support a Veteran Who Is Struggling or Does Not Want Mental Health Treatment",
+    "lead": "Guidance for supporting a Veteran through treatment reluctance, post-service adjustment, employment and access barriers, social isolation, and relationship strain while preserving autonomy, practical boundaries, and appropriate professional support.",
     "indexable": true,
     "sitemap": true
   },
@@ -615,11 +993,56 @@ export const generatedResourceRoutes = [
     "sitemap": true
   },
   {
+    "path": "/resources/va-community-care/moving-relocating-va-health-care",
+    "title": "Moving to Another State With VA Health Care: Records, Prescriptions, and Care Coordination | ValorWell",
+    "description": "A practical relocation guide for Veterans using VA health care, including the Traveling/Relocating Veteran process, what does and does not transfer automatically, medication planning, address updates, and Community Care coordination.",
+    "h1": "Moving to Another State With VA Health Care: Records, Prescriptions, and Care Coordination",
+    "lead": "A practical relocation guide for Veterans using VA health care, including the Traveling/Relocating Veteran process, what does and does not transfer automatically, medication planning, address updates, and Community Care coordination.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/va-community-care/non-va-emergency-care",
+    "title": "Non-VA Emergency Care for Veterans: 72-Hour Notification, Eligibility, and Billing | ValorWell",
+    "description": "A practical guide to emergency care outside VA, including the 72-hour notification rule, the difference between notification and payment eligibility, other health insurance, bills, and reimbursement.",
+    "h1": "Non-VA Emergency Care for Veterans: 72-Hour Notification, Eligibility, and Billing",
+    "lead": "A practical guide to emergency care outside VA, including the 72-hour notification rule, the difference between notification and payment eligibility, other health insurance, bills, and reimbursement.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/veteran-mental-health/post-deployment-loneliness-social-connection",
+    "title": "Post-Deployment Loneliness and Disconnection: Rebuilding Social Connection | ValorWell",
+    "description": "A guide to post-deployment social disconnection, including the difference between being around people and feeling understood, peer connection, ordinary friendships, recurring community contact, Vet Centers, and VA social-connection resources.",
+    "h1": "Post-Deployment Loneliness and Disconnection: Rebuilding Social Connection",
+    "lead": "A guide to post-deployment social disconnection, including the difference between being around people and feeling understood, peer connection, ordinary friendships, recurring community contact, Vet Centers, and VA social-connection resources.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
     "path": "/resources/champva/retroactive-eligibility-old-medical-bills",
     "title": "Retroactive CHAMPVA Eligibility: How to File Old Medical Bills | ValorWell",
     "description": "If VA grants retroactive CHAMPVA eligibility, claims for otherwise covered care on or after the first date of eligibility can have a special 180-day filing window. This guide explains how to use the effective date on your ID card, sort old bills, coordinate other insurance, gather claim records, and handle a missed deadline.",
     "h1": "Retroactive CHAMPVA Eligibility: How to File Old Medical Bills",
     "lead": "If VA grants retroactive CHAMPVA eligibility, claims for otherwise covered care on or after the first date of eligibility can have a special 180-day filing window. This guide explains how to use the effective date on your ID card, sort old bills, coordinate other insurance, gather claim records, and handle a missed deadline.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/family-systems/early-return-dependents-overseas",
+    "title": "Returning Dependents Early From an Overseas Assignment: Command Sponsorship, ERD, and What to Verify | ValorWell",
+    "description": "A practical guide to separating a personal family relocation from an authorized Early Return of Dependents, including command sponsorship, travel and household goods, housing and allowances, tour questions, and the offices that must verify the family's exact situation.",
+    "h1": "Returning Dependents Early From an Overseas Assignment: Command Sponsorship, ERD, and What to Verify",
+    "lead": "A practical guide to separating a personal family relocation from an authorized Early Return of Dependents, including command sponsorship, travel and household goods, housing and allowances, tour questions, and the offices that must verify the family's exact situation.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/documentation/ssdi-tdiu-va-disability-benefits",
+    "title": "SSDI, TDIU, and VA Disability: Eligibility, Concurrent Benefits, and Applying | ValorWell",
+    "description": "Eligibility, concurrent benefits, distinct disability standards and how to apply.",
+    "h1": "SSDI, TDIU, and VA Disability: Eligibility, Concurrent Benefits, and Applying",
+    "lead": "Eligibility, concurrent benefits, distinct disability standards and how to apply.",
     "indexable": true,
     "sitemap": true
   },
@@ -644,9 +1067,9 @@ export const generatedResourceRoutes = [
   {
     "path": "/resources/documentation/understanding-treatment-records",
     "title": "Understanding Clinical Treatment Records: What They Contain and What They Do Not Decide | ValorWell",
-    "description": "A practical guide to what clinical records document, how Veterans can access and share VA records, and why treatment notes are different from disability, insurance, legal, or other administrative decisions.",
+    "description": "A practical guide to what clinical records document, how service members and Veterans can access and share records, how Community Care reports move into VA, how to protect mental-health continuity when leaving active duty, how to separate clinical documentation from command or complaint processes, and why treatment notes are different from disability or other administrative decisions.",
     "h1": "Understanding Clinical Treatment Records: What They Contain and What They Do Not Decide",
-    "lead": "A practical guide to what clinical records document, how Veterans can access and share VA records, and why treatment notes are different from disability, insurance, legal, or other administrative decisions.",
+    "lead": "A practical guide to what clinical records document, how service members and Veterans can access and share records, how Community Care reports move into VA, how to protect mental-health continuity when leaving active duty, how to separate clinical documentation from command or complaint processes, and why treatment notes are different from disability or other administrative decisions.",
     "indexable": true,
     "sitemap": true
   },
@@ -669,6 +1092,15 @@ export const generatedResourceRoutes = [
     "sitemap": true
   },
   {
+    "path": "/resources/military-health-benefits/veteran-family-health-coverage-overseas",
+    "title": "VA and Family Health Coverage Overseas: FMP, CHAMPVA, and VADIP | ValorWell",
+    "description": "A practical guide to separating VA disability compensation from overseas health coverage, understanding the Foreign Medical Program, using CHAMPVA abroad, and checking carrier-specific VADIP dental rules.",
+    "h1": "VA and Family Health Coverage Overseas: FMP, CHAMPVA, and VADIP",
+    "lead": "A practical guide to separating VA disability compensation from overseas health coverage, understanding the Foreign Medical Program, using CHAMPVA abroad, and checking carrier-specific VADIP dental rules.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
     "path": "/resources/va-community-care/provider-billing-rules",
     "title": "VA Community Care Billing: Balance Billing, No-Show Fees, and Provider Rules | ValorWell",
     "description": "A provider-facing guide to the legal and contractual framework for VA Community Care billing, including 38 U.S.C. § 1703, balance billing, missed-appointment fees, denied claims, and how to raise a billing problem with a provider.",
@@ -678,11 +1110,11 @@ export const generatedResourceRoutes = [
     "sitemap": true
   },
   {
-    "path": "/resources/va-community-care",
-    "title": "VA Community Care Mental Health Resources | ValorWell",
-    "description": "Practical VA Community Care resources covering referrals and authorizations, how Community Care differs from private insurance, and what Veterans should know about provider billing rules.",
-    "h1": "VA Community Care Mental Health Resources",
-    "lead": "Practical VA Community Care resources covering referrals and authorizations, how Community Care differs from private insurance, and what Veterans should know about provider billing rules.",
+    "path": "/resources/va-community-care/community-care-prescriptions-formulary",
+    "title": "VA Community Care Prescriptions: Formulary, Criteria for Use, and Non-Formulary Requests | ValorWell",
+    "description": "A practical guide to the separate steps between a Community Care prescription and VA pharmacy dispensing, including routine versus urgent prescriptions, the VA National Formulary, Criteria for Use, non-formulary requests, and how to troubleshoot a medication that appears stuck.",
+    "h1": "VA Community Care Prescriptions: Formulary, Criteria for Use, and Non-Formulary Requests",
+    "lead": "A practical guide to the separate steps between a Community Care prescription and VA pharmacy dispensing, including routine versus urgent prescriptions, the VA National Formulary, Criteria for Use, non-formulary requests, and how to troubleshoot a medication that appears stuck.",
     "indexable": true,
     "sitemap": true
   },
@@ -692,6 +1124,24 @@ export const generatedResourceRoutes = [
     "description": "A practical guide to the separate steps in VA Community Care, including eligibility, referral, authorization, scheduling, Request for Service renewals, and what to do when care stalls.",
     "h1": "VA Community Care Referrals, Authorizations, and Continued Care",
     "lead": "A practical guide to the separate steps in VA Community Care, including eligibility, referral, authorization, scheduling, Request for Service renewals, and what to do when care stalls.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/va-community-care",
+    "title": "VA Community Care Resources | ValorWell",
+    "description": "Source-backed guidance on the Veterans Community Care Program, including eligibility and access standards, referrals and authorizations, the Community Care Network, scheduling, continued care, provider arrangements, billing, and related care-coordination issues.",
+    "h1": "VA Community Care Resources",
+    "lead": "Source-backed guidance on the Veterans Community Care Program, including eligibility and access standards, referrals and authorizations, the Community Care Network, scheduling, continued care, provider arrangements, billing, and related care-coordination issues.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/va-community-care/community-care-vs-ccn",
+    "title": "VA Community Care vs. the Community Care Network (CCN) | ValorWell",
+    "description": "VA Community Care is the eligibility and authorization framework for eligible Veterans to receive VA-paid care from community providers. The Community Care Network (CCN) is VA's main contracted provider network used to deliver much of that authorized care; CCN participation does not itself determine a Veteran's Community Care eligibility.",
+    "h1": "VA Community Care vs. the Community Care Network (CCN)",
+    "lead": "VA Community Care is the eligibility and authorization framework for eligible Veterans to receive VA-paid care from community providers. The Community Care Network (CCN) is VA's main contracted provider network used to deliver much of that authorized care; CCN participation does not itself determine a Veteran's Community Care eligibility.",
     "indexable": true,
     "sitemap": true
   },
@@ -786,6 +1236,15 @@ export const generatedResourceRoutes = [
     "sitemap": true
   },
   {
+    "path": "/resources/va-community-care/what-is-va-community-care",
+    "title": "What Is VA Community Care? When Veterans Can Use Care Outside VA | ValorWell",
+    "description": "VA Community Care lets eligible Veterans receive VA-authorized care from community providers when applicable requirements are met. It can include hospital care, medical services, and extended care, but routine community care generally requires VA health care eligibility, a qualifying Community Care pathway, and VA approval before treatment.",
+    "h1": "What Is VA Community Care? When Veterans Can Use Care Outside VA",
+    "lead": "VA Community Care lets eligible Veterans receive VA-authorized care from community providers when applicable requirements are met. It can include hospital care, medical services, and extended care, but routine community care generally requires VA health care eligibility, a qualifying Community Care pathway, and VA approval before treatment.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
     "path": "/resources/champva/not-eligible-next-steps",
     "title": "What to Do If CHAMPVA Says You’re Not Eligible | ValorWell",
     "description": "If VA says you are not eligible for CHAMPVA, first identify whether the issue is missing information, changed circumstances, or an actual adverse eligibility determination. The right next step may be to submit evidence, update or reapply, or use a formal decision-review option.",
@@ -797,9 +1256,9 @@ export const generatedResourceRoutes = [
   {
     "path": "/resources/family-systems/pcs-new-duty-station-adjustment",
     "title": "When a PCS Leaves You Isolated: Adjusting to a New Duty Station | ValorWell",
-    "description": "Practical ways to handle PCS adjustment while protecting military-spouse education and career continuity, rebuilding local support, evaluating whether long-term military life still fits both partners' goals, and navigating the identity shift when one spouse leaves service and the other remains in.",
+    "description": "Practical ways to handle PCS adjustment while protecting military-spouse education and career continuity, rebuilding local support, reducing caregiving overload, navigating OCONUS isolation, and evaluating whether long-term military life still fits both partners' goals.",
     "h1": "When a PCS Leaves You Isolated: Adjusting to a New Duty Station",
-    "lead": "Practical ways to handle PCS adjustment while protecting military-spouse education and career continuity, rebuilding local support, evaluating whether long-term military life still fits both partners' goals, and navigating the identity shift when one spouse leaves service and the other remains in.",
+    "lead": "Practical ways to handle PCS adjustment while protecting military-spouse education and career continuity, rebuilding local support, reducing caregiving overload, navigating OCONUS isolation, and evaluating whether long-term military life still fits both partners' goals.",
     "indexable": true,
     "sitemap": true
   },
@@ -840,6 +1299,15 @@ export const generatedResourceRoutes = [
     "sitemap": true
   },
   {
+    "path": "/resources/va-community-care/covered-veteran-definition",
+    "title": "Who Is a “Covered Veteran” for VA Community Care? | ValorWell",
+    "description": "For VA Community Care, a “covered veteran” is generally a Veteran enrolled in VA health care or one who fits specific regulatory exceptions allowing VA care without enrollment. This is the program’s baseline eligibility gate; it does not by itself authorize a particular community-care episode.",
+    "h1": "Who Is a “Covered Veteran” for VA Community Care?",
+    "lead": "For VA Community Care, a “covered veteran” is generally a Veteran enrolled in VA health care or one who fits specific regulatory exceptions allowing VA care without enrollment. This is the program’s baseline eligibility gate; it does not by itself authorize a particular community-care episode.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
     "path": "/resources/champva/who-qualifies",
     "title": "Who Qualifies for CHAMPVA? | ValorWell",
     "description": "A source-backed guide to CHAMPVA eligibility for spouses, dependent children, survivors, and qualifying Primary Family Caregivers, including the P&T, TRICARE, Medicare, remarriage, and child-status rules that can change eligibility.",
@@ -863,6 +1331,15 @@ export const generatedResourceRoutes = [
     "description": "CHAMPVA generally excludes care for a work-related injury or occupational illness when workers’ compensation or a similar protection plan is payable. The exclusion can apply even if no workers’ compensation claim has been filed or paid. If those benefits are exhausted, CHAMPVA may consider otherwise covered care.",
     "h1": "Workers’ Compensation and CHAMPVA: Work-Related Care Rules",
     "lead": "CHAMPVA generally excludes care for a work-related injury or occupational illness when workers’ compensation or a similar protection plan is payable. The exclusion can apply even if no workers’ compensation claim has been filed or paid. If those benefits are exhausted, CHAMPVA may consider otherwise covered care.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/resources/family-systems/first-pcs-after-training-family-moving-guide",
+    "title": "Your First Military PCS After Training: Orders, Leave, Moves, and Family Planning | ValorWell",
+    "description": "First-PCS planning for new military families: verify actual orders and approved leave, obtain transportation counseling, compare moving choices, retain required records, request sponsorship and prepare children.",
+    "h1": "Your First Military PCS After Training: Orders, Leave, Moves, and Family Planning",
+    "lead": "First-PCS planning for new military families: verify actual orders and approved leave, obtain transportation counseling, compare moving choices, retain required records, request sponsorship and prepare children.",
     "indexable": true,
     "sitemap": true
   }

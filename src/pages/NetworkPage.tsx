@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { ArrowUpRight, Building2, PlayCircle, RefreshCw } from "lucide-react";
@@ -21,7 +21,7 @@ function FeatureLink({
 }: {
   feature: PublishedFeature;
   className: string;
-  children: React.ReactNode;
+  children: ReactNode;
   ariaLabel?: string;
 }) {
   if (feature.internalPath) {

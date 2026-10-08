@@ -24,7 +24,6 @@ const groups: { title: string; links: { name: string; href: string }[] }[] = [
     links: [
       { name: "Beyond The Yellow", href: "/beyond-the-yellow" },
       { name: "Featured Organizations", href: "/network" },
-      { name: "Watch", href: "/watch" },
     ],
   },
   {

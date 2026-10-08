@@ -133,10 +133,10 @@ const progressiveEnhancementContent = new Map([
     "/beyond-the-yellow",
     [
       "The Question We Should All Ask",
-      "Meet the Doers",
+      "Meet the people doing the work",
+      "Watch the Stories",
       "The Beyond The Yellow Test",
       "Good stewardship looks exactly like obscurity from the outside.",
-      "American Corporate Partners",
       'href="/network"',
     ],
   ],

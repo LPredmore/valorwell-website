@@ -2,7 +2,6 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import {
-  ArrowLeft,
   ArrowRight,
   HeartHandshake,
   PlayCircle,
@@ -19,45 +18,11 @@ import {
 import { BtyNominationForm } from "@/components/intake/BtyNominationForm";
 import { UnifiedBtyForm } from "@/components/intake/UnifiedBtyForm";
 import { trackHomeEvent } from "@/lib/tracking";
+import btyHeroAsset from "@/assets/bty-hero.png.asset.json";
+
+const btyOgImage = `https://www.valorwell.org${btyHeroAsset.url}`;
 
 const FORM_ANCHOR = "bty-story-form";
-
-const episodes = [
-  {
-    organization: "F.I.S.H.",
-    route: "/fish",
-    videoId: "0E9YWKQ5iXY",
-    videoUrl: "https://www.youtube.com/watch?v=0E9YWKQ5iXY",
-    line: "Veterans shouldn't have to beg for help. Someone should notice first.",
-    current: true,
-  },
-  {
-    organization: "Always Give Back",
-    route: "/alwaysgiveback",
-    videoId: "oT4TSM3Q82k",
-    videoUrl: "https://www.youtube.com/watch?v=oT4TSM3Q82k",
-    line: "A computer is not the mission. It is the doorway.",
-    current: false,
-  },
-  {
-    organization: "American Corporate Partners",
-    route: "/americancorporatepartners",
-    videoId: "JHuLEqw2yG8",
-    videoUrl: "https://www.youtube.com/watch?v=JHuLEqw2yG8",
-    line: "A year of mentorship can turn military experience into a clearer civilian career path.",
-    current: false,
-  },
-  {
-    organization: "Veterans Breakfast Club",
-    route: "/veteransbreakfastclub",
-    videoId: "A4CUe3c8rJE",
-    videoUrl: "https://www.youtube.com/watch?v=A4CUe3c8rJE",
-    line: "Some veterans carry a story for decades. Sometimes the right room is what finally lets it out.",
-    current: false,
-  },
-] as const;
-
-const currentEpisode = episodes[0];
 
 type LaneValue = "share-story" | "nominate";
 
@@ -129,43 +94,8 @@ function scrollToForm() {
   });
 }
 
-function circularOffset(index: number, activeIndex: number) {
-  const length = episodes.length;
-  let offset = index - activeIndex;
-  if (offset > length / 2) offset -= length;
-  if (offset < -length / 2) offset += length;
-  return offset;
-}
-
-function carouselStyle(offset: number) {
-  const distance = Math.abs(offset);
-
-  if (distance === 0) {
-    return {
-      opacity: 1,
-      zIndex: 30,
-      transform: "translate(-50%, -50%) translateZ(0) scale(1) rotateY(0deg)",
-    };
-  }
-
-  if (distance === 1) {
-    return {
-      opacity: 0.64,
-      zIndex: 20,
-      transform: `translate(-50%, -50%) translateX(${offset * 64}%) translateZ(-120px) scale(0.8) rotateY(${offset * -38}deg)`,
-    };
-  }
-
-  return {
-    opacity: 0.2,
-    zIndex: 5,
-    transform: "translate(-50%, -50%) translateZ(-330px) scale(0.64) rotateY(0deg)",
-  };
-}
-
 export default function BeyondTheYellowPage() {
   const [selectedLane, setSelectedLane] = useState<LaneValue>("share-story");
-  const [activeEpisode, setActiveEpisode] = useState(0);
 
   useEffect(() => {
     track("bty_page_view");
@@ -183,28 +113,20 @@ export default function BeyondTheYellowPage() {
     window.setTimeout(scrollToForm, 40);
   };
 
-  const rotateEpisodes = (direction: -1 | 1) => {
-    setActiveEpisode((current) => (current + direction + episodes.length) % episodes.length);
-    track("bty_episode_carousel", { direction: direction === 1 ? "next" : "previous" });
-  };
-
   return (
     <>
       <Helmet>
         <title>Beyond The Yellow | Meet the People Doing the Work | ValorWell</title>
         <meta
           name="description"
-          content="Beyond The Yellow puts the focus on people and organizations doing the work—not just talking about the problem. Watch the current conversation and meet the doers."
+          content="Beyond The Yellow puts the focus on people and organizations doing the work—not just talking about the problem. Nominate a doer, share a story, and watch the conversations."
         />
         <meta property="og:title" content="Beyond The Yellow | ValorWell" />
         <meta
           property="og:description"
           content="Meet the people who stopped waiting for somebody else to solve the problem and started doing the work."
         />
-        <meta
-          property="og:image"
-          content={`https://i.ytimg.com/vi/${currentEpisode.videoId}/maxresdefault.jpg`}
-        />
+        <meta property="og:image" content={btyOgImage} />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
         <link rel="canonical" href="https://www.valorwell.org/beyond-the-yellow" />
@@ -251,28 +173,14 @@ export default function BeyondTheYellowPage() {
                 </div>
 
                 <div className="mt-10 flex flex-wrap gap-3">
-                  <a
-                    href={currentEpisode.videoUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => track("bty_hero_watch")}
-                    className="inline-flex min-h-12 items-center gap-2 rounded-md bg-[#D7A92E] px-6 py-3 text-sm font-bold text-[#111814] transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                  >
-                    <PlayCircle className="h-4 w-4" aria-hidden="true" />
-                    Watch the Current Episode
-                  </a>
                   <button
                     type="button"
                     onClick={() => chooseLane("nominate", "bty_hero_nominate")}
-                    className="inline-flex min-h-12 items-center gap-2 rounded-md border border-white/30 px-6 py-3 text-sm font-bold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                    className="inline-flex min-h-12 items-center gap-2 rounded-md bg-[#D7A92E] px-6 py-3 text-sm font-bold text-[#111814] transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
                   >
                     Nominate a Doer
                   </button>
                 </div>
-
-                <p className="mt-7 text-sm font-bold uppercase tracking-[0.14em] text-white/45">
-                  Current episode · {currentEpisode.organization}
-                </p>
               </div>
             </div>
           </section>
@@ -325,109 +233,22 @@ export default function BeyondTheYellowPage() {
             </div>
           </section>
 
-          <section className="overflow-hidden border-b border-[#3B5147]/15 bg-[#F4F1E8]">
-            <div className="container-wide py-20 text-center md:py-28">
-              <Eyebrow>Meet the Doers</Eyebrow>
-              <h2 className="mx-auto mt-4 max-w-5xl text-3xl font-bold leading-tight md:text-5xl">
+          <section className="border-b border-[#3B5147]/15 bg-[#F4F1E8]">
+            <div className="container-wide py-16 text-center md:py-20">
+              <Eyebrow>Meet the people doing the work</Eyebrow>
+              <h2 className="mx-auto mt-4 max-w-4xl text-3xl font-bold leading-tight md:text-4xl">
                 These people didn&apos;t wait for somebody else to solve it.
               </h2>
-              <p className="mx-auto mt-5 max-w-3xl text-lg leading-8 text-[#111814]/65">
-                Start with the current episode, then move through a few of the people and organizations we have already sat down with.
+              <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-[#111814]/65">
+                Every Beyond The Yellow feature is a long-form conversation with someone whose work would leave a real gap if it disappeared. Hear how they started, what the work takes, and how others can take part.
               </p>
-
-              <div
-                className="relative mx-auto mt-10 h-[270px] max-w-6xl overflow-hidden sm:h-[350px] lg:h-[430px]"
-                style={{ perspective: "1200px" }}
-                aria-label="Beyond The Yellow episode carousel"
-              >
-                {episodes.map((episode, index) => {
-                  const offset = circularOffset(index, activeEpisode);
-                  const distance = Math.abs(offset);
-                  const isActive = distance === 0;
-                  const isSide = distance === 1;
-
-                  return (
-                    <article
-                      key={episode.organization}
-                      className="absolute left-1/2 top-1/2 w-[min(78vw,650px)] overflow-hidden rounded-3xl border border-[#111814]/15 bg-[#111814] text-left shadow-2xl transition-[transform,opacity] duration-500 motion-reduce:transition-none"
-                      style={{
-                        ...carouselStyle(offset),
-                        transformStyle: "preserve-3d",
-                        pointerEvents: distance > 1 ? "none" : "auto",
-                      }}
-                      aria-hidden={distance > 1}
-                    >
-                      <div className="relative aspect-video overflow-hidden">
-                        <img
-                          src={`https://i.ytimg.com/vi/${episode.videoId}/maxresdefault.jpg`}
-                          alt={`${episode.organization} Beyond The Yellow episode`}
-                          className="h-full w-full object-cover"
-                          loading={isActive ? "eager" : "lazy"}
-                          onError={(event) => {
-                            event.currentTarget.src = `https://i.ytimg.com/vi/${episode.videoId}/hqdefault.jpg`;
-                          }}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" aria-hidden="true" />
-                        <div className="absolute bottom-0 left-0 right-0 p-5 text-white sm:p-7">
-                          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#D7A92E] sm:text-xs">
-                            {episode.current ? "Current episode" : "Past episode"}
-                          </p>
-                          <h3 className="mt-2 text-xl font-bold sm:text-2xl md:text-3xl">{episode.organization}</h3>
-                          <p className="mt-2 hidden max-w-xl text-sm leading-6 text-white/70 sm:block">{episode.line}</p>
-                        </div>
-                      </div>
-
-                      {isActive ? (
-                        <Link
-                          to={episode.route}
-                          onClick={() => track("bty_episode_open", { organization: episode.organization })}
-                          className="absolute inset-0 z-20 rounded-3xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#D7A92E]"
-                          aria-label={`Open ${episode.organization} Beyond The Yellow feature`}
-                        />
-                      ) : isSide ? (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setActiveEpisode(index);
-                            track("bty_episode_select", { organization: episode.organization });
-                          }}
-                          className="absolute inset-0 z-20 rounded-3xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#D7A92E]"
-                          aria-label={`Bring ${episode.organization} episode forward`}
-                        />
-                      ) : null}
-                    </article>
-                  );
-                })}
-              </div>
-
-              <div className="mt-5 flex items-center justify-center gap-4">
-                <button
-                  type="button"
-                  onClick={() => rotateEpisodes(-1)}
-                  className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-[#3B5147]/25 bg-white text-[#3B5147] transition hover:bg-[#3B5147] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147]"
-                  aria-label="Previous episode"
-                >
-                  <ArrowLeft className="h-5 w-5" aria-hidden="true" />
-                </button>
-                <p className="min-w-24 text-sm font-bold text-[#111814]/55" aria-live="polite">
-                  {activeEpisode + 1} of {episodes.length}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => rotateEpisodes(1)}
-                  className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-[#3B5147]/25 bg-white text-[#3B5147] transition hover:bg-[#3B5147] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147]"
-                  aria-label="Next episode"
-                >
-                  <ArrowRight className="h-5 w-5" aria-hidden="true" />
-                </button>
-              </div>
-
               <Link
                 to="/network"
-                onClick={() => track("bty_past_episodes")}
-                className="mt-7 inline-flex min-h-11 items-center gap-2 rounded-md px-4 py-2 text-sm font-bold text-[#3B5147] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147]"
+                onClick={() => track("bty_watch_stories")}
+                className="mt-8 inline-flex min-h-12 items-center gap-2 rounded-md bg-[#3B5147] px-6 py-3 text-sm font-bold text-white transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2"
               >
-                See All Past Episodes
+                <PlayCircle className="h-4 w-4" aria-hidden="true" />
+                Watch the Stories
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>

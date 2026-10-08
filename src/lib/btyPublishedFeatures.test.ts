@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { normalizeFeature } from "./btyPublishedFeatures";
+import { normalizeFeature, selectLatestFeature } from "./btyPublishedFeatures";
 import { redirects, canonicalRoutes } from "../../site-route-contract.mjs";
 
 describe("normalizeFeature", () => {
@@ -35,5 +35,21 @@ describe("route contract", () => {
       expect(route?.indexable).toBe(true);
       expect(route?.sitemap).toBe(true);
     }
+  });
+});
+
+describe("selectLatestFeature", () => {
+  const base = { summary: "S", internalPath: null, featureUrl: "https://x.org", imageUrl: null, fallbackImageUrl: null, videoUrl: null };
+  it("picks the newest published_at regardless of order and ignores missing dates", () => {
+    const pick = selectLatestFeature([
+      { ...base, id: "acp", name: "ACP", publishedAt: "2026-09-08T00:00:00Z" },
+      { ...base, id: "none", name: "NoDate", publishedAt: null },
+      { ...base, id: "sdod", name: "SDoD", publishedAt: "2026-10-05T00:00:00Z" },
+      { ...base, id: "fish", name: "FISH", publishedAt: "2026-09-28T00:00:00Z" },
+    ]);
+    expect(pick?.id).toBe("sdod");
+  });
+  it("returns null for an empty catalog", () => {
+    expect(selectLatestFeature([])).toBeNull();
   });
 });

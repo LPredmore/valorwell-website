@@ -4,7 +4,6 @@ import {
   ArrowRight,
   Building2,
   HeartHandshake,
-  PlayCircle,
   Stethoscope,
   Users,
 } from "lucide-react";

@@ -133,7 +133,7 @@ if (uniqueRoutePaths.size !== routePaths.length) {
   throw new Error("Published website resources contain duplicate public routes.");
 }
 
-const tsHeader = `// Generated from public.website_resources_public. Do not edit by hand.\n// scripts/generate-resource-content.mjs refreshes this file before production builds.\n\nexport type GeneratedWebsiteResource = {\n  slug: string;\n  title: string;\n  primary_question: string;\n  summary: string;\n  body_markdown: string;\n  faq: unknown[];\n  audience_tags: string[];\n  topic_aliases: string[];\n  source_urls: string[];\n  coverage_status: \"partial\" | \"complete\" | \"needs_review\";\n  status: \"published\";\n  live_url: string | null;\n  last_researched_at: string | null;\n  published_at: string | null;\n  resource_kind: "category" | "article";\n  category_slug: string | null;\n};\n\n`;
+const tsHeader = `// Generated from public.website_resources_public. Do not edit by hand.\n// scripts/generate-resource-content.mjs refreshes this file before production builds.\n\nexport type GeneratedWebsiteResource = {\n  slug: string;\n  title: string;\n  primary_question: string;\n  summary: string;\n  body_markdown: string;\n  faq: unknown[];\n  audience_tags: string[];\n  topic_aliases: string[];\n  source_urls?: string[];\n  coverage_status?: \"partial\" | \"complete\" | \"needs_review\";\n  status: \"published\";\n  live_url?: string | null;\n  last_researched_at?: string | null;\n  published_at: string | null;\n  resource_kind: "category" | "article";\n  category_slug: string | null;\n};\n\n`;
 
 const resourceModule = `${tsHeader}export const generatedWebsiteResources: GeneratedWebsiteResource[] = ${JSON.stringify(rows, null, 2)};\n`;
 const routeRows = rows.map((row) => ({

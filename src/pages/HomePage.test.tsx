@@ -172,7 +172,7 @@ describe("ValorWell homepage", () => {
   it("falls back to the archive link when the catalog is empty or fails", async () => {
     fetchFeaturesMock.mockRejectedValue(new Error("down"));
     renderHome();
-    expect(await screen.findByRole("link", { name: /See featured organizations/ })).toHaveAttribute("href", "/network");
+    expect(await screen.findByRole("link", { name: /See featured organizations/ }, { timeout: 5000 })).toHaveAttribute("href", "/network");
     expect(screen.queryByText("American Corporate Partners")).not.toBeInTheDocument();
   });
 

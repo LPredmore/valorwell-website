@@ -1,115 +1,176 @@
+import { useCallback, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
-import { ArrowUpRight, Building2, PlayCircle } from "lucide-react";
+import { ArrowUpRight, Building2, PlayCircle, RefreshCw } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { fetchPublishedFeatures, type PublishedFeature } from "@/lib/btyPublishedFeatures";
 
-const pastEpisodes = [
-  {
-    organization: "GallantFew",
-    title: "The mission ends. The need for direction doesn’t.",
-    videoId: "zsaTKjNVeew",
-    videoUrl: "https://www.youtube.com/watch?v=zsaTKjNVeew",
-    featureUrl: "/gallantfew",
-    description:
-      "Karl Monger on what happens when military structure, identity, accountability, and mission disappear—and how veterans can deliberately build what comes next.",
-  },
-  {
-    organization: "VETS2INDUSTRY",
-    title: "The resources exist. The problem is knowing where to find them.",
-    videoId: "iVDPZL_PEWo",
-    videoUrl: "https://www.youtube.com/watch?v=iVDPZL_PEWo",
-    featureUrl: "/vets2industry",
-    description:
-      "Matthew Philip Wee on why veterans need more than a list of resources—they need context, trusted connections, and a path toward what is useful.",
-  },
-  {
-    organization: "Military Missions in Action",
-    title: "Practical help should change what a veteran can do tomorrow.",
-    videoId: "19JpCgF-d9Q",
-    videoUrl: "https://www.youtube.com/watch?v=19JpCgF-d9Q",
-    featureUrl: "/mmia",
-    description:
-      "Zak Keisler on veteran support ranging from accessibility projects and furnished homes to transportation and essential supplies.",
-  },
-  {
-    organization: "Veterans Outreach of Wisconsin",
-    title: "A tiny home is the beginning. The work continues from there.",
-    videoId: "hLvZfGcycOQ",
-    videoUrl: "https://www.youtube.com/watch?v=hLvZfGcycOQ",
-    featureUrl: "/VOW",
-    description:
-      "John Shaw on housing, food access, community, peer support, and helping veterans rebuild stability after the immediate crisis.",
-  },
-] as const;
+const YOUTUBE_CHANNEL_URL = "https://www.youtube.com/@ValorWell";
 
-function EpisodeCard({
-  organization,
-  title,
-  videoId,
-  videoUrl,
-  featureUrl,
-  description,
-}: (typeof pastEpisodes)[number]) {
+type LoadState =
+  | { status: "loading" }
+  | { status: "error" }
+  | { status: "ready"; features: PublishedFeature[] };
+
+function FeatureLink({
+  feature,
+  className,
+  children,
+  ariaLabel,
+}: {
+  feature: PublishedFeature;
+  className: string;
+  children: React.ReactNode;
+  ariaLabel?: string;
+}) {
+  if (feature.internalPath) {
+    return (
+      <Link to={feature.internalPath} className={className} aria-label={ariaLabel}>
+        {children}
+      </Link>
+    );
+  }
+  return (
+    <a href={feature.featureUrl} className={className} aria-label={ariaLabel}>
+      {children}
+    </a>
+  );
+}
+
+function FeatureCard({ feature }: { feature: PublishedFeature }) {
   return (
     <article className="overflow-hidden rounded-3xl border border-[#3B5147]/15 bg-white shadow-sm">
-      <Link
-        to={featureUrl}
-        className="group block overflow-hidden bg-black focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#D7A92E]"
-        aria-label={`Explore ${organization}`}
+      <FeatureLink
+        feature={feature}
+        ariaLabel={`Explore ${feature.name}`}
+        className="group block overflow-hidden bg-[#111814] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#D7A92E]"
       >
         <div className="relative aspect-video overflow-hidden">
-          <img
-            src={`https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`}
-            alt={`${organization} Beyond The Yellow episode`}
-            className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02] motion-reduce:transform-none motion-reduce:transition-none"
-            loading="lazy"
-            onError={(event) => {
-              event.currentTarget.src = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
-            }}
-          />
+          {feature.imageUrl ? (
+            <img
+              src={feature.imageUrl}
+              alt={`${feature.name} Beyond The Yellow feature`}
+              className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02] motion-reduce:transform-none motion-reduce:transition-none"
+              loading="lazy"
+              onError={(event) => {
+                if (feature.fallbackImageUrl && event.currentTarget.src !== feature.fallbackImageUrl) {
+                  event.currentTarget.src = feature.fallbackImageUrl;
+                }
+              }}
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-[#D7A92E]">
+              <Building2 className="h-10 w-10" aria-hidden="true" />
+            </div>
+          )}
           <div className="absolute inset-0 bg-black/10 transition group-hover:bg-black/20" aria-hidden="true" />
         </div>
-      </Link>
+      </FeatureLink>
       <div className="p-6">
         <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-[#8A6814]">
           <Building2 className="h-4 w-4" aria-hidden="true" />
           Beyond The Yellow
         </div>
-        <h2 className="mt-3 text-2xl font-bold leading-tight text-[#111814]">{organization}</h2>
-        <p className="mt-3 text-sm font-semibold leading-6 text-[#111814]/78">{title}</p>
-        <p className="mt-4 text-sm leading-7 text-[#111814]/62">{description}</p>
+        <h2 className="mt-3 text-2xl font-bold leading-tight text-[#111814]">{feature.name}</h2>
+        <p className="mt-4 text-sm leading-7 text-[#111814]/62">{feature.summary}</p>
         <div className="mt-6 flex flex-wrap gap-4">
-          <Link
-            to={featureUrl}
+          <FeatureLink
+            feature={feature}
             className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#3B5147] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147]"
           >
             Read feature
             <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-          </Link>
-          <a
-            href={videoUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#111814]/55 transition hover:text-[#111814] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147]"
-          >
-            <PlayCircle className="h-4 w-4" aria-hidden="true" />
-            Watch conversation
-          </a>
+          </FeatureLink>
+          {feature.videoUrl ? (
+            <a
+              href={feature.videoUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#111814]/55 transition hover:text-[#111814] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147]"
+            >
+              <PlayCircle className="h-4 w-4" aria-hidden="true" />
+              Watch conversation
+            </a>
+          ) : null}
         </div>
       </div>
     </article>
   );
 }
 
+function FeatureGrid({ state, onRetry }: { state: LoadState; onRetry: () => void }) {
+  if (state.status === "loading") {
+    return (
+      <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3" aria-busy="true" aria-label="Loading featured organizations">
+        {[0, 1, 2].map((key) => (
+          <div key={key} className="h-[26rem] animate-pulse rounded-3xl border border-[#3B5147]/10 bg-[#F4F1E8]" />
+        ))}
+      </div>
+    );
+  }
+
+  if (state.status === "error") {
+    return (
+      <div role="alert" className="mt-10 rounded-3xl border border-[#3B5147]/15 bg-[#F4F1E8] p-8 text-center">
+        <p className="text-lg font-bold text-[#111814]">We couldn&apos;t load the featured organizations right now.</p>
+        <button
+          type="button"
+          onClick={onRetry}
+          className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-md bg-[#3B5147] px-5 py-2 text-sm font-bold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2"
+        >
+          <RefreshCw className="h-4 w-4" aria-hidden="true" />
+          Try again
+        </button>
+      </div>
+    );
+  }
+
+  if (state.features.length === 0) {
+    return (
+      <div className="mt-10 rounded-3xl border border-[#3B5147]/15 bg-[#F4F1E8] p-8 text-center">
+        <p className="text-lg font-bold text-[#111814]">New features are on the way.</p>
+        <p className="mt-2 text-sm text-[#111814]/62">Check back soon for published Beyond The Yellow conversations.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {state.features.map((feature) => (
+        <FeatureCard key={feature.id} feature={feature} />
+      ))}
+    </div>
+  );
+}
+
 export default function NetworkPage() {
+  const [state, setState] = useState<LoadState>({ status: "loading" });
+
+  const load = useCallback(() => {
+    let cancelled = false;
+    setState({ status: "loading" });
+    fetchPublishedFeatures()
+      .then((features) => {
+        if (!cancelled) setState({ status: "ready", features });
+      })
+      .catch(() => {
+        if (!cancelled) setState({ status: "error" });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => load(), [load]);
+
   return (
     <>
       <Helmet>
-        <title>Past Beyond The Yellow Episodes | ValorWell</title>
+        <title>Beyond The Yellow Featured Organizations | ValorWell</title>
         <meta
           name="description"
-          content="Explore previously published Beyond The Yellow episodes, read their feature pages, and watch the conversations behind the work."
+          content="Explore organizations featured through Beyond The Yellow, read their feature pages, and watch the conversations behind their work."
         />
         <meta name="robots" content="index,follow" />
         <link rel="canonical" href="https://www.valorwell.org/network" />
@@ -119,14 +180,12 @@ export default function NetworkPage() {
       <main className="min-h-screen bg-[#F4F1E8] text-[#111814]">
         <section className="border-b border-white/10 bg-[#111814] text-white">
           <div className="mx-auto max-w-6xl px-4 py-16 text-center md:py-20">
-            <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#D7A92E]">
-              Beyond The Yellow
-            </p>
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#D7A92E]">Beyond The Yellow</p>
             <h1 className="mx-auto mt-5 max-w-4xl text-4xl font-bold leading-tight md:text-6xl">
-              Past episodes.
+              Featured organizations.
             </h1>
             <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-white/72">
-              The current conversation lives on the Beyond The Yellow page. This archive is for the people and organizations we have already featured—and the work that is still worth knowing about.
+              Explore organizations featured through Beyond The Yellow, read their stories, and watch conversations about how their work operates.
             </p>
           </div>
         </section>
@@ -134,43 +193,45 @@ export default function NetworkPage() {
         <section className="border-b border-[#3B5147]/15 bg-white py-14 md:py-20">
           <div className="mx-auto max-w-6xl px-4">
             <div className="max-w-3xl">
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#3B5147]">
-                Published Conversations
-              </p>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#3B5147]">Published Conversations</p>
               <h2 className="mt-3 text-3xl font-bold text-[#111814] md:text-4xl">
                 Go deeper on the work behind each conversation.
               </h2>
               <p className="mt-5 text-base leading-8 text-[#111814]/62">
-                Read the feature or watch the full conversation. This is an archive of aired Beyond The Yellow episodes, not a comprehensive directory of veteran-service organizations.
+                Read the feature or watch the full conversation. This is an archive of published Beyond The Yellow features, not a comprehensive directory of veteran-service organizations.
               </p>
             </div>
-
-            <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {pastEpisodes.map((episode) => (
-                <EpisodeCard key={episode.organization} {...episode} />
-              ))}
-            </div>
+            <FeatureGrid state={state} onRetry={load} />
           </div>
         </section>
 
         <section className="bg-[#F4F1E8] py-16 md:py-20">
           <div className="mx-auto max-w-4xl px-4 text-center">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#3B5147]">
-              Who Are We Missing?
-            </p>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#3B5147]">Who Are We Missing?</p>
             <h2 className="mt-4 text-3xl font-bold text-[#111814] md:text-5xl">
               Know somebody whose work would leave a hole if it disappeared?
             </h2>
             <p className="mx-auto mt-5 max-w-2xl text-base leading-8 text-[#111814]/62">
               Send us back to Beyond The Yellow and tell us who is doing the work.
             </p>
-            <Link
-              to="/beyond-the-yellow?form=nomination"
-              className="mt-8 inline-flex min-h-12 items-center gap-2 rounded-md bg-[#3B5147] px-5 py-3 text-sm font-bold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2"
-            >
-              Nominate a Doer
-              <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <Link
+                to="/beyond-the-yellow?form=nomination"
+                className="inline-flex min-h-12 items-center gap-2 rounded-md bg-[#3B5147] px-5 py-3 text-sm font-bold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2"
+              >
+                Nominate a Doer
+                <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+              <a
+                href={YOUTUBE_CHANNEL_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-12 items-center gap-2 rounded-md border border-[#3B5147]/30 px-5 py-3 text-sm font-bold text-[#3B5147] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2"
+              >
+                <PlayCircle className="h-4 w-4" aria-hidden="true" />
+                More ValorWell videos on YouTube
+              </a>
+            </div>
           </div>
         </section>
       </main>

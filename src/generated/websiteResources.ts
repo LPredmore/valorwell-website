@@ -10,11 +10,11 @@ export type GeneratedWebsiteResource = {
   faq: unknown[];
   audience_tags: string[];
   topic_aliases: string[];
-  source_urls: string[];
-  coverage_status: "partial" | "complete" | "needs_review";
+  source_urls?: string[];
+  coverage_status?: "partial" | "complete" | "needs_review";
   status: "published";
-  live_url: string | null;
-  last_researched_at: string | null;
+  live_url?: string | null;
+  last_researched_at?: string | null;
   published_at: string | null;
   resource_kind: "category" | "article";
   category_slug: string | null;

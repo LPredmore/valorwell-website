@@ -170,7 +170,7 @@ describe("ValorWell homepage", () => {
   });
 
   it("falls back to the archive link when the catalog is empty or fails", async () => {
-    fetchFeaturesMock.mockRejectedValueOnce(new Error("down"));
+    fetchFeaturesMock.mockRejectedValue(new Error("down"));
     renderHome();
     expect(await screen.findByRole("link", { name: /See featured organizations/ })).toHaveAttribute("href", "/network");
     expect(screen.queryByText("American Corporate Partners")).not.toBeInTheDocument();

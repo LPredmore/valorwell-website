@@ -13,7 +13,11 @@ export const canonicalRoutes = [
 export const redirects = [
   {
     "from": "/videos",
-    "to": "/watch"
+    "to": "/network"
+  },
+  {
+    "from": "/watch",
+    "to": "/network"
   },
   {
     "from": "/beyondtheyellow",

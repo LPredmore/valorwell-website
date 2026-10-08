@@ -10,7 +10,6 @@ import { canonicalRoutes, redirects } from "../site-route-contract.mjs";
 import NotFound from "./pages/NotFound";
 import HomePage from "./pages/HomePage";
 import HowItWorksPage from "./pages/HowItWorksPage";
-import WatchPage from "./pages/WatchPage";
 import NetworkPage from "./pages/NetworkPage";
 import MissionPage from "./pages/MissionPage";
 import AboutPage from "./pages/AboutPage";
@@ -33,6 +32,8 @@ import VeteransBreakfastClubPage from "./pages/bty/VeteransBreakfastClubPage";
 import AlwaysGiveBackPage from "./pages/bty/AlwaysGiveBackPage";
 import FishPage from "./pages/bty/FishPage";
 import AmericanCorporatePartnersPage from "./pages/bty/AmericanCorporatePartnersPage";
+import CommunionPage from "./pages/bty/CommunionPage";
+import ServiceDogsOfDistinctionPage from "./pages/bty/ServiceDogsOfDistinctionPage";
 import AuthorityResources from "./pages/authority/Resources";
 import AuthorityFamilySystems from "./pages/authority/FamilySystems";
 import AuthorityMilitaryFamilyTherapy from "./pages/authority/MilitaryFamilyTherapy";
@@ -66,7 +67,6 @@ const routeElements: Record<string, ReactNode> = {
   "/donate": <DonatePage />,
   "/beyond-the-yellow": <BtyBillingHubPage />,
   "/beyond-the-yellow/schedule": <BtySchedulerPage />,
-  "/watch": <WatchPage />,
   "/network": <NetworkPage />,
   "/get-care": <GetCareWithSignup />,
   "/clinicians": <Clinicians />,
@@ -84,6 +84,8 @@ const routeElements: Record<string, ReactNode> = {
   "/veteransbreakfastclub": <VeteransBreakfastClubPage />,
   "/alwaysgiveback": <AlwaysGiveBackPage />,
   "/fish": <FishPage />,
+  "/communion": <CommunionPage />,
+  "/service-dogs-of-distinction": <ServiceDogsOfDistinctionPage />,
   "/privacy": <Privacy />,
   "/americancorporatepartners": (
     <div className="acp-page">

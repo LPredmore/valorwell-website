@@ -81,6 +81,24 @@ export const routes = [
     "sitemap": true
   },
   {
+    "path": "/communion",
+    "title": "COMMUNION | Beyond The Yellow | ValorWell",
+    "description": "Explore the Beyond The Yellow feature with Craig Smith of COMMUNION on community, authentic connection, meaningful conversation, vulnerability, and taking action together.",
+    "h1": "COMMUNION.",
+    "lead": "A Beyond The Yellow conversation with Craig Smith about building real community through honest conversation and shared action instead of performative argument.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
+    "path": "/service-dogs-of-distinction",
+    "title": "Service Dogs of Distinction | Beyond The Yellow | ValorWell",
+    "description": "Explore the Beyond The Yellow serialized conversation with Don Gardner of Service Dogs of Distinction on service dogs, veteran independence, belonging, and purpose.",
+    "h1": "Service Dogs of Distinction.",
+    "lead": "A serialized Beyond The Yellow conversation with Don Gardner about service dogs, veteran independence, belonging, and purpose.",
+    "indexable": true,
+    "sitemap": true
+  },
+  {
     "path": "/privacy",
     "title": "Privacy Policy | ValorWell",
     "description": "Read the ValorWell privacy policy and learn how information submitted through the public website is handled.",
@@ -92,11 +110,11 @@ export const routes = [
   {
     "path": "/americancorporatepartners",
     "title": "American Corporate Partners | Beyond The Yellow | ValorWell",
-    "description": "American Corporate Partners Beyond The Yellow feature page.",
+    "description": "Explore the Beyond The Yellow feature with American Corporate Partners on year-long mentorship that helps veterans translate military experience into civilian careers.",
     "h1": "American Corporate Partners.",
-    "lead": "This Beyond The Yellow feature is not part of the currently published episode collection.",
-    "indexable": false,
-    "sitemap": false
+    "lead": "A Beyond The Yellow conversation about one-on-one mentorship and turning military experience into a clearer civilian career path.",
+    "indexable": true,
+    "sitemap": true
   },
   {
     "path": "/pendulo",

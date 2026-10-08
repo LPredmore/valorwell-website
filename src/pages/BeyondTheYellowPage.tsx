@@ -176,7 +176,7 @@ export default function BeyondTheYellowPage() {
                   <button
                     type="button"
                     onClick={() => chooseLane("nominate", "bty_hero_nominate")}
-                    className="inline-flex min-h-12 items-center gap-2 rounded-md border border-white/30 px-6 py-3 text-sm font-bold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                    className="inline-flex min-h-12 items-center gap-2 rounded-md bg-[#D7A92E] px-6 py-3 text-sm font-bold text-[#111814] transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
                   >
                     Nominate a Doer
                   </button>

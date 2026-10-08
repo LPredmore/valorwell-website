@@ -81,15 +81,6 @@ export const routes = [
     "sitemap": false
   },
   {
-    "path": "/watch",
-    "title": "Watch ValorWell | Veteran, Family & Beyond The Yellow Videos",
-    "description": "Watch ValorWell videos about veteran systems, CHAMPVA, VA Community Care, mental health, military families, and Beyond The Yellow conversations.",
-    "h1": "Videos for veterans, families, and people following the work.",
-    "lead": "ValorWell videos cover care access, CHAMPVA, VA Community Care, mental health, veteran systems, and Beyond The Yellow conversations.",
-    "indexable": true,
-    "sitemap": true
-  },
-  {
     "path": "/network",
     "title": "Beyond The Yellow Featured Organizations | ValorWell",
     "description": "Explore organizations featured through Beyond The Yellow, read their feature pages, and watch the conversations behind their work.",

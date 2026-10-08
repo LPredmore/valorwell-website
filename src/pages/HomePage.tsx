@@ -34,10 +34,7 @@ import {
   type HomepageImpactRpcRow,
 } from "./homePageData";
 
-const CURRENT_BTY_VIDEO_ID = "JHuLEqw2yG8";
-const CURRENT_BTY_VIDEO_URL = `https://www.youtube.com/watch?v=${CURRENT_BTY_VIDEO_ID}`;
-const CURRENT_BTY_THUMBNAIL = `https://i.ytimg.com/vi/${CURRENT_BTY_VIDEO_ID}/maxresdefault.jpg`;
-const CURRENT_BTY_THUMBNAIL_FALLBACK = `https://i.ytimg.com/vi/${CURRENT_BTY_VIDEO_ID}/hqdefault.jpg`;
+import { LatestBtyFeatureCard } from "@/components/bty/LatestBtyFeatureCard";
 
 const involvementRoutes = [
   {
@@ -272,7 +269,6 @@ function FoundationImpactChart() {
 }
 
 export default function HomePage() {
-  const [thumbnailFallbackUsed, setThumbnailFallbackUsed] = useState(false);
 
   useEffect(() => {
     trackHomeEvent("homepage_view");
@@ -423,29 +419,7 @@ export default function HomePage() {
         <section className="border-b border-[#3B5147]/15 bg-[#F4F1E8]">
           <div className="container-wide grid items-center gap-12 py-16 md:py-24 lg:grid-cols-12">
             <div className="lg:col-span-6">
-              <a
-                href={CURRENT_BTY_VIDEO_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => trackHomeEvent("homepage_bty_current_episode", { organization: "American Corporate Partners", video_id: CURRENT_BTY_VIDEO_ID })}
-                className="group block overflow-hidden rounded-3xl border border-[#D7A92E]/30 bg-[#111814] shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2"
-              >
-                <div className="relative aspect-video overflow-hidden">
-                  <img
-                    src={thumbnailFallbackUsed ? CURRENT_BTY_THUMBNAIL_FALLBACK : CURRENT_BTY_THUMBNAIL}
-                    onError={() => setThumbnailFallbackUsed(true)}
-                    alt="American Corporate Partners Beyond The Yellow conversation"
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transform-none motion-reduce:transition-none"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" aria-hidden="true" />
-                  <PlayCircle className="absolute left-5 top-5 h-11 w-11 text-white drop-shadow" aria-hidden="true" />
-                  <div className="absolute bottom-5 left-5 right-5 text-white">
-                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#D7A92E]">Current episode</p>
-                    <p className="mt-2 text-2xl font-bold">American Corporate Partners</p>
-                  </div>
-                </div>
-              </a>
+              <LatestBtyFeatureCard onTrack={trackHomeEvent} eventPrefix="homepage_bty" />
             </div>
             <div className="lg:col-span-6">
               <Eyebrow>Beyond The Yellow</Eyebrow>

@@ -124,6 +124,7 @@ type ContactRecord = {
 type OrganizationRecord = {
   id: string;
   name: string;
+  veteran_affiliated: boolean | null;
   metadata: Record<string, unknown> | null;
   updated_at: string;
 };
@@ -354,6 +355,10 @@ function isBtyOpportunity(opportunity: OpportunityRecord) {
 
 function isEligibleBtyOrganization(organization: OrganizationRecord) {
   const metadata = organization.metadata ?? {};
+  const eligibility = metadata.bty_eligibility as Record<string, unknown> | undefined;
+  if (organization.veteran_affiliated !== true || eligibility?.exclude_from_bty === true) {
+    return false;
+  }
   return (
     metadata.btyNominationOutreachSent === true ||
     String(metadata.btyNominationOutreachSent ?? "").toLowerCase() === "true" ||
@@ -393,7 +398,7 @@ async function resolveContactContext(admin: SupabaseClient, email: string) {
 
   const { data: organizations, error: organizationError } = await admin
     .from("relationship_organizations")
-    .select("id,name,metadata,updated_at")
+    .select("id,name,veteran_affiliated,metadata,updated_at")
     .eq("tenant_id", TENANT_ID)
     .in("id", organizationIds);
   if (organizationError) throw new Error(organizationError.message);
@@ -1473,13 +1478,65 @@ async function reconcileConfirmedBooking(
   startUtc: string,
   calendarEventId: string,
 ) {
-  const opportunity = context.opportunity;
+  let opportunity = context.opportunity;
   if (!opportunity) {
-    console.error("BTY booking CRM opportunity not found", {
-      organizationId: context.organization.id,
-      reservationId,
-    });
-    return;
+    // Invited organizations may predate the CRM opportunity workflow.
+    // Create a BTY opportunity only AFTER the Google event and meeting are
+    // confirmed; never attach an unrelated opportunity by guesswork.
+    const targetStatus =
+      meetingType === "pre_interview" ? "pre_interview_scheduled" : "booked";
+    const nextAction =
+      meetingType === "pre_interview"
+        ? "Attend confirmed Beyond The Yellow pre-interview; Google Calendar invitation sent."
+        : "Attend confirmed Beyond The Yellow recording; StreamYard invitation sent.";
+    const { data: created, error: createError } = await admin
+      .from("relationship_opportunities")
+      .insert({
+        tenant_id: TENANT_ID,
+        organization_id: context.organization.id,
+        primary_contact_id: context.contact.id,
+        status: targetStatus,
+        veteran_priority: true,
+        review_status: "approved",
+        next_action: nextAction,
+        next_action_due_at: startUtc,
+        metadata: {
+          initiative: "Beyond The Yellow",
+          source: "bty_public_scheduler",
+          bty_scheduler_booking: {
+            source: "bty_public_scheduler",
+            meeting_type: meetingType,
+            meeting_id: reservationId,
+            calendar_event_id: calendarEventId,
+            start_utc: startUtc,
+            confirmed_at: new Date().toISOString(),
+          },
+        },
+      })
+      .select("id,organization_id,primary_contact_id,status,version,qualification,metadata,updated_at")
+      .single();
+    if (createError || !created) {
+      console.error("BTY booking missing opportunity could not be created", {
+        organizationId: context.organization.id,
+        reservationId,
+        error: createError,
+      });
+      return;
+    }
+    opportunity = created as OpportunityRecord;
+    const { error: linkError } = await admin
+      .from("relationship_meetings")
+      .update({ opportunity_id: opportunity.id })
+      .eq("id", reservationId)
+      .eq("organization_id", context.organization.id);
+    if (linkError) {
+      console.error("BTY booking new opportunity link failed", {
+        organizationId: context.organization.id,
+        reservationId,
+        opportunityId: opportunity.id,
+        error: linkError,
+      });
+    }
   }
 
   const { data: fresh, error: fetchError } = await admin

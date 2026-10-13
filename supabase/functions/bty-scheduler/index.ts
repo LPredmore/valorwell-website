@@ -1060,6 +1060,13 @@ async function selectedSlotAvailable(
     minutesFromMidnight + config.durationMinutes > DAY_END_MINUTES ||
     (minutesFromMidnight - DAY_START_MINUTES) % config.slotStepMinutes !== 0
   ) {
+    console.warn("BTY scheduler slot rejected: outside_booking_window", {
+      meetingType,
+      startUtc: start.toUTC().toISO(),
+      centralTime: start.toISO(),
+      firstBookable: firstDay.toISODate(),
+      lastBookable: finalDay.toISODate(),
+    });
     return false;
   }
 
@@ -1082,8 +1089,15 @@ async function selectedSlotAvailable(
   ]);
   const count = counts.get(centralDateKey(start)) ?? 0;
 
-  if (meetingType === "bty_interview" && count >= 1) return false;
-  if (meetingType === "pre_interview" && count >= 2) return false;
+  if ((meetingType === "bty_interview" && count >= 1) ||
+      (meetingType === "pre_interview" && count >= 2)) {
+    console.warn("BTY scheduler slot rejected: daily_capacity_reached", {
+      meetingType,
+      startUtc: start.toUTC().toISO(),
+      activeMeetingCount: count,
+    });
+    return false;
+  }
 
   if (
     meetingType === "bty_interview" &&
@@ -1094,12 +1108,31 @@ async function selectedSlotAvailable(
         centralDateKey(event.start) === centralDateKey(start),
     )
   ) {
+    console.warn("BTY scheduler slot rejected: existing_recording_on_day", {
+      meetingType,
+      startUtc: start.toUTC().toISO(),
+    });
     return false;
   }
 
-  return !busy.some((event) =>
+  const conflict = busy.find((event) =>
     meetingTypeConflicts(meetingType, start, end, event)
   );
+  if (conflict) {
+    console.warn("BTY scheduler slot rejected: calendar_overlap", {
+      meetingType,
+      startUtc: start.toUTC().toISO(),
+      source: conflict.source,
+      sourceId: conflict.sourceId,
+      busyStartUtc: conflict.start.toUTC().toISO(),
+      busyEndUtc: conflict.end.toUTC().toISO(),
+      eventIsBtyRecording: conflict.isBtyRecording,
+      eventIsPreInterview: conflict.isPreInterview,
+      allDay: conflict.allDay,
+    });
+    return false;
+  }
+  return true;
 }
 
 function hexToBytes(hex: string): Uint8Array {

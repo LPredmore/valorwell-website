@@ -22613,6 +22613,7 @@ export type Database = {
           connection_id: string | null
           contact_id: string
           created_at: string
+          decline_detected_at: string | null
           ends_at: string | null
           event_status: string
           external_event_id: string
@@ -22623,6 +22624,7 @@ export type Database = {
           opportunity_id: string | null
           organization_id: string
           purpose: string
+          scheduler_rollback: Json | null
           starts_at: string | null
           streamyard_url: string | null
           tenant_id: string
@@ -22636,6 +22638,7 @@ export type Database = {
           connection_id?: string | null
           contact_id: string
           created_at?: string
+          decline_detected_at?: string | null
           ends_at?: string | null
           event_status: string
           external_event_id: string
@@ -22646,6 +22649,7 @@ export type Database = {
           opportunity_id?: string | null
           organization_id: string
           purpose?: string
+          scheduler_rollback?: Json | null
           starts_at?: string | null
           streamyard_url?: string | null
           tenant_id: string
@@ -22659,6 +22663,7 @@ export type Database = {
           connection_id?: string | null
           contact_id?: string
           created_at?: string
+          decline_detected_at?: string | null
           ends_at?: string | null
           event_status?: string
           external_event_id?: string
@@ -22669,6 +22674,7 @@ export type Database = {
           opportunity_id?: string | null
           organization_id?: string
           purpose?: string
+          scheduler_rollback?: Json | null
           starts_at?: string | null
           streamyard_url?: string | null
           tenant_id?: string
@@ -32970,6 +32976,10 @@ export type Database = {
       relationship_worker_token_valid: {
         Args: { p_tenant_id: string; p_token: string }
         Returns: boolean
+      }
+      release_bty_scheduler_booking: {
+        Args: { p_meeting_id: string }
+        Returns: Json
       }
       release_campaign_step_claim: {
         Args: {

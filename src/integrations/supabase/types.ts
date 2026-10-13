@@ -4486,6 +4486,60 @@ export type Database = {
           },
         ]
       }
+      bty_scheduler_activity_events: {
+        Row: {
+          booking_attempt_id: string | null
+          calendar_event_id: string | null
+          contact_id: string | null
+          created_at: string
+          event_type: string
+          failure_code: string | null
+          failure_stage: string | null
+          http_status: number | null
+          id: string
+          meeting_type: string | null
+          opportunity_id: string | null
+          organization_id: string | null
+          requested_start_utc: string | null
+          tenant_id: string
+          visitor_session_id: string
+        }
+        Insert: {
+          booking_attempt_id?: string | null
+          calendar_event_id?: string | null
+          contact_id?: string | null
+          created_at?: string
+          event_type: string
+          failure_code?: string | null
+          failure_stage?: string | null
+          http_status?: number | null
+          id?: string
+          meeting_type?: string | null
+          opportunity_id?: string | null
+          organization_id?: string | null
+          requested_start_utc?: string | null
+          tenant_id: string
+          visitor_session_id: string
+        }
+        Update: {
+          booking_attempt_id?: string | null
+          calendar_event_id?: string | null
+          contact_id?: string | null
+          created_at?: string
+          event_type?: string
+          failure_code?: string | null
+          failure_stage?: string | null
+          http_status?: number | null
+          id?: string
+          meeting_type?: string | null
+          opportunity_id?: string | null
+          organization_id?: string | null
+          requested_start_utc?: string | null
+          tenant_id?: string
+          visitor_session_id?: string
+        }
+        Relationships: []
+      }
       calendar_sync_log: {
         Row: {
           appointment_id: string

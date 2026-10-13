@@ -81,6 +81,8 @@ type RelationshipCalendarRuntime = {
 
 type CalendarEvent = {
   id?: string;
+  iCalUID?: string;
+  updated?: string;
   status?: string;
   summary?: string;
   description?: string;
@@ -117,7 +119,27 @@ type BusyEvent = {
   isPreInterview: boolean;
   source: "google" | "database";
   sourceId?: string | null;
+  iCalUid?: string | null;
 };
+
+/**
+ * Identifies the guest's OWN booking so a reschedule preview/move does not
+ * collide with itself. Matching is by DB row id, exact Google event id, or
+ * iCalUID only (the iCalUID also covers the attendee copy on the owner's
+ * personal calendar). Never by attendee email or title.
+ */
+type BookingExclusion = {
+  meetingId?: string | null;
+  googleEventId?: string | null;
+  iCalUid?: string | null;
+};
+
+function isExcludedGoogleEvent(event: CalendarEvent, exclusion?: BookingExclusion) {
+  if (!exclusion) return false;
+  if (exclusion.googleEventId && event.id === exclusion.googleEventId) return true;
+  if (exclusion.iCalUid && event.iCalUID === exclusion.iCalUid) return true;
+  return false;
+}
 
 type ContactRecord = {
   id: string;
@@ -185,7 +207,8 @@ type SchedulerTrackingEvent =
   | "page_opened" | "invitation_verified" | "invitation_rejected"
   | "availability_viewed" | "slot_selected" | "booking_submitted"
   | "booking_confirmed" | "booking_failed" | "booking_client_error"
-  | "booking_crm_sync_warning" | "booking_released" | "booking_release_failed";
+  | "booking_crm_sync_warning" | "booking_released" | "booking_release_failed"
+  | "booking_rescheduled" | "booking_reschedule_failed";
 
 const TRACKING_ID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -537,7 +560,7 @@ async function resolveContactContext(admin: SupabaseClient, email: string) {
   const { data: activeMeetings, error: meetingError } = await admin
     .from("relationship_meetings")
     .select(
-      "id,purpose,opportunity_id,organization_id,contact_id,starts_at,ends_at,event_status,streamyard_url,external_event_id,metadata",
+      "id,purpose,opportunity_id,organization_id,contact_id,starts_at,ends_at,event_status,streamyard_url,external_event_id,ical_uid,decline_detected_at,metadata",
     )
     .eq("tenant_id", TENANT_ID)
     .in("purpose", ["bty_recording", "bty_preinterview"])
@@ -808,6 +831,7 @@ function normalizeCalendarEvent(event: CalendarEvent): BusyEvent | null {
     isPreInterview,
     source: "google",
     sourceId: event.id ?? null,
+    iCalUid: event.iCalUID ?? null,
   };
 }
 
@@ -881,6 +905,7 @@ async function findExistingCalendarBookings(
           ? meetingUrlFromCalendarEvent(event)
           : STREAMYARD_URL,
       external_event_id: event.id ?? null,
+      ical_uid: event.iCalUID ?? null,
       metadata: {},
     };
 
@@ -900,7 +925,7 @@ async function collectBusyEvents(
   admin: SupabaseClient,
   rangeStart: DateTime,
   rangeEnd: DateTime,
-  excludeMeetingId?: string,
+  exclusion?: BookingExclusion,
 ) {
   const connections = await relationshipCalendarConnections(admin);
   const timeMin = rangeStart.toUTC().toISO()!;
@@ -932,7 +957,7 @@ async function collectBusyEvents(
   const meetingsPromise = (async () => {
     let meetingsQuery = admin
       .from("relationship_meetings")
-      .select("id,purpose,starts_at,ends_at,external_event_id")
+      .select("id,purpose,starts_at,ends_at,external_event_id,ical_uid")
       .eq("tenant_id", TENANT_ID)
       .in("purpose", ["bty_recording", "bty_preinterview"])
       .in("event_status", ["tentative", "confirmed"])
@@ -940,8 +965,8 @@ async function collectBusyEvents(
       .not("ends_at", "is", null)
       .lt("starts_at", timeMax)
       .gt("ends_at", timeMin);
-    if (excludeMeetingId) {
-      meetingsQuery = meetingsQuery.neq("id", excludeMeetingId);
+    if (exclusion?.meetingId) {
+      meetingsQuery = meetingsQuery.neq("id", exclusion.meetingId);
     }
     const { data, error } = await meetingsQuery;
     if (error) throw new Error(error.message);
@@ -956,6 +981,8 @@ async function collectBusyEvents(
   const busy: BusyEvent[] = [];
   for (const { events } of calendarReads) {
     for (const event of events) {
+      // Suppress the guest's own event on every checked calendar.
+      if (isExcludedGoogleEvent(event, exclusion)) continue;
       const normalized = normalizeCalendarEvent(event);
       if (normalized) busy.push(normalized);
     }
@@ -1085,6 +1112,7 @@ function slotStartForDay(day: DateTime, minutesFromMidnight: number) {
 async function computeAvailability(
   admin: SupabaseClient,
   meetingType: MeetingType,
+  exclusion?: BookingExclusion,
 ) {
   const config = MEETING_CONFIG[meetingType];
   const firstDay = firstBookableMonday();
@@ -1095,12 +1123,14 @@ async function computeAvailability(
       admin,
       firstDay.minus({ hours: 3 }),
       rangeEnd.plus({ hours: 3 }),
+      exclusion,
     ),
     activeMeetingCountsByDate(
       admin,
       purpose,
       firstDay,
       rangeEnd,
+      exclusion?.meetingId ?? undefined,
     ),
   ]);
 
@@ -1180,7 +1210,7 @@ async function selectedSlotAvailable(
   meetingType: MeetingType,
   start: DateTime,
   end: DateTime,
-  excludeMeetingId?: string,
+  exclusion?: BookingExclusion,
 ) {
   const config = MEETING_CONFIG[meetingType];
   const firstDay = firstBookableMonday();
@@ -1215,13 +1245,13 @@ async function selectedSlotAvailable(
       purpose,
       dayStart,
       dayEnd,
-      excludeMeetingId,
+      exclusion?.meetingId ?? undefined,
     ),
     collectBusyEvents(
       admin,
       dayStart.minus({ hours: 3 }),
       dayEnd.plus({ hours: 3 }),
-      excludeMeetingId,
+      exclusion,
     ),
   ]);
   const count = counts.get(centralDateKey(start)) ?? 0;
@@ -1894,8 +1924,16 @@ async function handleSweepDeclines(request: Request, admin: SupabaseClient) {
       }
 
       const guests = externalGuestAttendees(event);
+      // A reschedule that Google answered with stale "declined" RSVPs stores
+      // the moved event's `updated` fingerprint. While the event is unchanged
+      // since that move, those RSVPs are stale; any real post-move decline
+      // changes `updated` and is handled normally.
+      const rsvpGuard = (meeting.metadata?.reschedule_rsvp_guard as
+        { event_updated?: unknown } | undefined)?.event_updated;
+      const staleFromMove = typeof rsvpGuard === "string" && rsvpGuard.length > 0 &&
+        event.updated === rsvpGuard;
       // tentative and needsAction never count as declined.
-      const allDeclined = guests.length > 0 &&
+      const allDeclined = !staleFromMove && guests.length > 0 &&
         guests.every((guest) => guest.responseStatus === "declined");
 
       if (!allDeclined) {
@@ -2014,6 +2052,33 @@ async function handleAvailability(
   const session = await verifySession(input.sessionToken);
   const context = await revalidateSession(admin, session);
   const existing = meetingForType(context, meetingType);
+
+  if (input.mode === "reschedule") {
+    // Read-only preview: nothing is cancelled or changed here.
+    const check = reschedulableMeeting(existing);
+    if (!check.ok) {
+      return json({ state: existing ? "booked" : "none", error: check.error }, check.status);
+    }
+    const exclusion = await exclusionForMeeting(admin, check.meeting);
+    const availability = await computeAvailability(admin, meetingType, exclusion);
+    await recordSchedulerEvent(
+      admin,
+      trackingContext(input, session, "availability_viewed", {
+        contactId: context.contact.id,
+        organizationId: context.organization.id,
+        opportunityId: context.opportunity?.id ?? null,
+        meetingType,
+        failureStage: "reschedule_preview",
+        calendarEventId: check.meeting.external_event_id ?? null,
+        httpStatus: 200,
+      }),
+    );
+    return json({
+      state: "reschedule",
+      currentBooking: serializeBooking(existing, meetingType),
+      ...availability,
+    });
+  }
 
   if (existing) {
     return json(
@@ -2380,7 +2445,7 @@ async function handleBook(
         meetingType,
         start,
         end,
-        reservation.id,
+        { meetingId: reservation.id },
       ))
     ) {
       console.warn("BTY booking rejected: slot_changed_after_reservation", {
@@ -2601,6 +2666,7 @@ Deno.serve(async (request: Request) => {
     }
 
     if (action === "release") return await handleRelease(admin, input);
+    if (action === "reschedule") return await handleReschedule(admin, input);
     if (action === "sweep_declines") return await handleSweepDeclines(request, admin);
 
     return json({ error: "Unknown action" }, 400);

@@ -1032,8 +1032,9 @@ async function activeMeetingCountsByDate(
   purpose: "bty_recording" | "bty_preinterview",
   rangeStart: DateTime,
   rangeEnd: DateTime,
+  excludeMeetingId?: string,
 ) {
-  const { data, error } = await admin
+  let query = admin
     .from("relationship_meetings")
     .select("starts_at")
     .eq("tenant_id", TENANT_ID)
@@ -1041,6 +1042,11 @@ async function activeMeetingCountsByDate(
     .in("event_status", ["tentative", "confirmed"])
     .gte("starts_at", rangeStart.toUTC().toISO()!)
     .lt("starts_at", rangeEnd.toUTC().toISO()!);
+  // Exclude the booking's own tentative reservation during the post-reservation recheck.
+  if (excludeMeetingId) {
+    query = query.neq("id", excludeMeetingId);
+  }
+  const { data, error } = await query;
   if (error) throw new Error(error.message);
 
   const counts = new Map<string, number>();
@@ -1195,6 +1201,7 @@ async function selectedSlotAvailable(
       purpose,
       dayStart,
       dayEnd,
+      excludeMeetingId,
     ),
     collectBusyEvents(
       admin,

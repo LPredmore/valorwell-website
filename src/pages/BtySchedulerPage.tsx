@@ -40,6 +40,7 @@ type Booking = {
   meetingUrl: string | null;
   streamyardUrl: string | null;
   calendarEventId?: string | null;
+  canChange?: boolean;
 };
 
 type BookingSet = {
@@ -312,6 +313,9 @@ export default function BtySchedulerPage() {
   const [checking, setChecking] = useState(false);
   const [loadingAvailability, setLoadingAvailability] = useState(false);
   const [bookingNow, setBookingNow] = useState(false);
+  const [releasing, setReleasing] = useState(false);
+  const [confirmingRelease, setConfirmingRelease] = useState(false);
+  const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
 
   const currentWeekStart = weekStarts[weekIndex] ?? "";
@@ -442,6 +446,8 @@ export default function BtySchedulerPage() {
   async function chooseMeetingType(type: MeetingType) {
     setMeetingType(type);
     setError("");
+    setNotice("");
+    setConfirmingRelease(false);
     clearCalendarState();
 
     const existing = bookingForType(bookings, type);
@@ -533,12 +539,48 @@ export default function BtySchedulerPage() {
     }
   }
 
+  async function handleRelease() {
+    if (!sessionToken || !meetingType || !booking || releasing) return;
+    const releasedType = meetingType;
+    const releasedStart = booking.startUtc;
+    setReleasing(true);
+    setError("");
+    try {
+      await invokeScheduler<{ released: boolean }>({
+        action: "release",
+        visitorSessionId,
+        sessionToken,
+        meetingType: releasedType,
+      });
+      setBookings((current) => {
+        const key = releasedType === "pre_interview" ? "preInterview" : "btyInterview";
+        return current[key]?.startUtc === releasedStart
+          ? { ...current, [key]: null }
+          : current;
+      });
+      setBooking(null);
+      setConfirmingRelease(false);
+      setNotice("Your previous appointment was cancelled. Choose a new time below.");
+      await loadAvailability(sessionToken, releasedType);
+    } catch (releaseError) {
+      setError(
+        releaseError instanceof Error
+          ? releaseError.message
+          : "We couldn't cancel that appointment. Please try again or email info@valorwell.org.",
+      );
+    } finally {
+      setReleasing(false);
+    }
+  }
+
   const reset = () => {
     setIdentity(null);
     setSessionToken("");
     setBookings(EMPTY_BOOKINGS);
     setMeetingType(null);
     setBooking(null);
+    setConfirmingRelease(false);
+    setNotice("");
     clearCalendarState();
     setError("");
   };
@@ -546,6 +588,8 @@ export default function BtySchedulerPage() {
   const backToMeetingTypes = () => {
     setMeetingType(null);
     setBooking(null);
+    setConfirmingRelease(false);
+    setNotice("");
     clearCalendarState();
     setError("");
   };

@@ -2026,16 +2026,54 @@ async function handleBook(
       // CRM changes happen only after Google Calendar + booking DB confirm.
       // Errors are logged without turning an already-sent invite into a
       // misleading failed-booking response.
+      // Capture the pre-booking CRM state first so a later release can
+      // restore it exactly (the snapshot never fails the booking).
+      let rollbackBase: Awaited<ReturnType<typeof captureRollbackSnapshot>> = null;
       try {
-        await reconcileConfirmedBooking(
+        rollbackBase = await captureRollbackSnapshot(admin, context, reservation.id);
+      } catch (snapshotError) {
+        console.error("BTY booking rollback snapshot capture failed", {
+          reservationId: reservation.id,
+          error: snapshotError instanceof Error ? snapshotError.message : String(snapshotError),
+        });
+      }
+      let opportunityCreated = false;
+      try {
+        const reconciled = await reconcileConfirmedBooking(
           admin, context, reservation.id, meetingType,
           start.toUTC().toISO()!, String(event.id),
         );
+        opportunityCreated = reconciled.opportunityCreated;
       } catch (syncError) {
         console.error("BTY booking CRM reconciliation exception", {
           reservationId: reservation.id,
           error: syncError instanceof Error ? syncError.message : String(syncError),
         });
+      }
+      if (rollbackBase) {
+        try {
+          const { error: snapshotSaveError } = await admin
+            .from("relationship_meetings")
+            .update({
+              scheduler_rollback: {
+                version: 1,
+                original: rollbackBase.original,
+                opportunity_created:
+                  rollbackBase.carriedForwardOpportunityCreated ?? opportunityCreated,
+              },
+            })
+            .eq("id", reservation.id);
+          if (snapshotSaveError) {
+            console.error("BTY booking rollback snapshot save failed", {
+              reservationId: reservation.id, error: snapshotSaveError,
+            });
+          }
+        } catch (snapshotError) {
+          console.error("BTY booking rollback snapshot save exception", {
+            reservationId: reservation.id,
+            error: snapshotError instanceof Error ? snapshotError.message : String(snapshotError),
+          });
+        }
       }
     }
 
@@ -2067,6 +2105,7 @@ async function handleBook(
         streamyardUrl:
           meetingType === "bty_interview" ? STREAMYARD_URL : null,
         calendarEventId: event.id,
+        canChange: start.toUTC() > DateTime.utc(),
       },
       contact: {
         name: displayName(context.contact),
@@ -2129,6 +2168,9 @@ Deno.serve(async (request: Request) => {
         throw error;
       }
     }
+
+    if (action === "release") return await handleRelease(admin, input);
+    if (action === "sweep_declines") return await handleSweepDeclines(request, admin);
 
     return json({ error: "Unknown action" }, 400);
   } catch (error) {

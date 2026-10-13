@@ -919,6 +919,15 @@ export default function BtySchedulerPage() {
                   </p>
                 </div>
 
+                {notice && (
+                  <div
+                    role="status"
+                    className="mt-6 rounded-2xl border border-[#3B5147]/20 bg-[#3B5147]/5 p-4 text-sm font-medium leading-6 text-[#3B5147]"
+                  >
+                    {notice}
+                  </div>
+                )}
+
                 {loadingAvailability ? (
                   <div className="flex min-h-72 items-center justify-center gap-3 text-[#3B5147]">
                     <Loader2

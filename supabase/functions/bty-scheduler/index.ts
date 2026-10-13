@@ -2765,7 +2765,7 @@ async function handleReschedule(admin: SupabaseClient, input: Record<string, unk
   const exclusion = await exclusionForMeeting(admin, meeting);
   if (!(await selectedSlotAvailable(admin, meetingType, start, end, exclusion))) {
     return await fail(409, "initial_validation", "slot_unavailable",
-      "That time is no longer available. Your appointment was not changed.");
+      "That time is no longer available.");
   }
 
   const write = await calendarWriteAccess(admin);
@@ -2784,7 +2784,7 @@ async function handleReschedule(admin: SupabaseClient, input: Record<string, unk
     console.error("BTY reschedule event read failed", { meetingId: meeting.id, status: eventResponse.status });
     await eventResponse.text().catch(() => "");
     return await fail(502, "calendar_read", "calendar_read_failed",
-      "We couldn't reach the calendar. Your appointment was not changed.");
+      "We couldn't reach the calendar.");
   }
   const event = await eventResponse.json() as CalendarEvent;
   if (event.status === "cancelled") {
@@ -2811,7 +2811,7 @@ async function handleReschedule(admin: SupabaseClient, input: Record<string, unk
   if (moveError) {
     if (moveError.code === "23505") {
       return await fail(409, "database_reservation", "reservation_conflict",
-        "That time is no longer available. Your appointment was not changed.");
+        "That time is no longer available.");
     }
     throw new Error(moveError.message);
   }
@@ -2854,7 +2854,7 @@ async function handleReschedule(admin: SupabaseClient, input: Record<string, unk
   try {
     if (!(await selectedSlotAvailable(admin, meetingType, start, end, exclusion))) {
       return await failAfterMove(409, "post_reservation_recheck", "slot_changed_during_booking",
-        "That time just became unavailable. Your appointment was not changed.");
+        "That time just became unavailable.");
     }
 
     const patchBody: Record<string, unknown> = {
@@ -2899,7 +2899,7 @@ async function handleReschedule(admin: SupabaseClient, input: Record<string, unk
     }
     if (!patchResult) {
       return await failAfterMove(502, "calendar_update", "calendar_update_failed",
-        "We couldn't update the calendar invitation. Your appointment was not changed.");
+        "We couldn't update the calendar invitation.");
     }
     patched = patchResult;
   } catch (unexpected) {
@@ -2908,7 +2908,7 @@ async function handleReschedule(admin: SupabaseClient, input: Record<string, unk
       error: unexpected instanceof Error ? unexpected.message : String(unexpected),
     });
     return await failAfterMove(502, "calendar_update", "unexpected_reschedule_error",
-      "We couldn't move your appointment. Your appointment was not changed.");
+      "We couldn't move your appointment.");
   }
 
   // If Google kept every guest "declined", fingerprint this exact event

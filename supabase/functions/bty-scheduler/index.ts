@@ -131,6 +131,9 @@ type OrganizationRecord = {
 type OpportunityRecord = {
   id: string;
   organization_id: string;
+  primary_contact_id?: string | null;
+  status?: string;
+  version?: number;
   qualification: Record<string, unknown> | null;
   metadata: Record<string, unknown> | null;
   updated_at: string;
@@ -444,14 +447,19 @@ async function resolveContactContext(admin: SupabaseClient, email: string) {
 
   const { data: opportunities, error: opportunityError } = await admin
     .from("relationship_opportunities")
-    .select("id,organization_id,qualification,metadata,updated_at")
+    .select("id,organization_id,primary_contact_id,status,version,qualification,metadata,updated_at")
     .eq("tenant_id", TENANT_ID)
     .eq("organization_id", organization.id)
     .order("updated_at", { ascending: false });
   if (opportunityError) throw new Error(opportunityError.message);
-  const opportunity = ((opportunities ?? []) as OpportunityRecord[]).find(
-    isBtyOpportunity,
-  ) ?? null;
+  const organizationOpportunities = (opportunities ?? []) as OpportunityRecord[];
+  // Historic BTY opportunities generally predate the initiative metadata flag.
+  // An invitation is already validated above. For organizations with exactly
+  // one opportunity, linking that existing record is safer than writing an
+  // orphaned meeting. For multiple opportunities, require explicit BTY evidence.
+  const opportunity =
+    organizationOpportunities.find(isBtyOpportunity) ??
+    (organizationOpportunities.length === 1 ? organizationOpportunities[0] : null);
 
   return {
     contact,
@@ -1420,6 +1428,145 @@ async function handleAvailability(
   });
 }
 
+async function reconcileConfirmedBooking(
+  admin: SupabaseClient,
+  context: {
+    contact: ContactRecord;
+    organization: OrganizationRecord;
+    opportunity: OpportunityRecord | null;
+  },
+  reservationId: string,
+  meetingType: MeetingType,
+  startUtc: string,
+  calendarEventId: string,
+) {
+  const opportunity = context.opportunity;
+  if (!opportunity) {
+    console.error("BTY booking CRM opportunity not found", {
+      organizationId: context.organization.id,
+      reservationId,
+    });
+    return;
+  }
+
+  const { data: fresh, error: fetchError } = await admin
+    .from("relationship_opportunities")
+    .select("id,tenant_id,status,version,metadata")
+    .eq("id", opportunity.id)
+    .eq("organization_id", context.organization.id)
+    .maybeSingle();
+  if (fetchError || !fresh) {
+    console.error("BTY booking CRM lookup failed", {
+      opportunityId: opportunity.id, reservationId, error: fetchError,
+    });
+    return;
+  }
+
+  const closed = ["completed", "declined", "disqualified"].includes(fresh.status);
+  const allowedPreStatuses = [
+    "identified", "researching", "qualified", "ready_for_campaign",
+    "contacted", "responded", "interested", "pre_interview_scheduled",
+  ];
+  const targetStatus =
+    meetingType === "pre_interview" ? "pre_interview_scheduled" : "booked";
+  const advanceStatus =
+    !closed &&
+    (meetingType === "bty_interview" ||
+      allowedPreStatuses.includes(fresh.status));
+  const statusChanged = advanceStatus && fresh.status !== targetStatus;
+  const nextAction =
+    meetingType === "pre_interview"
+      ? "Attend confirmed Beyond The Yellow pre-interview; Google Calendar invitation sent."
+      : "Attend confirmed Beyond The Yellow recording; StreamYard invitation sent.";
+  const recordedAt = new Date().toISOString();
+  const metadata = {
+    ...(fresh.metadata ?? {}),
+    bty_scheduler_booking: {
+      source: "bty_public_scheduler",
+      meeting_type: meetingType,
+      meeting_id: reservationId,
+      calendar_event_id: calendarEventId,
+      start_utc: startUtc,
+      confirmed_at: recordedAt,
+    },
+  };
+  const updates: Record<string, unknown> = { metadata };
+  if (!closed) {
+    updates.next_action = nextAction;
+    updates.next_action_due_at = startUtc;
+  }
+  if (statusChanged) {
+    updates.status = targetStatus;
+    updates.status_changed_at = recordedAt;
+  }
+  const { data: updated, error: updateError } = await admin
+    .from("relationship_opportunities")
+    .update(updates)
+    .eq("id", opportunity.id)
+    .eq("version", fresh.version)
+    .select("id,version")
+    .maybeSingle();
+  if (updateError || !updated) {
+    console.error("BTY booking CRM update failed", {
+      opportunityId: opportunity.id, reservationId, error: updateError,
+    });
+    return;
+  }
+  if (statusChanged) {
+    const { error: historyError } = await admin
+      .from("relationship_opportunity_status_history")
+      .insert({
+        tenant_id: TENANT_ID,
+        opportunity_id: opportunity.id,
+        from_status: fresh.status,
+        to_status: targetStatus,
+        changed_at: recordedAt,
+        reason: "BTY guest confirmed the appointment through the public scheduler.",
+        version: updated.version,
+        metadata: {
+          source: "bty_public_scheduler",
+          meeting_id: reservationId,
+          calendar_event_id: calendarEventId,
+        },
+      });
+    if (historyError) console.error("BTY booking status history failed", {
+      opportunityId: opportunity.id, reservationId, error: historyError,
+    });
+  }
+
+  const { error: orgError } = await admin
+    .from("relationship_organizations")
+    .update({ next_action: nextAction, next_action_due_at: startUtc })
+    .eq("id", context.organization.id);
+  if (orgError) console.error("BTY booking organization action failed", {
+    organizationId: context.organization.id, reservationId, error: orgError,
+  });
+
+  const { error: activityError } = await admin
+    .from("relationship_interactions")
+    .insert({
+      tenant_id: TENANT_ID,
+      organization_id: context.organization.id,
+      contact_id: context.contact.id,
+      opportunity_id: opportunity.id,
+      interaction_type: "manual_note",
+      occurred_at: recordedAt,
+      summary: "Confirmed " +
+        (meetingType === "pre_interview" ? "BTY pre-interview" : "BTY full interview") +
+        " through the public scheduler; Google Calendar invitation sent.",
+      metadata: {
+        source: "bty_public_scheduler",
+        meeting_id: reservationId,
+        calendar_event_id: calendarEventId,
+        meeting_type: meetingType,
+        start_utc: startUtc,
+      },
+    });
+  if (activityError) console.error("BTY booking CRM activity failed", {
+    opportunityId: opportunity.id, reservationId, error: activityError,
+  });
+}
+
 async function handleBook(
   admin: SupabaseClient,
   input: Record<string, unknown>,
@@ -1460,13 +1607,14 @@ async function handleBook(
   const end = start.plus({ minutes: config.durationMinutes });
 
   if (!(await selectedSlotAvailable(admin, meetingType, start, end))) {
-    return json(
-      {
-        booked: false,
-        error: "That time is no longer available. Please choose another time.",
-      },
-      409,
-    );
+    console.warn("BTY booking rejected: selected_slot_unavailable", {
+      meetingType, startUtc, organizationId: context.organization.id,
+      phase: "initial_validation",
+    });
+    return json({
+      booked: false, code: "slot_unavailable",
+      error: "That time is no longer available. Please select a different time.",
+    }, 409);
   }
 
   const connections = await relationshipCalendarConnections(admin);
@@ -1509,6 +1657,10 @@ async function handleBook(
 
   if (reservationError) {
     if (reservationError.code === "23505") {
+      console.warn("BTY booking rejected: reservation_conflict", {
+        meetingType, startUtc, organizationId: context.organization.id,
+        phase: "database_reservation", constraint: reservationError.message,
+      });
       return json(
         {
           booked: false,
@@ -1516,6 +1668,7 @@ async function handleBook(
             meetingType === "pre_interview"
               ? "That pre-interview day or invitation is no longer available. Please choose another time."
               : "That day is no longer available. Please choose another day.",
+          code: "reservation_conflict",
         },
         409,
       );
@@ -1533,14 +1686,15 @@ async function handleBook(
         reservation.id,
       ))
     ) {
+      console.warn("BTY booking rejected: slot_changed_after_reservation", {
+        meetingType, startUtc, organizationId: context.organization.id,
+        reservationId: reservation.id, phase: "post_reservation_recheck",
+      });
       await admin.from("relationship_meetings").delete().eq("id", reservation.id);
-      return json(
-        {
-          booked: false,
-          error: "That time is no longer available. Please choose another time.",
-        },
-        409,
-      );
+      return json({
+        booked: false, code: "slot_changed_during_booking",
+        error: "That time has just become unavailable. Please choose a different time.",
+      }, 409);
     }
 
     const event = await createGoogleEvent(admin, {
@@ -1584,8 +1738,35 @@ async function handleBook(
     if (meetingUpdateError) {
       console.error("BTY scheduler meeting confirmation update failed", {
         reservationId: reservation.id,
+        calendarEventId: event.id,
         error: meetingUpdateError,
       });
+      // Google already accepted the invitation; never tell the guest to retry
+      // and accidentally create a duplicate. Preserve the event ID for repair.
+      await admin.from("relationship_meetings").update({
+        external_event_id: String(event.id),
+        metadata: {
+          source: "bty_public_scheduler",
+          meeting_type: meetingType,
+          booking_state: "calendar_created_crm_sync_pending",
+          booked_by_email: session.email,
+        },
+      }).eq("id", reservation.id);
+    } else {
+      // CRM changes happen only after Google Calendar + booking DB confirm.
+      // Errors are logged without turning an already-sent invite into a
+      // misleading failed-booking response.
+      try {
+        await reconcileConfirmedBooking(
+          admin, context, reservation.id, meetingType,
+          start.toUTC().toISO()!, String(event.id),
+        );
+      } catch (syncError) {
+        console.error("BTY booking CRM reconciliation exception", {
+          reservationId: reservation.id,
+          error: syncError instanceof Error ? syncError.message : String(syncError),
+        });
+      }
     }
 
     return json({

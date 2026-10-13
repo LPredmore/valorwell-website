@@ -1141,17 +1141,18 @@ export default function BtySchedulerPage() {
                   <div>
                     <button
                       type="button"
-                      onClick={backToMeetingTypes}
-                      className="mb-4 inline-flex min-h-10 items-center gap-1 rounded-lg border border-[#3B5147]/15 px-3 py-2 text-sm font-bold text-[#3B5147] transition hover:bg-[#3B5147]/5"
+                      onClick={rescheduleFrom ? keepCurrentTime : backToMeetingTypes}
+                      disabled={bookingNow}
+                      className="mb-4 inline-flex min-h-10 items-center gap-1 rounded-lg border border-[#3B5147]/15 px-3 py-2 text-sm font-bold text-[#3B5147] transition hover:bg-[#3B5147]/5 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       <ChevronLeft className="h-4 w-4" aria-hidden="true" />
-                      Meeting options
+                      {rescheduleFrom ? "Keep my current time" : "Meeting options"}
                     </button>
                     <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3B5147]">
                       {meetingTypeContent[meetingType].shortTitle}
                     </p>
                     <h2 className="mt-2 text-2xl font-bold">
-                      Available times
+                      {rescheduleFrom ? "Choose a new time" : "Available times"}
                     </h2>
                   </div>
                   <p className="text-sm font-medium text-[#111814]/55">
@@ -1159,7 +1160,18 @@ export default function BtySchedulerPage() {
                   </p>
                 </div>
 
-                {notice && (
+                {rescheduleFrom && (
+                  <div
+                    role="status"
+                    className="mt-6 rounded-2xl border border-[#3B5147]/20 bg-[#3B5147]/5 p-4 text-sm font-medium leading-6 text-[#3B5147]"
+                  >
+                    Your current appointment on {centralDateLabel(rescheduleFrom.startUtc)} at{" "}
+                    {centralTimeLabel(rescheduleFrom.startUtc)} stays booked until you
+                    confirm a new time.
+                  </div>
+                )}
+
+                {notice && !rescheduleFrom && (
                   <div
                     role="status"
                     className="mt-6 rounded-2xl border border-[#3B5147]/20 bg-[#3B5147]/5 p-4 text-sm font-medium leading-6 text-[#3B5147]"
@@ -1301,6 +1313,24 @@ export default function BtySchedulerPage() {
                                 Boolean(slot) &&
                                 selectedSlot?.startUtc === slot?.startUtc;
 
+                              if (rescheduleFrom && `${date}|${minutes}` === currentSlotKey) {
+                                return (
+                                  <div
+                                    key={date}
+                                    className="flex min-h-[72px] flex-col items-center justify-center border-r border-[#3B5147]/10 bg-[#3B5147]/10 px-2 text-center last:border-r-0"
+                                    aria-disabled="true"
+                                    aria-label={`${dayHeader(date).weekday} ${minutesLabel(minutes)}, your current time`}
+                                  >
+                                    <span className="text-sm font-bold text-[#3B5147]">
+                                      {minutesLabel(minutes)}
+                                    </span>
+                                    <span className="mt-1 text-xs font-bold text-[#3B5147]/80">
+                                      Your current time
+                                    </span>
+                                  </div>
+                                );
+                              }
+
                               if (!slot) {
                                 return (
                                   <div
@@ -1358,7 +1388,12 @@ export default function BtySchedulerPage() {
                         role="alert"
                         className="mt-5 rounded-2xl border border-[#B24A3A]/50 bg-[#B24A3A]/10 p-5 text-sm leading-6 text-[#6d2f27]"
                       >
-                        <strong>Your appointment was not booked.</strong> {error}
+                        <strong>
+                          {rescheduleFrom
+                            ? "Your appointment was not changed."
+                            : "Your appointment was not booked."}
+                        </strong>{" "}
+                        {error}
                         <p className="mt-2">Please choose another available time, or email info@valorwell.org and we'll help.</p>
                       </div>
                     )}
@@ -1366,7 +1401,9 @@ export default function BtySchedulerPage() {
                     {selectedSlot && (
                       <div className="mt-5 rounded-2xl border border-[#D7A92E]/35 bg-[#D7A92E]/10 p-5">
                         <p className="text-sm font-bold uppercase tracking-[0.12em] text-[#3B5147]">
-                          Confirm {meetingTypeContent[meetingType].shortTitle}
+                          {rescheduleFrom
+                            ? `Move your ${meetingTypeContent[meetingType].shortTitle} to`
+                            : `Confirm ${meetingTypeContent[meetingType].shortTitle}`}
                         </p>
                         <p className="mt-2 text-lg font-bold">
                           {centralDateLabel(selectedSlot.startUtc)} ·{" "}
@@ -1390,8 +1427,10 @@ export default function BtySchedulerPage() {
                                 className="h-5 w-5 animate-spin motion-reduce:animate-none"
                                 aria-hidden="true"
                               />
-                              Booking
+                              {rescheduleFrom ? "Moving…" : "Booking"}
                             </>
+                          ) : rescheduleFrom ? (
+                            "Move my appointment"
                           ) : (
                             `Schedule ${meetingTypeContent[meetingType].shortTitle}`
                           )}

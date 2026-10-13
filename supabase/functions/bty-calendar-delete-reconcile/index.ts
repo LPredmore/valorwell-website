@@ -295,13 +295,13 @@ async function main(request: Request) {
   // this exact calendar is still accessible with the acquired token.
   const probe = await fetch(
     "https://www.googleapis.com/calendar/v3/calendars/" +
-      encodeURIComponent(CALENDAR_ID),
+      encodeURIComponent(CALENDAR_ID) + "/events?maxResults=1",
     { headers: { authorization: "Bearer " + token } },
   );
-  if (!probe.ok) throw new Error("Calendar identity/availability probe failed (" + probe.status + ")");
+  if (!probe.ok) throw new Error("Calendar events availability probe failed (" + probe.status + ")");
   const identity = await probe.json().catch(() => ({}));
-  if (String(identity.id ?? "").toLowerCase() !== CALENDAR_ID) {
-    throw new Error("Calendar identity probe returned the wrong calendar");
+  if (identity.kind !== "calendar#events") {
+    throw new Error("Calendar events probe returned an unexpected response");
   }
 
   const summary: {
@@ -316,9 +316,9 @@ async function main(request: Request) {
 
   // Iterate all linked BTY appointments, including historical and imported
   // ones. Never touch clinical appointments or another calendar.
-  let offset = 0;
+  let afterId: string | null = null;
   while (true) {
-    const { data, error } = await admin
+    let query = admin
       .from("relationship_meetings")
       .select("id,tenant_id,organization_id,contact_id,opportunity_id,purpose,calendar_id,external_event_id,event_status,starts_at,metadata")
       .eq("tenant_id", TENANT_ID)
@@ -327,7 +327,9 @@ async function main(request: Request) {
       .in("event_status", ACTIVE)
       .not("external_event_id", "is", null)
       .order("id", { ascending: true })
-      .range(offset, offset + 199);
+      .limit(200);
+    if (afterId) query = query.gt("id", afterId);
+    const { data, error } = await query;
     if (error) throw new Error("BTY meeting read failed: " + error.message);
     const meetings = (data ?? []) as Meeting[];
     for (const meeting of meetings) {
@@ -353,7 +355,7 @@ async function main(request: Request) {
       }
     }
     if (meetings.length < 200) break;
-    offset += 200;
+    afterId = meetings[meetings.length - 1].id;
   }
   console.log("BTY calendar delete reconcile", {
     dryRun: summary.dryRun, checked: summary.checked,

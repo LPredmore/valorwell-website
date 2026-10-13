@@ -1625,8 +1625,9 @@ async function reconcileConfirmedBooking(
   meetingType: MeetingType,
   startUtc: string,
   calendarEventId: string,
-) {
+): Promise<{ opportunityCreated: boolean }> {
   let opportunity = context.opportunity;
+  let opportunityCreated = false;
   if (!opportunity) {
     // Invited organizations may predate the CRM opportunity workflow.
     // Create a BTY opportunity only AFTER the Google event and meeting are
@@ -1669,9 +1670,10 @@ async function reconcileConfirmedBooking(
         reservationId,
         error: createError,
       });
-      return;
+      return { opportunityCreated: false };
     }
     opportunity = created as OpportunityRecord;
+    opportunityCreated = true;
     const { error: linkError } = await admin
       .from("relationship_meetings")
       .update({ opportunity_id: opportunity.id })
@@ -1697,7 +1699,7 @@ async function reconcileConfirmedBooking(
     console.error("BTY booking CRM lookup failed", {
       opportunityId: opportunity.id, reservationId, error: fetchError,
     });
-    return;
+    return { opportunityCreated };
   }
 
   const closed = ["completed", "declined", "disqualified"].includes(fresh.status);
@@ -1748,7 +1750,7 @@ async function reconcileConfirmedBooking(
     console.error("BTY booking CRM update failed", {
       opportunityId: opportunity.id, reservationId, error: updateError,
     });
-    return;
+    return { opportunityCreated };
   }
   if (statusChanged) {
     const { error: historyError } = await admin
@@ -1803,6 +1805,7 @@ async function reconcileConfirmedBooking(
   if (activityError) console.error("BTY booking CRM activity failed", {
     opportunityId: opportunity.id, reservationId, error: activityError,
   });
+  return { opportunityCreated };
 }
 
 async function handleBook(

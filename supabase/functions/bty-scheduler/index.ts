@@ -41,7 +41,7 @@ const VALIDATE_WINDOW_MS = 10 * 60 * 1000;
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version, x-cron-secret",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
@@ -89,7 +89,13 @@ type CalendarEvent = {
   eventType?: string;
   start?: { dateTime?: string; date?: string };
   end?: { dateTime?: string; date?: string };
-  attendees?: Array<{ email?: string }>;
+  attendees?: Array<{
+    email?: string;
+    organizer?: boolean;
+    self?: boolean;
+    resource?: boolean;
+    responseStatus?: string;
+  }>;
   hangoutLink?: string;
   conferenceData?: {
     createRequest?: {
@@ -179,7 +185,7 @@ type SchedulerTrackingEvent =
   | "page_opened" | "invitation_verified" | "invitation_rejected"
   | "availability_viewed" | "slot_selected" | "booking_submitted"
   | "booking_confirmed" | "booking_failed" | "booking_client_error"
-  | "booking_crm_sync_warning";
+  | "booking_crm_sync_warning" | "booking_released" | "booking_release_failed";
 
 const TRACKING_ID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -323,10 +329,17 @@ function serializeBooking(
     meeting_url?: string | null;
     metadata?: Record<string, unknown> | null;
     external_event_id?: string | null;
+    id?: string | null;
   } | null,
   meetingType: MeetingType,
 ) {
   if (!meeting) return null;
+  const startsAt = DateTime.fromISO(String(meeting.starts_at ?? ""), { zone: "utc" });
+  const canChange =
+    Boolean(meeting.id) &&
+    meeting.metadata?.source === "bty_public_scheduler" &&
+    startsAt.isValid &&
+    startsAt > DateTime.utc();
   const metadataMeetUrl =
     typeof meeting.metadata?.google_meet_url === "string"
       ? meeting.metadata.google_meet_url
@@ -345,6 +358,7 @@ function serializeBooking(
         ? meeting.streamyard_url ?? STREAMYARD_URL
         : null,
     calendarEventId: meeting.external_event_id ?? null,
+    canChange,
   };
 }
 
@@ -1504,6 +1518,420 @@ async function createGoogleEvent(
     ...event,
     schedulerMeetingUrl: STREAMYARD_URL,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Scheduler-owned booking release (guest "I need a different time", all-guest
+// decline sweep, and manually deleted Google events).
+// ---------------------------------------------------------------------------
+
+const REBOOK_URL = "https://valorwell.org/beyond-the-yellow/schedule";
+const DECLINE_GRACE_MS = 60_000;
+const SCHEDULER_SOURCE = "bty_public_scheduler";
+
+type ReleaseReason = "guest_requested" | "all_declined" | "event_deleted";
+
+type ReleasableMeeting = {
+  id: string;
+  purpose?: string | null;
+  organization_id?: string | null;
+  contact_id?: string | null;
+  starts_at?: string | null;
+  external_event_id?: string | null;
+  metadata?: Record<string, unknown> | null;
+};
+
+type CalendarWrite = { accessToken: string; calendarId: string };
+
+type RollbackOriginal = {
+  opportunity: {
+    id: string;
+    status: string | null;
+    next_action: string | null;
+    next_action_due_at: string | null;
+    bty_scheduler_booking: unknown;
+  } | null;
+  organization: {
+    id: string;
+    next_action: string | null;
+    next_action_due_at: string | null;
+  };
+};
+
+function isSchedulerOwned(meeting: ReleasableMeeting | Record<string, unknown> | null) {
+  if (!meeting) return false;
+  const metadata = (meeting as ReleasableMeeting).metadata;
+  return Boolean((meeting as ReleasableMeeting).id) && metadata?.source === SCHEDULER_SOURCE;
+}
+
+function hasRealEventId(value: unknown) {
+  return typeof value === "string" && value.length > 0 && !value.startsWith("pending:");
+}
+
+function escapeHtml(value: unknown) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function meetingTypeFromPurpose(purpose: unknown): MeetingType | null {
+  if (purpose === "bty_preinterview") return "pre_interview";
+  if (purpose === "bty_recording") return "bty_interview";
+  return null;
+}
+
+async function captureRollbackSnapshot(
+  admin: SupabaseClient,
+  context: { organization: OrganizationRecord; opportunity: OpportunityRecord | null },
+  reservationId: string,
+): Promise<{ original: RollbackOriginal; carriedForwardOpportunityCreated: boolean | null } | null> {
+  // If another active scheduler-owned booking for this organization already
+  // holds a snapshot, carry its pre-booking state forward so releases in any
+  // order restore the true original state.
+  const { data: siblings, error: siblingError } = await admin
+    .from("relationship_meetings")
+    .select("id,scheduler_rollback,metadata")
+    .eq("tenant_id", TENANT_ID)
+    .eq("organization_id", context.organization.id)
+    .in("purpose", ["bty_recording", "bty_preinterview"])
+    .in("event_status", ["tentative", "confirmed"])
+    .neq("id", reservationId)
+    .not("scheduler_rollback", "is", null);
+  if (siblingError) throw new Error(siblingError.message);
+  const sibling = (siblings ?? []).find((row) => {
+    const rollback = row.scheduler_rollback as Record<string, unknown> | null;
+    return (row.metadata as Record<string, unknown> | null)?.source === SCHEDULER_SOURCE &&
+      rollback && typeof rollback === "object" && rollback.original;
+  });
+  if (sibling) {
+    const rollback = sibling.scheduler_rollback as Record<string, unknown>;
+    return {
+      original: rollback.original as RollbackOriginal,
+      carriedForwardOpportunityCreated: rollback.opportunity_created === true,
+    };
+  }
+
+  const { data: org, error: orgError } = await admin
+    .from("relationship_organizations")
+    .select("id,next_action,next_action_due_at")
+    .eq("id", context.organization.id)
+    .maybeSingle();
+  if (orgError || !org) throw new Error(orgError?.message ?? "Organization not found");
+
+  let opportunity: RollbackOriginal["opportunity"] = null;
+  if (context.opportunity) {
+    const { data: opp, error: oppError } = await admin
+      .from("relationship_opportunities")
+      .select("id,status,next_action,next_action_due_at,metadata")
+      .eq("id", context.opportunity.id)
+      .eq("organization_id", context.organization.id)
+      .maybeSingle();
+    if (oppError) throw new Error(oppError.message);
+    if (opp) {
+      const metadata = (opp.metadata ?? {}) as Record<string, unknown>;
+      opportunity = {
+        id: String(opp.id),
+        status: opp.status ?? null,
+        next_action: opp.next_action ?? null,
+        next_action_due_at: opp.next_action_due_at ?? null,
+        bty_scheduler_booking: metadata.bty_scheduler_booking ?? null,
+      };
+    }
+  }
+
+  return {
+    original: {
+      opportunity,
+      organization: {
+        id: String(org.id),
+        next_action: org.next_action ?? null,
+        next_action_due_at: org.next_action_due_at ?? null,
+      },
+    },
+    carriedForwardOpportunityCreated: null,
+  };
+}
+
+async function deleteGoogleEvent(write: CalendarWrite, eventId: string) {
+  const response = await fetch(
+    `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(write.calendarId)}/events/${encodeURIComponent(eventId)}?sendUpdates=all`,
+    { method: "DELETE", headers: { authorization: `Bearer ${write.accessToken}` } },
+  );
+  await response.text().catch(() => "");
+  if (![200, 204, 404, 410].includes(response.status)) {
+    throw new Error(`Google Calendar event deletion failed (${response.status}).`);
+  }
+}
+
+async function sendRebookingEmail(
+  meeting: ReleasableMeeting,
+  contact: ContactRecord | null,
+  reason: Exclude<ReleaseReason, "event_deleted">,
+) {
+  const apiKey = Deno.env.get("RESEND_API_KEY") ?? "";
+  const recipient =
+    normalizeEmail(meeting.metadata?.booked_by_email) || normalizeEmail(contact?.email);
+  if (!apiKey || !recipient) {
+    console.error("BTY rebooking email skipped", {
+      meetingId: meeting.id, hasApiKey: Boolean(apiKey), hasRecipient: Boolean(recipient),
+    });
+    return;
+  }
+  const meetingType = meetingTypeFromPurpose(meeting.purpose);
+  const label = meetingType === "pre_interview" ? "pre-interview" : "recording";
+  const start = DateTime.fromISO(String(meeting.starts_at ?? ""), { zone: "utc" })
+    .setZone(CENTRAL_ZONE);
+  const dayLabel = start.isValid ? start.toFormat("cccc, LLLL d") : "your scheduled day";
+  const timeLabel = start.isValid ? `${start.toFormat("h:mm a")} Central Time` : "";
+  const name = contact ? displayName(contact) : "there";
+  const when = timeLabel ? `${dayLabel} at ${timeLabel}` : dayLabel;
+  const reasonLine = reason === "guest_requested"
+    ? `As you requested, we've cancelled your Beyond The Yellow ${label} on ${when}.`
+    : `Since the calendar invitation was declined, we've cancelled your Beyond The Yellow ${label} on ${when}.`;
+  const subject = `Your Beyond The Yellow ${label} has been cancelled. Choose a new time`;
+  const html = `<!doctype html><html><body style="font-family:'Trebuchet MS',Arial,sans-serif;color:#111814;background:#F4F1E8;padding:24px;">
+<div style="max-width:560px;margin:0 auto;background:#ffffff;border-radius:16px;padding:28px;">
+<p>Hi ${escapeHtml(name)},</p>
+<p>${escapeHtml(reasonLine)}</p>
+<p>We&rsquo;d still love to talk with you.</p>
+<p style="margin:28px 0;"><a href="${escapeHtml(REBOOK_URL)}" style="background:#3B5147;color:#ffffff;text-decoration:none;font-weight:bold;padding:12px 20px;border-radius:10px;display:inline-block;">Choose a new time</a></p>
+<p>When the scheduler opens, use this same email address (${escapeHtml(recipient)}) to pick a new time.</p>
+<p>Questions? Just reply to this email.</p>
+<p>&mdash; The ValorWell team</p>
+</div></body></html>`;
+  const text = `Hi ${name},\n\n${reasonLine}\n\nWe’d still love to talk with you.\n\nChoose a new time: ${REBOOK_URL}\nUse this same email address (${recipient}) when the scheduler asks.\n\nQuestions? Just reply to this email.\n\n— The ValorWell team`;
+  try {
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { authorization: `Bearer ${apiKey}`, "content-type": "application/json" },
+      body: JSON.stringify({
+        from: "ValorWell <noreply@valorwell.org>",
+        to: [recipient],
+        bcc: [INFO_CALENDAR],
+        reply_to: INFO_CALENDAR,
+        subject,
+        html,
+        text,
+      }),
+    });
+    if (!response.ok) {
+      console.error("BTY rebooking email failed", {
+        meetingId: meeting.id, status: response.status, body: await response.text().catch(() => ""),
+      });
+    }
+  } catch (emailError) {
+    console.error("BTY rebooking email exception", {
+      meetingId: meeting.id,
+      error: emailError instanceof Error ? emailError.message : String(emailError),
+    });
+  }
+}
+
+/**
+ * Shared release: delete the Google event (unless it is already gone), then
+ * atomically delete the meeting + roll back CRM through the RPC, then email.
+ * Any non-accepted Google DELETE response aborts BEFORE the RPC.
+ */
+async function releaseBooking(
+  admin: SupabaseClient,
+  write: CalendarWrite,
+  meeting: ReleasableMeeting,
+  reason: ReleaseReason,
+  contact: ContactRecord | null,
+) {
+  if (!isSchedulerOwned(meeting)) {
+    throw new Error("Only scheduler-owned appointments can be released.");
+  }
+  if (reason !== "event_deleted" && hasRealEventId(meeting.external_event_id)) {
+    await deleteGoogleEvent(write, String(meeting.external_event_id));
+  }
+  const { error } = await admin.rpc("release_bty_scheduler_booking", {
+    p_meeting_id: meeting.id,
+  });
+  if (error) throw new Error(`Booking release failed: ${error.message}`);
+  if (reason !== "event_deleted") {
+    await sendRebookingEmail(meeting, contact, reason);
+  }
+}
+
+async function handleRelease(admin: SupabaseClient, input: Record<string, unknown>) {
+  const meetingType = parseMeetingType(input.meetingType);
+  if (!meetingType) {
+    return json({ released: false, error: "A valid meeting type is required." }, 400);
+  }
+  const session = await verifySession(input.sessionToken);
+  const context = await revalidateSession(admin, session);
+  const meeting = meetingForType(context, meetingType) as ReleasableMeeting | null;
+  const trace = (eventType: SchedulerTrackingEvent, more: Partial<TrackingDetails> = {}) =>
+    recordSchedulerEvent(admin, trackingContext(input, session, eventType, {
+      contactId: context.contact.id,
+      organizationId: context.organization.id,
+      opportunityId: context.opportunity?.id ?? null,
+      meetingType,
+      startUtc: meeting?.starts_at ?? null,
+      calendarEventId: meeting?.external_event_id ?? null,
+      ...more,
+    }));
+
+  if (!meeting) {
+    return json({ released: false, error: "No appointment was found to change." }, 404);
+  }
+  if (!meeting.id || meeting.metadata?.source !== SCHEDULER_SOURCE) {
+    return json({
+      released: false,
+      error: "This appointment can't be changed here. Email info@valorwell.org and we'll help.",
+    }, 409);
+  }
+  const start = DateTime.fromISO(String(meeting.starts_at ?? ""), { zone: "utc" });
+  if (!start.isValid || start <= DateTime.utc()) {
+    return json({
+      released: false,
+      error: "This appointment has already started. Email info@valorwell.org and we'll help.",
+    }, 409);
+  }
+
+  try {
+    const write = await calendarWriteAccess(admin);
+    await releaseBooking(admin, write, meeting, "guest_requested", context.contact);
+  } catch (releaseError) {
+    console.error("BTY guest release failed", {
+      meetingId: meeting.id,
+      error: releaseError instanceof Error ? releaseError.message : String(releaseError),
+    });
+    await trace("booking_release_failed", {
+      failureStage: "release", failureCode: "guest_requested", httpStatus: 500,
+    });
+    return json({
+      released: false,
+      error: "We couldn't cancel that appointment right now. Please try again or email info@valorwell.org.",
+    }, 500);
+  }
+  await trace("booking_released", { failureCode: "guest_requested", httpStatus: 200 });
+  return json({ released: true, meetingType });
+}
+
+function timingSafeEqualString(a: string, b: string) {
+  const aBytes = new TextEncoder().encode(a);
+  const bBytes = new TextEncoder().encode(b);
+  let diff = aBytes.length ^ bBytes.length;
+  const length = Math.max(aBytes.length, bBytes.length);
+  for (let i = 0; i < length; i += 1) diff |= (aBytes[i] ?? 0) ^ (bBytes[i] ?? 0);
+  return diff === 0;
+}
+
+function externalGuestAttendees(event: CalendarEvent) {
+  return (event.attendees ?? []).filter((attendee) => {
+    const email = normalizeEmail(attendee.email);
+    return Boolean(email) && !attendee.organizer && !attendee.self &&
+      !attendee.resource && email !== INFO_CALENDAR;
+  });
+}
+
+async function handleSweepDeclines(request: Request, admin: SupabaseClient) {
+  const expected = Deno.env.get("CRON_SECRET") ?? "";
+  const provided = request.headers.get("x-cron-secret") ?? "";
+  if (!expected || !provided || !timingSafeEqualString(provided, expected)) {
+    return json({ error: "Unauthorized" }, 401);
+  }
+
+  const summary = { checked: 0, declinesPending: 0, released: 0, errors: 0 };
+  const { data: candidates, error: candidateError } = await admin
+    .from("relationship_meetings")
+    .select("id,purpose,organization_id,contact_id,starts_at,external_event_id,metadata,decline_detected_at")
+    .eq("tenant_id", TENANT_ID)
+    .in("purpose", ["bty_recording", "bty_preinterview"])
+    .eq("event_status", "confirmed")
+    .eq("calendar_id", INFO_CALENDAR)
+    .eq("metadata->>source", SCHEDULER_SOURCE)
+    .gt("starts_at", new Date().toISOString())
+    .not("external_event_id", "is", null)
+    .not("external_event_id", "like", "pending:%");
+  if (candidateError) throw new Error(candidateError.message);
+  const meetings = ((candidates ?? []) as Array<ReleasableMeeting & { decline_detected_at?: string | null }>)
+    .filter((meeting) => isSchedulerOwned(meeting) && hasRealEventId(meeting.external_event_id));
+  if (!meetings.length) return json(summary);
+
+  // One Google write token for the whole sweep.
+  const write = await calendarWriteAccess(admin);
+
+  const loadContact = async (contactId: string | null | undefined) => {
+    if (!contactId) return null;
+    const { data } = await admin.from("relationship_contacts")
+      .select("id,email,first_name,last_name,preferred_name")
+      .eq("id", contactId).maybeSingle();
+    return (data as ContactRecord | null) ?? null;
+  };
+
+  for (const meeting of meetings) {
+    summary.checked += 1;
+    try {
+      const response = await fetch(
+        `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(write.calendarId)}/events/${encodeURIComponent(String(meeting.external_event_id))}`,
+        { headers: { authorization: `Bearer ${write.accessToken}` } },
+      );
+      if (response.status === 404 || response.status === 410) {
+        await response.text().catch(() => "");
+        await releaseBooking(admin, write, meeting, "event_deleted", null);
+        summary.released += 1;
+        continue;
+      }
+      if (!response.ok) {
+        console.error("BTY decline sweep event read failed", {
+          meetingId: meeting.id, status: response.status,
+        });
+        await response.text().catch(() => "");
+        summary.errors += 1;
+        continue;
+      }
+      const event = await response.json() as CalendarEvent;
+      if (event.status === "cancelled") {
+        await releaseBooking(admin, write, meeting, "event_deleted", null);
+        summary.released += 1;
+        continue;
+      }
+
+      const guests = externalGuestAttendees(event);
+      // tentative and needsAction never count as declined.
+      const allDeclined = guests.length > 0 &&
+        guests.every((guest) => guest.responseStatus === "declined");
+
+      if (!allDeclined) {
+        if (meeting.decline_detected_at) {
+          const { error } = await admin.from("relationship_meetings")
+            .update({ decline_detected_at: null }).eq("id", meeting.id);
+          if (error) throw new Error(error.message);
+        }
+        continue;
+      }
+
+      if (!meeting.decline_detected_at) {
+        const { error } = await admin.from("relationship_meetings")
+          .update({ decline_detected_at: new Date().toISOString() }).eq("id", meeting.id);
+        if (error) throw new Error(error.message);
+        summary.declinesPending += 1;
+        continue;
+      }
+
+      const detectedAt = Date.parse(meeting.decline_detected_at);
+      if (!Number.isFinite(detectedAt) || Date.now() - detectedAt < DECLINE_GRACE_MS) {
+        summary.declinesPending += 1;
+        continue;
+      }
+
+      await releaseBooking(admin, write, meeting, "all_declined", await loadContact(meeting.contact_id));
+      summary.released += 1;
+    } catch (itemError) {
+      summary.errors += 1;
+      console.error("BTY decline sweep item failed", {
+        meetingId: meeting.id,
+        error: itemError instanceof Error ? itemError.message : String(itemError),
+      });
+    }
+  }
+  return json(summary);
 }
 
 async function handleValidate(

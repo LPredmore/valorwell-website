@@ -101,6 +101,14 @@ const meetingTypeContent: Record<
   },
 };
 
+class SchedulerRequestError extends Error {
+  code?: string;
+  constructor(message: string, code?: string) {
+    super(message);
+    this.code = code;
+  }
+}
+
 async function invokeScheduler<T>(body: Record<string, unknown>): Promise<T> {
   const { data, error } = await billingHubSupabase.functions.invoke(
     "bty-scheduler",
@@ -110,17 +118,20 @@ async function invokeScheduler<T>(body: Record<string, unknown>): Promise<T> {
     // Expose safe, actionable non-2xx validation failures to the guest.
     const response = (error as { context?: Response }).context;
     if (response && typeof response.json === "function" && response.status < 500) {
-      let details: { error?: unknown } | null = null;
+      let details: { error?: unknown; code?: unknown } | null = null;
       try {
-        details = (await response.json()) as { error?: unknown };
+        details = (await response.json()) as { error?: unknown; code?: unknown };
       } catch {
         // The generic fallback is used if the response body is malformed.
       }
       if (typeof details?.error === "string" && details.error.trim()) {
-        throw new Error(details.error);
+        throw new SchedulerRequestError(
+          details.error,
+          typeof details.code === "string" ? details.code : undefined,
+        );
       }
     }
-    throw new Error(
+    throw new SchedulerRequestError(
       "The scheduler couldn't complete that request. Please try again or email info@valorwell.org for help.",
     );
   }
@@ -248,6 +259,21 @@ function centralStartMinutes(startUtc: string) {
   return hour >= 0 && minute >= 0 ? hour * 60 + minute : -1;
 }
 
+function centralDateKey(startUtc: string) {
+  // en-CA formats as YYYY-MM-DD.
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: CENTRAL_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(startUtc));
+}
+
+function mondayOf(date: string) {
+  const weekday = dateOnlyToUtc(date).getUTCDay();
+  return addDays(date, -((weekday + 6) % 7));
+}
+
 function slotRowsForType(meetingType: MeetingType) {
   const step = meetingType === "pre_interview" ? 30 : 60;
   const duration = meetingType === "pre_interview" ? 30 : 60;
@@ -315,7 +341,9 @@ export default function BtySchedulerPage() {
   const [bookingNow, setBookingNow] = useState(false);
   const [releasing, setReleasing] = useState(false);
   const [confirmingRelease, setConfirmingRelease] = useState(false);
+  const [rescheduleFrom, setRescheduleFrom] = useState<Booking | null>(null);
   const [notice, setNotice] = useState("");
+  const [chooserNotice, setChooserNotice] = useState("");
   const [error, setError] = useState("");
 
   const currentWeekStart = weekStarts[weekIndex] ?? "";
@@ -360,6 +388,7 @@ export default function BtySchedulerPage() {
     type: MeetingType,
     preferredWeekStart?: string,
     preserveBookingError = false,
+    mode?: "reschedule",
   ) {
     setLoadingAvailability(true);
     if (!preserveBookingError) setError("");
@@ -369,6 +398,7 @@ export default function BtySchedulerPage() {
         visitorSessionId,
         sessionToken: token,
         meetingType: type,
+        ...(mode ? { mode } : {}),
       });
       const nextDays = result.days ?? [];
       const nextWeeks = buildWeekStarts(
@@ -447,7 +477,9 @@ export default function BtySchedulerPage() {
     setMeetingType(type);
     setError("");
     setNotice("");
+    setChooserNotice("");
     setConfirmingRelease(false);
+    setRescheduleFrom(null);
     clearCalendarState();
 
     const existing = bookingForType(bookings, type);
@@ -462,7 +494,129 @@ export default function BtySchedulerPage() {
     }
   }
 
+  // Read-only preview: the current appointment stays booked.
+  async function startReschedule() {
+    if (!sessionToken || !meetingType || !booking) return;
+    const current = booking;
+    setRescheduleFrom(current);
+    setBooking(null);
+    setConfirmingRelease(false);
+    setNotice("");
+    setError("");
+    clearCalendarState();
+    await loadAvailability(
+      sessionToken,
+      meetingType,
+      mondayOf(centralDateKey(current.startUtc)),
+      false,
+      "reschedule",
+    );
+  }
+
+  function keepCurrentTime() {
+    if (!rescheduleFrom) return;
+    setBooking(rescheduleFrom);
+    setRescheduleFrom(null);
+    setNotice("");
+    setError("");
+    clearCalendarState();
+  }
+
+  async function refreshBookings() {
+    try {
+      const result = await invokeScheduler<ValidateResponse>({
+        action: "validate",
+        visitorSessionId,
+        email: email.trim(),
+      });
+      if (result.eligible && result.bookings) setBookings(result.bookings);
+      if (result.sessionToken) setSessionToken(result.sessionToken);
+    } catch {
+      // The guest can still refresh the page; the error message says so.
+    }
+  }
+
+  async function handleReschedule() {
+    if (!sessionToken || !selectedSlot || !meetingType || !rescheduleFrom) return;
+    const attemptedSlot = selectedSlot;
+    const original = rescheduleFrom;
+    const movedType = meetingType;
+    const attemptId = crypto.randomUUID();
+    const weekToPreserve = currentWeekStart;
+    setBookingNow(true);
+    setError("");
+    try {
+      const result = await invokeScheduler<{
+        rescheduled: boolean;
+        booking?: Booking;
+        previousStartUtc?: string;
+        error?: string;
+      }>({
+        action: "reschedule",
+        visitorSessionId,
+        bookingAttemptId: attemptId,
+        sessionToken,
+        meetingType: movedType,
+        startUtc: attemptedSlot.startUtc,
+      });
+      if (!result.rescheduled || !result.booking) {
+        throw new SchedulerRequestError(
+          result.error || "That time could not be used. Please choose another time.",
+        );
+      }
+      const movedBooking = result.booking;
+      setBookings((current) =>
+        movedType === "pre_interview"
+          ? { ...current, preInterview: movedBooking }
+          : { ...current, btyInterview: movedBooking },
+      );
+      setBooking(movedBooking);
+      setRescheduleFrom(null);
+      clearCalendarState();
+      setNotice(
+        "Your appointment was moved. Google Calendar will send you an updated invitation.",
+      );
+    } catch (requestError) {
+      const message = requestError instanceof Error
+        ? requestError.message
+        : "That time could not be used.";
+      if (
+        requestError instanceof SchedulerRequestError &&
+        requestError.code === "state_uncertain"
+      ) {
+        // Never claim the original time is still held when we can't confirm it.
+        setRescheduleFrom(null);
+        setBooking(null);
+        setMeetingType(null);
+        clearCalendarState();
+        setError(message);
+        await refreshBookings();
+        return;
+      }
+      setSelectedSlot(null);
+      await loadAvailability(
+        sessionToken,
+        movedType,
+        weekToPreserve || mondayOf(centralDateKey(original.startUtc)),
+        true,
+        "reschedule",
+      );
+      setError(message);
+      window.requestAnimationFrame(() =>
+        document.getElementById("bty-scheduler-booking-error")?.scrollIntoView({
+          behavior: "smooth", block: "center",
+        }),
+      );
+    } finally {
+      setBookingNow(false);
+    }
+  }
+
   async function handleBook() {
+    if (rescheduleFrom) {
+      await handleReschedule();
+      return;
+    }
     if (!sessionToken || !selectedSlot || !meetingType) return;
     const attemptedSlot = selectedSlot;
     const attemptId = crypto.randomUUID();
@@ -552,6 +706,7 @@ export default function BtySchedulerPage() {
         sessionToken,
         meetingType: releasedType,
       });
+      // Only after the server confirms the release.
       setBookings((current) => {
         const key = releasedType === "pre_interview" ? "preInterview" : "btyInterview";
         return current[key]?.startUtc === releasedStart
@@ -560,8 +715,13 @@ export default function BtySchedulerPage() {
       });
       setBooking(null);
       setConfirmingRelease(false);
-      setNotice("Your previous appointment was cancelled. Choose a new time below.");
-      await loadAvailability(sessionToken, releasedType);
+      setRescheduleFrom(null);
+      setNotice("");
+      clearCalendarState();
+      setMeetingType(null);
+      setChooserNotice(
+        `Your ${meetingTypeContent[releasedType].shortTitle} on ${centralDateLabel(releasedStart)} at ${centralTimeLabel(releasedStart)} was cancelled. You can schedule a new meeting whenever you're ready.`,
+      );
     } catch (releaseError) {
       setError(
         releaseError instanceof Error
@@ -580,7 +740,9 @@ export default function BtySchedulerPage() {
     setMeetingType(null);
     setBooking(null);
     setConfirmingRelease(false);
+    setRescheduleFrom(null);
     setNotice("");
+    setChooserNotice("");
     clearCalendarState();
     setError("");
   };
@@ -589,10 +751,16 @@ export default function BtySchedulerPage() {
     setMeetingType(null);
     setBooking(null);
     setConfirmingRelease(false);
+    setRescheduleFrom(null);
     setNotice("");
+    setChooserNotice("");
     clearCalendarState();
     setError("");
   };
+
+  const currentSlotKey = rescheduleFrom
+    ? `${centralDateKey(rescheduleFrom.startUtc)}|${centralStartMinutes(rescheduleFrom.startUtc)}`
+    : "";
 
   return (
     <Layout>
@@ -710,6 +878,15 @@ export default function BtySchedulerPage() {
                     What would you like to schedule?
                   </h2>
                 </div>
+
+                {chooserNotice && (
+                  <div
+                    role="status"
+                    className="mt-6 rounded-2xl border border-[#3B5147]/20 bg-[#3B5147]/5 p-4 text-sm font-medium leading-6 text-[#3B5147]"
+                  >
+                    {chooserNotice}
+                  </div>
+                )}
 
                 <div className="mt-6 grid gap-4 md:grid-cols-2">
                   {(
@@ -861,6 +1038,15 @@ export default function BtySchedulerPage() {
                   for this booking.
                 </p>
 
+                {notice && (
+                  <div
+                    role="status"
+                    className="mt-6 rounded-2xl border border-[#3B5147]/20 bg-[#3B5147]/5 p-4 text-sm font-medium leading-6 text-[#3B5147]"
+                  >
+                    {notice}
+                  </div>
+                )}
+
                 {error && (
                   <div
                     role="alert"
@@ -872,21 +1058,21 @@ export default function BtySchedulerPage() {
 
                 {booking.canChange ? (
                   confirmingRelease ? (
-                    <div className="mt-6 rounded-2xl border border-[#3B5147]/20 bg-[#F4F1E8] p-5">
+                    <div className="mt-6 rounded-2xl border border-[#B24A3A]/30 bg-[#B24A3A]/5 p-5">
                       <p className="font-bold">
                         Cancel your {centralDateLabel(booking.startUtc)} appointment at{" "}
                         {centralTimeLabel(booking.startUtc)}?
                       </p>
                       <p className="mt-2 text-sm leading-6 text-[#111814]/65">
-                        We'll cancel the calendar invitation and show you open
-                        times so you can pick a new one.
+                        We'll cancel the calendar invitation. This can't be undone,
+                        but you can schedule a new meeting afterward.
                       </p>
                       <div className="mt-4 flex flex-col gap-3 sm:flex-row">
                         <button
                           type="button"
                           onClick={handleRelease}
                           disabled={releasing}
-                          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#3B5147] px-4 py-2 text-sm font-bold text-white transition hover:bg-[#2f4139] disabled:cursor-not-allowed disabled:opacity-60"
+                          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#B24A3A] px-4 py-2 text-sm font-bold text-white transition hover:bg-[#963d30] disabled:cursor-not-allowed disabled:opacity-60"
                         >
                           {releasing ? (
                             <>
@@ -897,7 +1083,7 @@ export default function BtySchedulerPage() {
                               Cancelling…
                             </>
                           ) : (
-                            "Yes, cancel and pick a new time"
+                            "Yes, cancel appointment"
                           )}
                         </button>
                         <button
@@ -911,16 +1097,26 @@ export default function BtySchedulerPage() {
                       </div>
                     </div>
                   ) : (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setError("");
-                        setConfirmingRelease(true);
-                      }}
-                      className="mt-6 block text-sm font-bold text-[#3B5147] underline underline-offset-4 hover:text-[#2f4139] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147]"
-                    >
-                      I need a different time
-                    </button>
+                    <div className="mt-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+                      <button
+                        type="button"
+                        onClick={() => void startReschedule()}
+                        className="min-h-11 rounded-xl bg-[#3B5147] px-4 py-2 text-sm font-bold text-white transition hover:bg-[#2f4139] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2"
+                      >
+                        I need a different time
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setError("");
+                          setNotice("");
+                          setConfirmingRelease(true);
+                        }}
+                        className="text-sm font-bold text-[#B24A3A] underline underline-offset-4 hover:text-[#963d30] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B24A3A]"
+                      >
+                        Cancel this Appointment
+                      </button>
+                    </div>
                   )
                 ) : (
                   <p className="mt-6 text-sm leading-6 text-[#111814]/55">

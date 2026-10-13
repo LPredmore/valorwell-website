@@ -1081,6 +1081,7 @@ export default function BtySchedulerPage() {
                                   type="button"
                                   onClick={() => {
                                     setSelectedSlot(slot);
+                                    setNotice("");
                                     setError("");
                                     if (sessionToken && meetingType) {
                                       void invokeScheduler({

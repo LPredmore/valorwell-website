@@ -2626,6 +2626,373 @@ async function handleBook(
   }
 }
 
+// ---------------------------------------------------------------------------
+// In-place reschedule: same relationship_meetings row, same Google event.
+// ---------------------------------------------------------------------------
+
+type ReschedulableMeeting = ReleasableMeeting & {
+  ends_at?: string | null;
+  opportunity_id?: string | null;
+  event_status?: string | null;
+  ical_uid?: string | null;
+  decline_detected_at?: string | null;
+  streamyard_url?: string | null;
+};
+
+const SCHEDULER_NEXT_ACTION: Record<MeetingType, string> = {
+  pre_interview:
+    "Attend confirmed Beyond The Yellow pre-interview; Google Calendar invitation sent.",
+  bty_interview:
+    "Attend confirmed Beyond The Yellow recording; StreamYard invitation sent.",
+};
+
+function reschedulableMeeting(
+  meeting: Record<string, unknown> | null,
+):
+  | { ok: true; meeting: ReschedulableMeeting }
+  | { ok: false; status: number; code: string; error: string } {
+  if (!meeting) {
+    return { ok: false, status: 404, code: "no_booking", error: "No appointment was found to change." };
+  }
+  const candidate = meeting as ReschedulableMeeting;
+  if (!isSchedulerOwned(candidate) || !hasRealEventId(candidate.external_event_id) ||
+      candidate.event_status !== "confirmed") {
+    return {
+      ok: false, status: 409, code: "not_reschedulable",
+      error: "This appointment can't be changed here. Email info@valorwell.org and we'll help.",
+    };
+  }
+  const start = DateTime.fromISO(String(candidate.starts_at ?? ""), { zone: "utc" });
+  const end = DateTime.fromISO(String(candidate.ends_at ?? ""), { zone: "utc" });
+  if (!start.isValid || !end.isValid || start <= DateTime.utc()) {
+    return {
+      ok: false, status: 409, code: "already_started",
+      error: "This appointment has already started. Email info@valorwell.org and we'll help.",
+    };
+  }
+  return { ok: true, meeting: candidate };
+}
+
+async function exclusionForMeeting(
+  admin: SupabaseClient,
+  meeting: ReschedulableMeeting,
+): Promise<BookingExclusion> {
+  const googleEventId = hasRealEventId(meeting.external_event_id)
+    ? String(meeting.external_event_id)
+    : null;
+  let iCalUid = typeof meeting.ical_uid === "string" && meeting.ical_uid
+    ? meeting.ical_uid
+    : null;
+  if (!iCalUid && googleEventId) {
+    // Older rows may lack ical_uid; read it from the exact event id.
+    try {
+      const write = await calendarWriteAccess(admin);
+      const event = await readGoogleEvent(write.accessToken, write.calendarId, googleEventId);
+      iCalUid = typeof event?.iCalUID === "string" && event.iCalUID ? event.iCalUID : null;
+    } catch (lookupError) {
+      console.warn("BTY reschedule iCalUID lookup failed", {
+        meetingId: meeting.id,
+        error: lookupError instanceof Error ? lookupError.message : String(lookupError),
+      });
+    }
+  }
+  return { meetingId: meeting.id ?? null, googleEventId, iCalUid };
+}
+
+function isExternalGuest(attendee: NonNullable<CalendarEvent["attendees"]>[number]) {
+  const email = normalizeEmail(attendee.email);
+  return Boolean(email) && !attendee.organizer && !attendee.self &&
+    !attendee.resource && email !== INFO_CALENDAR;
+}
+
+function sameInstant(a: string | undefined, b: DateTime) {
+  if (!a) return false;
+  const parsed = DateTime.fromISO(a);
+  return parsed.isValid && parsed.toMillis() === b.toMillis();
+}
+
+async function handleReschedule(admin: SupabaseClient, input: Record<string, unknown>) {
+  const meetingType = parseMeetingType(input.meetingType);
+  if (!meetingType) {
+    return json({ rescheduled: false, error: "A valid meeting type is required." }, 400);
+  }
+  const session = await verifySession(input.sessionToken);
+  const context = await revalidateSession(admin, session);
+  const current = meetingForType(context, meetingType);
+  const parsedStart = DateTime.fromISO(String(input.startUtc ?? ""), { zone: "utc" });
+
+  const trace = (eventType: SchedulerTrackingEvent, more: Partial<TrackingDetails> = {}) =>
+    recordSchedulerEvent(admin, trackingContext(input, session, eventType, {
+      contactId: context.contact.id,
+      organizationId: context.organization.id,
+      opportunityId: context.opportunity?.id ?? null,
+      meetingType,
+      startUtc: parsedStart.isValid ? parsedStart.toUTC().toISO() : null,
+      calendarEventId: (current?.external_event_id as string | null | undefined) ?? null,
+      ...more,
+    }));
+  const fail = async (
+    status: number,
+    failureStage: string,
+    code: string,
+    error: string,
+  ) => {
+    await trace("booking_reschedule_failed", { failureStage, failureCode: code, httpStatus: status });
+    return json({ rescheduled: false, code, error }, status);
+  };
+  const UNCERTAIN =
+    "We couldn't confirm whether your appointment changed. Please check your calendar invitation or email info@valorwell.org and we'll help.";
+
+  const check = reschedulableMeeting(current);
+  if (!check.ok) return await fail(check.status, "authorize", check.code, check.error);
+  const meeting = check.meeting;
+  const oldStartIso = String(meeting.starts_at);
+  const oldEndIso = String(meeting.ends_at);
+  const previousStart = DateTime.fromISO(oldStartIso, { zone: "utc" });
+
+  if (!parsedStart.isValid) {
+    return await fail(400, "validate_time", "invalid_start", "That time is invalid.");
+  }
+  const config = MEETING_CONFIG[meetingType];
+  const start = parsedStart.setZone(CENTRAL_ZONE);
+  const end = start.plus({ minutes: config.durationMinutes });
+  if (start.toMillis() === previousStart.toMillis()) {
+    return await fail(400, "validate_time", "same_time", "That's already your current appointment time.");
+  }
+  const newStartIso = start.toUTC().toISO()!;
+  const newEndIso = end.toUTC().toISO()!;
+
+  const exclusion = await exclusionForMeeting(admin, meeting);
+  if (!(await selectedSlotAvailable(admin, meetingType, start, end, exclusion))) {
+    return await fail(409, "initial_validation", "slot_unavailable",
+      "That time is no longer available. Your appointment was not changed.");
+  }
+
+  const write = await calendarWriteAccess(admin);
+  const eventId = String(meeting.external_event_id);
+  const eventUrl =
+    `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(write.calendarId)}/events/${encodeURIComponent(eventId)}`;
+  const eventResponse = await fetch(eventUrl, {
+    headers: { authorization: `Bearer ${write.accessToken}` },
+  });
+  if (eventResponse.status === 404 || eventResponse.status === 410) {
+    await eventResponse.text().catch(() => "");
+    return await fail(409, "calendar_read", "event_gone",
+      "This appointment's calendar invitation no longer exists. Please email info@valorwell.org and we'll help.");
+  }
+  if (!eventResponse.ok) {
+    console.error("BTY reschedule event read failed", { meetingId: meeting.id, status: eventResponse.status });
+    await eventResponse.text().catch(() => "");
+    return await fail(502, "calendar_read", "calendar_read_failed",
+      "We couldn't reach the calendar. Your appointment was not changed.");
+  }
+  const event = await eventResponse.json() as CalendarEvent;
+  if (event.status === "cancelled") {
+    return await fail(409, "calendar_read", "event_gone",
+      "This appointment's calendar invitation no longer exists. Please email info@valorwell.org and we'll help.");
+  }
+
+  // Move the SAME row in place, guarded on its current times so a concurrent
+  // release or move is never overwritten.
+  const { data: moved, error: moveError } = await admin
+    .from("relationship_meetings")
+    .update({
+      starts_at: newStartIso,
+      ends_at: newEndIso,
+      decline_detected_at: null,
+      last_synced_at: new Date().toISOString(),
+    })
+    .eq("id", meeting.id)
+    .eq("tenant_id", TENANT_ID)
+    .eq("starts_at", oldStartIso)
+    .eq("event_status", "confirmed")
+    .select("id")
+    .maybeSingle();
+  if (moveError) {
+    if (moveError.code === "23505") {
+      return await fail(409, "database_reservation", "reservation_conflict",
+        "That time is no longer available. Your appointment was not changed.");
+    }
+    throw new Error(moveError.message);
+  }
+  if (!moved) {
+    return await fail(409, "database_reservation", "booking_changed",
+      "Your appointment changed while we were updating it. Please refresh this page to see its current status.");
+  }
+
+  // Restore the row only if it still holds the new times we wrote.
+  const restore = async () => {
+    try {
+      const { data, error } = await admin
+        .from("relationship_meetings")
+        .update({
+          starts_at: oldStartIso,
+          ends_at: oldEndIso,
+          decline_detected_at: meeting.decline_detected_at ?? null,
+          last_synced_at: new Date().toISOString(),
+        })
+        .eq("id", meeting.id)
+        .eq("starts_at", newStartIso)
+        .select("id")
+        .maybeSingle();
+      if (error) console.error("BTY reschedule rollback failed", { meetingId: meeting.id, error });
+      return !error && Boolean(data);
+    } catch (rollbackError) {
+      console.error("BTY reschedule rollback exception", {
+        meetingId: meeting.id,
+        error: rollbackError instanceof Error ? rollbackError.message : String(rollbackError),
+      });
+      return false;
+    }
+  };
+  const failAfterMove = async (status: number, stage: string, code: string, error: string) => {
+    if (await restore()) return await fail(status, stage, code, error);
+    return await fail(409, stage, "state_uncertain", UNCERTAIN);
+  };
+
+  let patched: CalendarEvent;
+  try {
+    if (!(await selectedSlotAvailable(admin, meetingType, start, end, exclusion))) {
+      return await failAfterMove(409, "post_reservation_recheck", "slot_changed_during_booking",
+        "That time just became unavailable. Your appointment was not changed.");
+    }
+
+    const patchBody: Record<string, unknown> = {
+      start: { dateTime: start.toISO(), timeZone: CENTRAL_ZONE },
+      end: { dateTime: end.toISO(), timeZone: CENTRAL_ZONE },
+    };
+    if (Array.isArray(event.attendees)) {
+      // Guests are re-marked accepted so a stale pre-move "declined" RSVP
+      // cannot trigger the decline sweep. Organizer/self/resources unchanged.
+      patchBody.attendees = event.attendees.map((attendee) =>
+        isExternalGuest(attendee) ? { ...attendee, responseStatus: "accepted" } : attendee
+      );
+    }
+
+    let patchResult: CalendarEvent | null = null;
+    try {
+      const patchResponse = await fetch(`${eventUrl}?sendUpdates=all`, {
+        method: "PATCH",
+        headers: {
+          authorization: `Bearer ${write.accessToken}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(patchBody),
+      });
+      if (patchResponse.ok) {
+        patchResult = await patchResponse.json().catch(() => ({})) as CalendarEvent;
+      } else {
+        console.error("BTY reschedule Google PATCH failed", {
+          meetingId: meeting.id, status: patchResponse.status,
+          body: await patchResponse.text().catch(() => ""),
+        });
+      }
+    } catch (patchError) {
+      // The request may or may not have reached Google; read back to decide.
+      console.error("BTY reschedule Google PATCH exception", {
+        meetingId: meeting.id,
+        error: patchError instanceof Error ? patchError.message : String(patchError),
+      });
+      const readBack = await readGoogleEvent(write.accessToken, write.calendarId, eventId)
+        .catch(() => null);
+      if (readBack && sameInstant(readBack.start?.dateTime, start)) patchResult = readBack;
+    }
+    if (!patchResult) {
+      return await failAfterMove(502, "calendar_update", "calendar_update_failed",
+        "We couldn't update the calendar invitation. Your appointment was not changed.");
+    }
+    patched = patchResult;
+  } catch (unexpected) {
+    console.error("BTY reschedule unexpected error after move", {
+      meetingId: meeting.id,
+      error: unexpected instanceof Error ? unexpected.message : String(unexpected),
+    });
+    return await failAfterMove(502, "calendar_update", "unexpected_reschedule_error",
+      "We couldn't move your appointment. Your appointment was not changed.");
+  }
+
+  // If Google kept every guest "declined", fingerprint this exact event
+  // version so the sweep ignores the stale RSVPs until anything changes.
+  const patchedGuests = (patched.attendees ?? []).filter(isExternalGuest);
+  if (
+    patchedGuests.length > 0 &&
+    patchedGuests.every((guest) => guest.responseStatus === "declined") &&
+    typeof patched.updated === "string"
+  ) {
+    const { error: guardError } = await admin.from("relationship_meetings")
+      .update({
+        metadata: {
+          ...(meeting.metadata ?? {}),
+          reschedule_rsvp_guard: { event_updated: patched.updated, set_at: new Date().toISOString() },
+        },
+      })
+      .eq("id", meeting.id);
+    if (guardError) console.error("BTY reschedule RSVP guard save failed", { meetingId: meeting.id, guardError });
+  }
+
+  // CRM: only scheduler-owned due dates and the booking snapshot start time.
+  const nextAction = SCHEDULER_NEXT_ACTION[meetingType];
+  let crmWarning: string | null = null;
+  const opportunityId = meeting.opportunity_id ?? context.opportunity?.id ?? null;
+  if (opportunityId) {
+    const { data: fresh, error: freshError } = await admin
+      .from("relationship_opportunities")
+      .select("id,version,next_action,metadata")
+      .eq("id", opportunityId)
+      .eq("organization_id", context.organization.id)
+      .maybeSingle();
+    if (freshError || !fresh) {
+      crmWarning = "opportunity_lookup";
+    } else {
+      const updates: Record<string, unknown> = {};
+      if (fresh.next_action === nextAction) updates.next_action_due_at = newStartIso;
+      const metadata = (fresh.metadata ?? {}) as Record<string, unknown>;
+      const snapshot = metadata.bty_scheduler_booking as Record<string, unknown> | undefined;
+      if (snapshot && snapshot.meeting_id === meeting.id) {
+        updates.metadata = {
+          ...metadata,
+          bty_scheduler_booking: { ...snapshot, start_utc: newStartIso },
+        };
+      }
+      if (Object.keys(updates).length) {
+        const { data: updated, error: updateError } = await admin
+          .from("relationship_opportunities")
+          .update(updates)
+          .eq("id", fresh.id)
+          .eq("version", fresh.version)
+          .select("id")
+          .maybeSingle();
+        if (updateError || !updated) crmWarning = "opportunity_update";
+      }
+    }
+  }
+  const { error: orgError } = await admin
+    .from("relationship_organizations")
+    .update({ next_action_due_at: newStartIso })
+    .eq("id", context.organization.id)
+    .eq("next_action", nextAction);
+  if (orgError) crmWarning = crmWarning ?? "organization_update";
+  if (crmWarning) {
+    console.error("BTY reschedule CRM sync warning", { meetingId: meeting.id, crmWarning });
+    await trace("booking_crm_sync_warning", {
+      failureStage: "reschedule_crm_sync", failureCode: crmWarning, calendarEventId: eventId,
+    });
+  }
+
+  await trace("booking_rescheduled", {
+    startUtc: newStartIso, calendarEventId: eventId, httpStatus: 200,
+  });
+  return json({
+    rescheduled: true,
+    previousStartUtc: oldStartIso,
+    booking: serializeBooking(
+      { ...meeting, starts_at: newStartIso, ends_at: newEndIso },
+      meetingType,
+    ),
+  });
+}
+
+
 Deno.serve(async (request: Request) => {
   if (request.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });

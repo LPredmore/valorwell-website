@@ -106,8 +106,21 @@ async function invokeScheduler<T>(body: Record<string, unknown>): Promise<T> {
     { body },
   );
   if (error) {
+    // Expose safe, actionable non-2xx validation failures to the guest.
+    const response = (error as { context?: Response }).context;
+    if (response && typeof response.json === "function" && response.status < 500) {
+      let details: { error?: unknown } | null = null;
+      try {
+        details = (await response.json()) as { error?: unknown };
+      } catch {
+        // The generic fallback is used if the response body is malformed.
+      }
+      if (typeof details?.error === "string" && details.error.trim()) {
+        throw new Error(details.error);
+      }
+    }
     throw new Error(
-      "The scheduler could not complete that request. Please try again.",
+      "The scheduler couldn't complete that request. Please try again or email info@valorwell.org for help.",
     );
   }
   return data as T;
@@ -322,9 +335,10 @@ export default function BtySchedulerPage() {
     token: string,
     type: MeetingType,
     preferredWeekStart?: string,
+    preserveBookingError = false,
   ) {
     setLoadingAvailability(true);
-    setError("");
+    if (!preserveBookingError) setError("");
     try {
       const result = await invokeScheduler<AvailabilityResponse>({
         action: "availability",
@@ -439,7 +453,15 @@ export default function BtySchedulerPage() {
           result.error ||
             "That time could not be booked. Please choose another time.",
         );
-        await loadAvailability(sessionToken, meetingType, weekToPreserve);
+        const message = result.error ||
+          "That time could not be booked. Please choose another available time.";
+        await loadAvailability(sessionToken, meetingType, weekToPreserve, true);
+        setError(message);
+        window.requestAnimationFrame(() =>
+          document.getElementById("bty-scheduler-booking-error")?.scrollIntoView({
+            behavior: "smooth", block: "center",
+          }),
+        );
         return;
       }
 
@@ -465,7 +487,16 @@ export default function BtySchedulerPage() {
           ? requestError.message
           : "That time could not be booked.",
       );
-      await loadAvailability(sessionToken, meetingType, weekToPreserve);
+      const message = requestError instanceof Error
+        ? requestError.message
+        : "That time could not be booked.";
+      await loadAvailability(sessionToken, meetingType, weekToPreserve, true);
+      setError(message);
+      window.requestAnimationFrame(() =>
+        document.getElementById("bty-scheduler-booking-error")?.scrollIntoView({
+          behavior: "smooth", block: "center",
+        }),
+      );
     } finally {
       setBookingNow(false);
     }
@@ -965,6 +996,17 @@ export default function BtySchedulerPage() {
                       </div>
                     </div>
 
+                    {error && (
+                      <div
+                        id="bty-scheduler-booking-error"
+                        role="alert"
+                        className="mt-5 rounded-2xl border border-[#B24A3A]/50 bg-[#B24A3A]/10 p-5 text-sm leading-6 text-[#6d2f27]"
+                      >
+                        <strong>Your appointment was not booked.</strong> {error}
+                        <p className="mt-2">Please choose another available time, or email info@valorwell.org and we'll help.</p>
+                      </div>
+                    )}
+
                     {selectedSlot && (
                       <div className="mt-5 rounded-2xl border border-[#D7A92E]/35 bg-[#D7A92E]/10 p-5">
                         <p className="text-sm font-bold uppercase tracking-[0.12em] text-[#3B5147]">
@@ -1007,7 +1049,7 @@ export default function BtySchedulerPage() {
           </div>
         )}
 
-        {error && (
+        {error && !meetingType && (
           <div
             role="alert"
             className="mx-auto mt-6 max-w-2xl rounded-2xl border border-[#B24A3A]/30 bg-[#B24A3A]/10 p-4 text-sm leading-6 text-[#6d2f27]"

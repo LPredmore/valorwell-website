@@ -14,7 +14,7 @@ const expectations = [
     body: [
       "The VA said our kids were covered. No one would take the coverage.",
       "No one else is fixing this from both sides",
-      "American Corporate Partners",
+      "Explore Beyond The Yellow",
     ],
   },
   {

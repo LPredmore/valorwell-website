@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import {
   CheckCircle2,
   ChevronLeft,
@@ -274,6 +274,26 @@ function SchedulerShell({ children }: { children: React.ReactNode }) {
 }
 
 export default function BtySchedulerPage() {
+  // Random per-tab ID. We do not store email, IP address or browser fingerprint.
+  const [visitorSessionId] = useState(() => {
+    const key = "bty-scheduler-visitor-session-v1";
+    try {
+      const stored = window.sessionStorage.getItem(key);
+      if (stored && /^[0-9a-f-]{36}$/i.test(stored)) return stored;
+      const generated = window.crypto.randomUUID();
+      window.sessionStorage.setItem(key, generated);
+      return generated;
+    } catch {
+      return crypto.randomUUID();
+    }
+  });
+  useEffect(() => {
+    // Best effort: telemetry failures must never block scheduling.
+    void invokeScheduler({
+      action: "track", eventType: "page_opened", visitorSessionId,
+    }).catch(() => undefined);
+  }, [visitorSessionId]);
+
   const localZone =
     typeof Intl !== "undefined"
       ? Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -342,6 +362,7 @@ export default function BtySchedulerPage() {
     try {
       const result = await invokeScheduler<AvailabilityResponse>({
         action: "availability",
+        visitorSessionId,
         sessionToken: token,
         meetingType: type,
       });
@@ -381,6 +402,7 @@ export default function BtySchedulerPage() {
     try {
       const result = await invokeScheduler<ValidateResponse>({
         action: "validate",
+        visitorSessionId,
         email: email.trim(),
       });
 
@@ -436,6 +458,8 @@ export default function BtySchedulerPage() {
 
   async function handleBook() {
     if (!sessionToken || !selectedSlot || !meetingType) return;
+    const attemptedSlot = selectedSlot;
+    const attemptId = crypto.randomUUID();
     setBookingNow(true);
     setError("");
     const weekToPreserve = currentWeekStart;
@@ -443,9 +467,11 @@ export default function BtySchedulerPage() {
     try {
       const result = await invokeScheduler<BookResponse>({
         action: "book",
+        visitorSessionId,
+        bookingAttemptId: attemptId,
         sessionToken,
         meetingType,
-        startUtc: selectedSlot.startUtc,
+        startUtc: attemptedSlot.startUtc,
       });
       if (!result.booked || !result.booking) {
         setSelectedSlot(null);
@@ -481,6 +507,11 @@ export default function BtySchedulerPage() {
       setBooking(confirmedBooking);
       clearCalendarState();
     } catch (requestError) {
+      void invokeScheduler({
+        action: "track", eventType: "booking_client_error",
+        visitorSessionId, bookingAttemptId: attemptId,
+        sessionToken, meetingType, startUtc: attemptedSlot.startUtc,
+      }).catch(() => undefined);
       setSelectedSlot(null);
       setError(
         requestError instanceof Error
@@ -974,6 +1005,13 @@ export default function BtySchedulerPage() {
                                   onClick={() => {
                                     setSelectedSlot(slot);
                                     setError("");
+                                    if (sessionToken && meetingType) {
+                                      void invokeScheduler({
+                                        action: "track", eventType: "slot_selected",
+                                        visitorSessionId, sessionToken,
+                                        meetingType, startUtc: slot.startUtc,
+                                      }).catch(() => undefined);
+                                    }
                                   }}
                                   className={`min-h-[72px] border-r border-[#3B5147]/10 px-3 py-3 text-center transition last:border-r-0 focus-visible:relative focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#3B5147] ${
                                     active

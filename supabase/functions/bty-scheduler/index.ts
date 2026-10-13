@@ -175,6 +175,117 @@ function parseMeetingType(value: unknown): MeetingType | null {
     : null;
 }
 
+type SchedulerTrackingEvent =
+  | "page_opened" | "invitation_verified" | "invitation_rejected"
+  | "availability_viewed" | "slot_selected" | "booking_submitted"
+  | "booking_confirmed" | "booking_failed" | "booking_client_error"
+  | "booking_crm_sync_warning";
+
+const TRACKING_ID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function trackingId(value: unknown): string | null {
+  return typeof value === "string" && TRACKING_ID_PATTERN.test(value)
+    ? value : null;
+}
+
+type TrackingDetails = {
+  eventType: SchedulerTrackingEvent;
+  sessionId: string | null;
+  attemptId?: string | null;
+  contactId?: string | null;
+  organizationId?: string | null;
+  opportunityId?: string | null;
+  meetingType?: MeetingType | null;
+  startUtc?: string | null;
+  failureStage?: string | null;
+  failureCode?: string | null;
+  httpStatus?: number | null;
+  calendarEventId?: string | null;
+};
+
+async function recordSchedulerEvent(
+  admin: SupabaseClient,
+  details: TrackingDetails,
+): Promise<void> {
+  if (!details.sessionId) return;
+  const { error } = await admin.from("bty_scheduler_activity_events").insert({
+    tenant_id: TENANT_ID,
+    visitor_session_id: details.sessionId,
+    booking_attempt_id: details.attemptId ?? null,
+    event_type: details.eventType,
+    contact_id: details.contactId ?? null,
+    organization_id: details.organizationId ?? null,
+    opportunity_id: details.opportunityId ?? null,
+    meeting_type: details.meetingType ?? null,
+    requested_start_utc: details.startUtc ?? null,
+    failure_stage: details.failureStage ?? null,
+    failure_code: details.failureCode ?? null,
+    http_status: details.httpStatus ?? null,
+    calendar_event_id: details.calendarEventId ?? null,
+  });
+  if (error) {
+    // Telemetry must never stop the visitor from making a booking.
+    console.error("BTY scheduler tracking write failed", {
+      eventType: details.eventType, code: error.code,
+    });
+  }
+}
+
+function trackingContext(
+  input: Record<string, unknown>,
+  session: SessionPayload,
+  eventType: SchedulerTrackingEvent,
+  more: Partial<TrackingDetails> = {},
+): TrackingDetails {
+  return {
+    eventType,
+    sessionId: trackingId(input.visitorSessionId),
+    attemptId: trackingId(input.bookingAttemptId),
+    contactId: session.contactId,
+    organizationId: session.organizationId,
+    opportunityId: session.opportunityId,
+    ...more,
+  };
+}
+
+async function handleTrack(
+  request: Request,
+  admin: SupabaseClient,
+  input: Record<string, unknown>,
+) {
+  const sessionId = trackingId(input.visitorSessionId);
+  if (!sessionId) return json({ ok: false }, 400);
+  const eventType = input.eventType;
+  if (eventType === "page_opened") {
+    // Reuse the existing per-request throttle; anonymous events carry no PII.
+    if (!checkValidateRateLimit(request)) return json({ ok: false }, 429);
+    await recordSchedulerEvent(admin, { eventType: "page_opened", sessionId });
+    return json({ ok: true });
+  }
+  if (eventType !== "slot_selected" && eventType !== "booking_client_error") {
+    return json({ ok: false }, 400);
+  }
+  const session = await verifySession(input.sessionToken);
+  const context = await revalidateSession(admin, session);
+  const meetingType = parseMeetingType(input.meetingType);
+  const parsedStart = DateTime.fromISO(String(input.startUtc ?? ""), { zone: "utc" });
+  if (!meetingType || !parsedStart.isValid) return json({ ok: false }, 400);
+  await recordSchedulerEvent(
+    admin,
+    trackingContext(input, session, eventType, {
+      organizationId: context.organization.id,
+      contactId: context.contact.id,
+      opportunityId: context.opportunity?.id ?? null,
+      meetingType,
+      startUtc: parsedStart.toUTC().toISO(),
+      failureStage: eventType === "booking_client_error" ? "client_request" : null,
+      failureCode: eventType === "booking_client_error" ? "network_or_http_error" : null,
+    }),
+  );
+  return json({ ok: true });
+}
+
 function meetingPurpose(meetingType: MeetingType) {
   return MEETING_CONFIG[meetingType].purpose;
 }
@@ -1401,10 +1512,29 @@ async function handleValidate(
   }
   const email = normalizeEmail(input.email);
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    await recordSchedulerEvent(admin, {
+      eventType: "invitation_rejected",
+      sessionId: trackingId(input.visitorSessionId),
+      failureCode: "invalid_email_format", httpStatus: 200,
+    });
     return json({ eligible: false });
   }
   const context = await resolveContactContext(admin, email);
-  if (!context) return json({ eligible: false });
+  if (!context) {
+    await recordSchedulerEvent(admin, {
+      eventType: "invitation_rejected",
+      sessionId: trackingId(input.visitorSessionId),
+      failureCode: "no_active_invitation", httpStatus: 200,
+    });
+    return json({ eligible: false });
+  }
+  await recordSchedulerEvent(admin, {
+    eventType: "invitation_verified",
+    sessionId: trackingId(input.visitorSessionId),
+    contactId: context.contact.id, organizationId: context.organization.id,
+    opportunityId: context.opportunity?.id ?? null,
+    httpStatus: 200,
+  });
 
   const contactName = displayName(context.contact);
   const sessionToken = await issueSession({
@@ -1460,9 +1590,20 @@ async function handleAvailability(
     );
   }
 
+  const availability = await computeAvailability(admin, meetingType);
+  await recordSchedulerEvent(
+    admin,
+    trackingContext(input, session, "availability_viewed", {
+      contactId: context.contact.id,
+      organizationId: context.organization.id,
+      opportunityId: context.opportunity?.id ?? null,
+      meetingType,
+      httpStatus: 200,
+    }),
+  );
   return json({
     state: "ready",
-    ...(await computeAvailability(admin, meetingType)),
+    ...availability,
   });
 }
 
@@ -1668,9 +1809,26 @@ async function handleBook(
 
   const session = await verifySession(input.sessionToken);
   const context = await revalidateSession(admin, session);
+  const startForTracking = String(input.startUtc ?? "");
+  const attemptedStart = DateTime.fromISO(startForTracking, { zone: "utc" });
+  const bookTrace = (eventType: SchedulerTrackingEvent, options: Partial<TrackingDetails> = {}) =>
+    recordSchedulerEvent(admin, trackingContext(input, session, eventType, {
+      organizationId: context.organization.id,
+      contactId: context.contact.id,
+      opportunityId: context.opportunity?.id ?? null,
+      meetingType,
+      startUtc: attemptedStart.isValid ? attemptedStart.toUTC().toISO() : null,
+      ...options,
+    }));
+  await bookTrace("booking_submitted");
   const existing = meetingForType(context, meetingType);
 
   if (existing) {
+    await bookTrace("booking_confirmed", {
+      failureStage: "already_booked",
+      calendarEventId: existing.external_event_id,
+      httpStatus: 200,
+    });
     return json({
       booked: true,
       alreadyBooked: true,
@@ -1689,6 +1847,9 @@ async function handleBook(
   const startUtc = String(input.startUtc ?? "");
   const parsedStart = DateTime.fromISO(startUtc, { zone: "utc" });
   if (!parsedStart.isValid) {
+    await bookTrace("booking_failed", {
+      failureStage: "validate_time", failureCode: "invalid_start", httpStatus: 400,
+    });
     return json({ booked: false, error: "That time is invalid." }, 400);
   }
 
@@ -1700,6 +1861,10 @@ async function handleBook(
     console.warn("BTY booking rejected: selected_slot_unavailable", {
       meetingType, startUtc, organizationId: context.organization.id,
       phase: "initial_validation",
+    });
+    await bookTrace("booking_failed", {
+      failureStage: "initial_validation", failureCode: "slot_unavailable",
+      httpStatus: 409,
     });
     return json({
       booked: false, code: "slot_unavailable",
@@ -1751,6 +1916,10 @@ async function handleBook(
         meetingType, startUtc, organizationId: context.organization.id,
         phase: "database_reservation", constraint: reservationError.message,
       });
+      await bookTrace("booking_failed", {
+        failureStage: "database_reservation", failureCode: "reservation_conflict",
+        httpStatus: 409,
+      });
       return json(
         {
           booked: false,
@@ -1781,6 +1950,10 @@ async function handleBook(
         reservationId: reservation.id, phase: "post_reservation_recheck",
       });
       await admin.from("relationship_meetings").delete().eq("id", reservation.id);
+      await bookTrace("booking_failed", {
+        failureStage: "post_reservation_recheck",
+        failureCode: "slot_changed_during_booking", httpStatus: 409,
+      });
       return json({
         booked: false, code: "slot_changed_during_booking",
         error: "That time has just become unavailable. Please choose a different time.",
@@ -1859,6 +2032,21 @@ async function handleBook(
       }
     }
 
+    const { data: linkedMeeting } = await admin.from("relationship_meetings")
+      .select("opportunity_id").eq("id", reservation.id).maybeSingle();
+    await bookTrace("booking_confirmed", {
+      calendarEventId: String(event.id),
+      opportunityId: linkedMeeting?.opportunity_id ?? context.opportunity?.id ?? null,
+      failureStage: meetingUpdateError ? "calendar_created_db_update_pending" : null,
+      httpStatus: 200,
+    });
+    if (meetingUpdateError || !linkedMeeting?.opportunity_id) {
+      await bookTrace("booking_crm_sync_warning", {
+        calendarEventId: String(event.id),
+        failureStage: "crm_sync",
+        failureCode: meetingUpdateError ? "meeting_confirmation_update" : "opportunity_link_missing",
+      });
+    }
     return json({
       booked: true,
       booking: {
@@ -1888,6 +2076,10 @@ async function handleBook(
       .delete()
       .eq("id", reservation.id)
       .eq("external_event_id", reservationExternalId);
+    await bookTrace("booking_failed", {
+      failureStage: "calendar_or_reservation",
+      failureCode: "unexpected_booking_error", httpStatus: 500,
+    });
     throw error;
   }
 }
@@ -1905,9 +2097,31 @@ Deno.serve(async (request: Request) => {
     const action = String(input.action ?? "");
     const admin = adminClient();
 
+    if (action === "track") return await handleTrack(request, admin, input);
     if (action === "validate") return await handleValidate(request, admin, input);
     if (action === "availability") return await handleAvailability(admin, input);
-    if (action === "book") return await handleBook(admin, input);
+    if (action === "book") {
+      try {
+        return await handleBook(admin, input);
+      } catch (error) {
+        // Covers errors that happen before the reservation try/catch above.
+        try {
+          const session = await verifySession(input.sessionToken);
+          await recordSchedulerEvent(admin, trackingContext(input, session, "booking_failed", {
+            meetingType: parseMeetingType(input.meetingType),
+            startUtc: DateTime.fromISO(String(input.startUtc ?? ""), { zone: "utc" }).isValid
+              ? DateTime.fromISO(String(input.startUtc), { zone: "utc" }).toISO()
+              : null,
+            failureStage: "unhandled_exception",
+            failureCode: "server_exception",
+            httpStatus: 500,
+          }));
+        } catch {
+          // Do not change the original error, even if telemetry also fails.
+        }
+        throw error;
+      }
+    }
 
     return json({ error: "Unknown action" }, 400);
   } catch (error) {

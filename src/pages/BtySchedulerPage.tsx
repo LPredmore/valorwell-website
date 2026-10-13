@@ -817,9 +817,77 @@ export default function BtySchedulerPage() {
                   for this booking.
                 </p>
 
+                {error && (
+                  <div
+                    role="alert"
+                    className="mt-6 rounded-2xl border border-red-300 bg-red-50 p-4 text-sm font-medium leading-6 text-red-800"
+                  >
+                    {error}
+                  </div>
+                )}
+
+                {booking.canChange ? (
+                  confirmingRelease ? (
+                    <div className="mt-6 rounded-2xl border border-[#3B5147]/20 bg-[#F4F1E8] p-5">
+                      <p className="font-bold">
+                        Cancel your {centralDateLabel(booking.startUtc)} appointment at{" "}
+                        {centralTimeLabel(booking.startUtc)}?
+                      </p>
+                      <p className="mt-2 text-sm leading-6 text-[#111814]/65">
+                        We'll cancel the calendar invitation and show you open
+                        times so you can pick a new one.
+                      </p>
+                      <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                        <button
+                          type="button"
+                          onClick={handleRelease}
+                          disabled={releasing}
+                          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#3B5147] px-4 py-2 text-sm font-bold text-white transition hover:bg-[#2f4139] disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          {releasing ? (
+                            <>
+                              <Loader2
+                                className="h-4 w-4 animate-spin motion-reduce:animate-none"
+                                aria-hidden="true"
+                              />
+                              Cancelling…
+                            </>
+                          ) : (
+                            "Yes, cancel and pick a new time"
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setConfirmingRelease(false)}
+                          disabled={releasing}
+                          className="min-h-11 rounded-xl border border-[#3B5147]/25 px-4 py-2 text-sm font-bold text-[#3B5147] transition hover:bg-[#3B5147]/5 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          Keep my appointment
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setError("");
+                        setConfirmingRelease(true);
+                      }}
+                      className="mt-6 block text-sm font-bold text-[#3B5147] underline underline-offset-4 hover:text-[#2f4139] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147]"
+                    >
+                      I need a different time
+                    </button>
+                  )
+                ) : (
+                  <p className="mt-6 text-sm leading-6 text-[#111814]/55">
+                    Need a different time? Email info@valorwell.org.
+                  </p>
+                )}
+
                 <button
                   type="button"
                   onClick={backToMeetingTypes}
+                  disabled={releasing}
                   className="mt-6 min-h-11 rounded-xl border border-[#3B5147]/25 px-4 py-2 text-sm font-bold text-[#3B5147] transition hover:bg-[#3B5147]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147]"
                 >
                   Back to scheduling options

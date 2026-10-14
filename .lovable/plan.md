@@ -1,16 +1,21 @@
-# Read-only verification result (no changes needed)
+# Editorial Resource Article Template
 
-Nothing to build. These are the findings from the verification. Approving this does nothing.
+## Scope
+- Redesign only runtime resource article detail pages; keep shared authority and category pages unchanged.
+- Preserve live Billing Hub Supabase queries, routes, SEO/schema, related-resource selection, and hidden research metadata.
 
-## Live HTTP checks (actually run, 2026-10-14, against https://valorwell.org)
-- `/` — 200, the current homepage title, bundle `assets/index-CcCo4SsL.js`
-- `/resources/for-therapists` — 200, "Resources for Therapists | ValorWell"
-- `/resources/for-therapists/no-shows-and-therapist-income` — 200, "How No-Shows Affect Therapist Income and Who Carries the Risk"
-- `/resources/champva/what-is-champva` — 200, "What Is CHAMPVA? How VA's Family Health Program Works"
-- `/resources/for-therapists/therapist-opportunities-texas` — 200, "Therapist Jobs Serving Veterans in Texas: Telehealth Opportunities"
-- Old addresses I sampled (`/authority/resources/champva`, `/therapy`, `/videos`) — raw HTTP 200 with no Location header. That means there is no server 301; the redirect only happens in the browser.
+## Implementation
+1. Replace the lossy article parser with safe Markdown rendering that preserves heading hierarchy, inline emphasis/links, nested lists, and document order while excluding internal source/review sections and lines.
+2. Build a dedicated article page with a linked breadcrumb hero, category and reading-time metadata, continuous paper reading surface, stable heading anchors, and responsive H2 table of contents.
+3. Present FAQs through the existing accessible accordion, related articles as compact recommendations, and the existing care/topic actions in a concise closing area.
+4. Add article-scoped print rules that remove site chrome, breadcrumbs, navigation, recommendations, and actions while producing a clean printable document.
+5. Expand runtime tests for nested headings, sequence preservation, emphasis, metadata suppression, table-of-contents links, and future runtime slugs.
 
-## What could not be verified
-- **Deployment 96a25bd2 status / build error:** I have no tool that reads a deployment by ID. The new resource pages are live and prerendered with their own titles, so a build that includes the #128 resource import is being served. That is an inference, not a confirmed deployment record.
-- **Exact SHA match:** the live HTML has no commit hash in it. The repository HEAD is `7e21b21` plus a later local "Work in progress" commit `0b82b97`.
-- **The five 301s:** the rollout plan that lists them is not in this repository, and the current redirect list for retired resources (generated from the sheet) is empty. Send the five source paths and I will check each one live. Known limitation: Lovable hosting serves the app shell with a 200 and does not run the generated `_worker.js` that would return 301s. Real 301s are not expected on this hosting.
+## Technical Details
+- Add `react-markdown` with `remark-gfm`; raw HTML remains disabled.
+- Keep sanitization as a preprocessing step before rendering and before reading-time/TOC calculation.
+- Use semantic design tokens and article-scoped styles so non-resource authority pages retain their current appearance.
+
+## Verification
+- Run focused lint, TypeScript checking, resource tests, the full test suite, and the production build.
+- Inspect the Family Systems article at mobile and desktop widths, including horizontal overflow and print-media behavior.

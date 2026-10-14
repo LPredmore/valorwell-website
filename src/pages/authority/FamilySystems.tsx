@@ -15,7 +15,7 @@ export default function FamilySystems() {
       subhead="ValorWell helps families move from reacting to each situation individually toward building repeatable ways to think, communicate, and solve problems."
       heroCTAs={[
         { label: "Find Family Care", to: "/get-care" },
-        { label: "Explore Family Systems Resources", to: "/resources/family-systems", variant: "secondary" },
+        { label: "Explore Family Resources", to: "/resources", variant: "secondary" },
       ]}
       sections={[
         {
@@ -84,12 +84,12 @@ export default function FamilySystems() {
       ]}
       related={[
         { name: "Military Family Therapy", href: "/military-family-therapy", body: "Clinical support for military-connected families when an appropriate care path is available." },
-        { name: "Family Systems Resources", href: "/resources/family-systems", body: "Practical communication, regulation, conflict-repair, and household frameworks." },
+        { name: "Veteran Mental Health Resources", href: "/resources/veteran-mental-health", body: "Supporting a Veteran who is struggling, and what to do when a provider isn't a fit." },
         { name: "Find Care", href: "/get-care", body: "See the current ValorWell care pathways for veterans and veteran family members." },
       ]}
       finalCTAs={[
         { label: "Find Family Support", to: "/get-care" },
-        { label: "Explore Family Systems Resources", to: "/resources/family-systems", variant: "secondary" },
+        { label: "Explore Family Resources", to: "/resources", variant: "secondary" },
       ]}
     />
   );

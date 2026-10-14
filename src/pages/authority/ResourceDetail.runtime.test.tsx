@@ -35,7 +35,53 @@ const base = {
   published_at: null,
 };
 
-const rows: Row[] = [
+const rows: (Row & Record<string, unknown>)[] = [
+  {
+    ...base,
+    slug: "for-therapists",
+    title: "Resources for Therapists",
+    summary: "Practical answers for licensed therapists.",
+    body_markdown: "## Hub\n\nHub body.",
+    source_urls: [],
+    last_researched_at: null,
+    resource_kind: "category",
+    category_slug: null,
+  },
+  {
+    ...base,
+    id: "therapist-page",
+    slug: "how-valorwell-works",
+    title: "How ValorWell Works for Therapists",
+    summary: "Clinical control stays with you.",
+    quick_answer: "You make the clinical decisions and ValorWell handles billing.",
+    in_practice_markdown: "We see **therapists** stay longer when admin work is handled.",
+    body_markdown: "## What do you control?\n\nYour schedule. See [telehealth](/resources/for-therapists/telehealth-rules).",
+    reviewed_by: "ValorWell",
+    last_reviewed_on: "2026-10-14",
+    public_updated_at: "2026-10-14T17:00:00Z",
+    cta: "join_network",
+    group_slug: "start-here",
+    sort_order: 2,
+    source_urls: [],
+    last_researched_at: null,
+    resource_kind: "article",
+    category_slug: "for-therapists",
+  },
+  {
+    ...base,
+    id: "telehealth-page",
+    slug: "telehealth-rules",
+    title: "Telehealth Licensure Rules",
+    summary: "Where the client sits matters.",
+    body_markdown: "## Which license?\n\nThe client's state.",
+    cta: "join_network",
+    group_slug: "telehealth",
+    sort_order: 1,
+    source_urls: [],
+    last_researched_at: null,
+    resource_kind: "article",
+    category_slug: "for-therapists",
+  },
   {
     ...base,
     slug: "family-systems",
@@ -83,26 +129,44 @@ const rows: Row[] = [
   },
 ];
 
+const extraRows: Record<string, Record<string, unknown>[]> = {
+  website_resource_groups: [
+    { category_slug: "for-therapists", group_slug: "start-here", name: "Start Here", display_order: 1, intro: "Read these first." },
+    { category_slug: "for-therapists", group_slug: "telehealth", name: "Telehealth Practice", display_order: 2, intro: null },
+  ],
+  website_resource_sources: [
+    { resource_id: "therapist-page", title: "VA: Community Care", url: "https://www.va.gov/communitycare/", organization: "VA", display_order: 1 },
+  ],
+  website_resource_relations: [
+    { resource_id: "therapist-page", related_resource_id: "telehealth-page", relation_type: "related", display_order: 1 },
+  ],
+};
+
 vi.mock("@/integrations/supabase/client", () => {
-  const builder = (rowsForQuery: Row[]) => {
+  type Data = Record<string, unknown>[];
+  const builder = (rowsForQuery: Data) => {
+    const narrowed = (next: Data) => builder(next);
     const chain = {
       select: () => chain,
-      eq: (column: string, value: string) => {
-        if (column === "slug" || column === "resource_kind" || column === "category_slug") {
-          return builder(
-            rowsForQuery.filter((row) => (row as unknown as Record<string, unknown>)[column] === value),
-          );
-        }
-        return chain;
-      },
-      order: () => Promise.resolve({ data: rowsForQuery, error: null }),
+      eq: (column: string, value: unknown) =>
+        rowsForQuery.some((row) => column in row)
+          ? narrowed(rowsForQuery.filter((row) => row[column] === value))
+          : chain,
+      in: (column: string, values: unknown[]) =>
+        narrowed(rowsForQuery.filter((row) => values.includes(row[column]))),
+      order: () => chain,
       maybeSingle: () => Promise.resolve({ data: rowsForQuery[0] ?? null, error: null }),
+      then: (resolve: (value: { data: Data; error: null }) => unknown) =>
+        Promise.resolve({ data: rowsForQuery, error: null }).then(resolve),
     };
     return chain;
   };
 
   return {
-    billingHubSupabase: { from: () => builder(rows) },
+    billingHubSupabase: {
+      from: (table: string) =>
+        builder(table === "website_resources_public" ? (rows as unknown as Data) : extraRows[table] ?? []),
+    },
     supabase: {},
   };
 });
@@ -219,5 +283,51 @@ describe("runtime resource routing", () => {
 
     renderAt("/resources/not-a-real-category");
     await waitFor(() => expect(screen.getByText("Page not found")).toBeInTheDocument());
+  });
+
+  it("shows the quick answer, in-practice notes, sources, reviewer, related pages, and the therapist CTA", async () => {
+    renderAt("/resources/for-therapists/how-valorwell-works");
+
+    await waitFor(() =>
+      expect(screen.getByRole("heading", { level: 1, name: "How ValorWell Works for Therapists" })).toBeInTheDocument(),
+    );
+    expect(screen.getByRole("heading", { name: "The short answer" })).toBeInTheDocument();
+    expect(screen.getByText("You make the clinical decisions and ValorWell handles billing.")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "What we see in practice" })).toBeInTheDocument();
+    expect(screen.getByText("therapists").tagName).toBe("STRONG");
+    expect(screen.getByText("Reviewed by ValorWell")).toBeInTheDocument();
+    expect(screen.getByText("Last reviewed October 14, 2026")).toBeInTheDocument();
+    expect(screen.getByText("Updated October 14, 2026")).toBeInTheDocument();
+
+    await waitFor(() =>
+      expect(screen.getByRole("link", { name: "VA: Community Care" })).toHaveAttribute(
+        "href",
+        "https://www.va.gov/communitycare/",
+      ),
+    );
+    await waitFor(() =>
+      expect(screen.getAllByRole("link", { name: /Telehealth Licensure Rules/ })[0]).toHaveAttribute(
+        "href",
+        "/resources/for-therapists/telehealth-rules",
+      ),
+    );
+    expect(screen.getByRole("link", { name: "telehealth" })).toHaveAttribute(
+      "href",
+      "/resources/for-therapists/telehealth-rules",
+    );
+    expect(screen.getByRole("link", { name: "Work With ValorWell" })).toHaveAttribute("href", "/clinicians");
+    expect(screen.getByRole("heading", { name: "Treat Veterans and their families with ValorWell" })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Need care?" })).not.toBeInTheDocument();
+  });
+
+  it("groups a topic's articles under its sections in sheet order", async () => {
+    renderAt("/resources/for-therapists");
+
+    await waitFor(() => expect(screen.getByRole("heading", { level: 3, name: "Start Here" })).toBeInTheDocument());
+    const startHere = screen.getByRole("heading", { level: 3, name: "Start Here" });
+    const telehealth = screen.getByRole("heading", { level: 3, name: "Telehealth Practice" });
+    expect(startHere.compareDocumentPosition(telehealth) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getByText("Read these first.")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Work With ValorWell/ })).toHaveAttribute("href", "/clinicians");
   });
 });

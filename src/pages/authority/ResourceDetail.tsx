@@ -14,9 +14,11 @@ import { Button } from "@/components/ui/button";
 import { Layout } from "@/components/layout/Layout";
 import NotFound from "@/pages/NotFound";
 import {
+  useArticleExtras,
   usePublishedArticle,
   usePublishedCategory,
   usePublishedCategoryArticles,
+  type WebsiteResourceCta,
 } from "@/lib/websiteResources";
 
 type ResourceDetailProps = {
@@ -133,6 +135,42 @@ function titleFromSlug(slug: string): string {
     .join(" ");
 }
 
+const CTA_CONTENT: Record<
+  WebsiteResourceCta,
+  { heading: string; body: string; label: string; to: string }
+> = {
+  find_care: {
+    heading: "Need care?",
+    body: "Find the care path that fits your situation.",
+    label: "Find Care",
+    to: "/get-care",
+  },
+  join_network: {
+    heading: "Treat Veterans and their families with ValorWell",
+    body: "Licensed therapists keep clinical control. ValorWell handles credentialing, billing, and claims.",
+    label: "Work With ValorWell",
+    to: "/clinicians",
+  },
+  support_foundation: {
+    heading: "Help cover care VA won't pay for",
+    body: "The ValorWell Foundation works to pay for treatment for Veterans and their families that VA won't cover.",
+    label: "Support the Foundation",
+    to: "/donate",
+  },
+};
+
+function formatDate(value: string | null): string | null {
+  if (!value) return null;
+  const date = new Date(value.length === 10 ? `${value}T00:00:00Z` : value);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZone: "UTC",
+  });
+}
+
 function ResourceStatus({ message }: { message: string }) {
   return (
     <Layout>
@@ -190,6 +228,28 @@ function TableOfContents({ items, mobile = false }: { items: TocItem[]; mobile?:
   );
 }
 
+function PlainMarkdown({ markdown }: { markdown: string }) {
+  const components: Components = {
+    h1: ({ children }) => <h3>{children}</h3>,
+    h2: ({ children }) => <h3>{children}</h3>,
+    a: ({ href, children }) => {
+      if (href?.startsWith("/") && !href.startsWith("//")) return <Link to={href}>{children}</Link>;
+      return (
+        <a href={href} target="_blank" rel="noopener noreferrer">
+          {children}
+        </a>
+      );
+    },
+  };
+  return (
+    <div className="resource-article-prose">
+      <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+        {markdown}
+      </ReactMarkdown>
+    </div>
+  );
+}
+
 function ResourceMarkdown({ markdown, toc }: { markdown: string; toc: TocItem[] }) {
   const headingIds = new Map<string, string[]>();
   toc.forEach((item) => {
@@ -212,6 +272,9 @@ function ResourceMarkdown({ markdown, toc }: { markdown: string; toc: TocItem[] 
     h6: ({ children }) => <h6>{children}</h6>,
     a: ({ href, children }) => {
       const external = Boolean(href?.startsWith("http"));
+      if (href?.startsWith("/") && !href.startsWith("//")) {
+        return <Link to={href}>{children}</Link>;
+      }
       return (
         <a href={href} target={external ? "_blank" : undefined} rel={external ? "noopener noreferrer" : undefined}>
           {children}
@@ -240,6 +303,7 @@ export default function ResourceDetail({
   const { data: resource, isPending, isError } = usePublishedArticle(categorySlug, articleSlug);
   const { data: category } = usePublishedCategory(categorySlug);
   const { data: siblings } = usePublishedCategoryArticles(categorySlug);
+  const { data: extras } = useArticleExtras(resource);
 
   const markdown = useMemo(
     () => sanitizeResourceMarkdown(resource?.body_markdown ?? ""),
@@ -258,12 +322,22 @@ export default function ResourceDetail({
   if (!resource) return <NotFound />;
 
   const categoryName = category?.title ?? titleFromSlug(categorySlug);
-  const related = (siblings ?? [])
-    .filter(
-      (candidate) =>
-        candidate.resource_kind === "article" && candidate.slug !== resource.slug,
-    )
-    .slice(0, 3);
+  const chosenRelated = (extras?.related ?? []).filter(
+    (candidate) => !(candidate.category_slug === categorySlug && candidate.slug === resource.slug),
+  );
+  const related =
+    chosenRelated.length > 0
+      ? chosenRelated.slice(0, 4)
+      : (siblings ?? [])
+          .filter(
+            (candidate) =>
+              candidate.resource_kind === "article" && candidate.slug !== resource.slug,
+          )
+          .slice(0, 3);
+  const sources = extras?.sources ?? [];
+  const cta = CTA_CONTENT[resource.cta] ?? CTA_CONTENT.find_care;
+  const updated = formatDate(resource.public_updated_at);
+  const lastReviewed = formatDate(resource.last_reviewed_on);
   const path = `/resources/${categorySlug}/${resource.slug}`;
 
   return (
@@ -307,6 +381,9 @@ export default function ResourceDetail({
                 <Clock className="h-4 w-4" aria-hidden />
                 {readingTime} min read
               </span>
+              <span>Reviewed by {resource.reviewed_by}</span>
+              {lastReviewed ? <span>Last reviewed {lastReviewed}</span> : null}
+              {updated ? <span>Updated {updated}</span> : null}
             </div>
           </div>
         </header>
@@ -316,7 +393,33 @@ export default function ResourceDetail({
           <div className="grid min-w-0 gap-8 lg:grid-cols-[260px_minmax(0,760px)] lg:justify-center lg:gap-12">
             <TableOfContents items={toc} />
             <article className="resource-article-surface min-w-0 rounded-md border border-border bg-card px-5 py-8 shadow-sm sm:px-8 md:px-12 md:py-12">
+              {resource.quick_answer ? (
+                <section
+                  className="resource-article-quick-answer mb-10 rounded-md border-l-4 border-primary bg-secondary/50 px-5 py-4"
+                  aria-labelledby="resource-quick-answer-heading"
+                >
+                  <h2 id="resource-quick-answer-heading" className="text-sm font-bold uppercase text-primary">
+                    The short answer
+                  </h2>
+                  <p className="mt-2 text-lg leading-8 text-foreground">{resource.quick_answer}</p>
+                </section>
+              ) : null}
+
               <ResourceMarkdown markdown={markdown} toc={toc} />
+
+              {resource.in_practice_markdown ? (
+                <section
+                  className="resource-article-in-practice mt-14 border-t border-border pt-10"
+                  aria-labelledby="resource-in-practice-heading"
+                >
+                  <h2 id="resource-in-practice-heading" className="text-3xl font-bold text-foreground">
+                    What we see in practice
+                  </h2>
+                  <div className="mt-5">
+                    <PlainMarkdown markdown={resource.in_practice_markdown} />
+                  </div>
+                </section>
+              ) : null}
 
               {resource.faq.length > 0 ? (
                 <section className="resource-article-faq mt-14 border-t border-border pt-10" aria-labelledby="resource-faq-heading">
@@ -335,6 +438,26 @@ export default function ResourceDetail({
                   </Accordion>
                 </section>
               ) : null}
+
+              {sources.length > 0 ? (
+                <section className="resource-article-sources mt-14 border-t border-border pt-10" aria-labelledby="resource-sources-heading">
+                  <h2 id="resource-sources-heading" className="text-2xl font-bold text-foreground">Sources</h2>
+                  <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm leading-6 text-muted-foreground">
+                    {sources.map((source) => (
+                      <li key={source.url}>
+                        <a
+                          href={source.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary underline-offset-2 hover:underline"
+                        >
+                          {source.title}
+                        </a>
+                      </li>
+                    ))}
+                  </ol>
+                </section>
+              ) : null}
             </article>
           </div>
         </div>
@@ -343,7 +466,7 @@ export default function ResourceDetail({
           <section className="resource-article-related border-t border-border bg-secondary/40 py-10" aria-labelledby="related-resources-heading">
             <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
               <h2 id="related-resources-heading" className="text-2xl font-bold text-foreground">Continue reading</h2>
-              <div className="mt-5 grid gap-3 md:grid-cols-3">
+              <div className={`mt-5 grid gap-3 ${related.length === 4 ? "md:grid-cols-2 lg:grid-cols-4" : "md:grid-cols-3"}`}>
                 {related.map((candidate) => (
                   <Link
                     key={candidate.slug}
@@ -362,12 +485,12 @@ export default function ResourceDetail({
         <section className="resource-article-cta border-t border-border bg-primary py-8 text-primary-foreground">
           <div className="mx-auto flex max-w-6xl flex-col gap-5 px-4 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
             <div>
-              <h2 className="text-2xl font-bold">Need care?</h2>
-              <p className="mt-1 text-sm text-primary-foreground/80">Find the care path that fits your situation.</p>
+              <h2 className="text-2xl font-bold">{cta.heading}</h2>
+              <p className="mt-1 text-sm text-primary-foreground/80">{cta.body}</p>
             </div>
             <div className="flex flex-wrap gap-3">
               <Button asChild size="lg" variant="secondary">
-                <Link to="/get-care">Find Care</Link>
+                <Link to={cta.to}>{cta.label}</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="border-primary-foreground/40 bg-transparent text-primary-foreground hover:bg-primary-foreground hover:text-primary">
                 <Link to={`/resources/${categorySlug}`}>Back to This Topic</Link>

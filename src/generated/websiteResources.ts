@@ -18,6 +18,25 @@ export type GeneratedWebsiteResource = {
   published_at: string | null;
   resource_kind: "category" | "article";
   category_slug: string | null;
+  public_updated_at?: string | null;
+  sort_order?: number;
+  quick_answer?: string | null;
+  in_practice_markdown?: string | null;
+  reviewed_by?: string;
+  last_reviewed_on?: string | null;
+  cta?: "find_care" | "join_network" | "support_foundation";
+  group_slug?: string | null;
+  id?: string;
+  sources?: { title: string; url: string; organization: string | null }[];
+  related?: string[];
+};
+
+export type GeneratedResourceGroup = {
+  category_slug: string;
+  group_slug: string;
+  name: string;
+  display_order: number;
+  intro: string | null;
 };
 
 export const generatedWebsiteResources: GeneratedWebsiteResource[] = [
@@ -8285,3 +8304,5 @@ export const generatedWebsiteResources: GeneratedWebsiteResource[] = [
     "category_slug": "family-systems"
   }
 ];
+
+export const generatedResourceGroups: GeneratedResourceGroup[] = [];

@@ -80,7 +80,6 @@ export default function VeteranMentalHealthCare() {
       ]}
       related={[
         { name: "Military Family Therapy", href: "/military-family-therapy", body: "Support for spouses, family members, and household strain when an appropriate care path is available." },
-        { name: "Clinical Documentation Resources", href: "/resources/documentation", body: "Understand treatment records, functional impact, and documentation boundaries." },
         { name: "CHAMPVA Resources", href: "/resources/champva", body: "Provider access, assignment, authorization basics, and current CHAMPVA care information." },
         { name: "VA Community Care Resources", href: "/resources/va-community-care", body: "Understand referrals, authorization, access standards, and records to keep." },
       ]}

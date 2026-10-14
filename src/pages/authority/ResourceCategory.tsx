@@ -4,9 +4,56 @@ import { Layout } from "@/components/layout/Layout";
 import { SEO, BreadcrumbSchema } from "@/components/SEO";
 import NotFound from "@/pages/NotFound";
 import {
+  useCategoryGroups,
   usePublishedCategory,
   usePublishedCategoryArticles,
+  type WebsiteResource,
+  type WebsiteResourceGroup,
 } from "@/lib/websiteResources";
+
+type ArticleSection = {
+  key: string;
+  name: string | null;
+  intro: string | null;
+  articles: WebsiteResource[];
+};
+
+/** Groups articles under the topic's sections, in sheet order. */
+function sectionArticles(articles: WebsiteResource[], groups: WebsiteResourceGroup[]): ArticleSection[] {
+  const sections: ArticleSection[] = groups.map((group) => ({
+    key: group.group_slug,
+    name: group.name,
+    intro: group.intro,
+    articles: articles.filter((article) => article.group_slug === group.group_slug),
+  }));
+  const known = new Set(groups.map((group) => group.group_slug));
+  const ungrouped = articles.filter((article) => !article.group_slug || !known.has(article.group_slug));
+  if (ungrouped.length > 0) {
+    sections.push({ key: "more", name: sections.length > 0 ? "More" : null, intro: null, articles: ungrouped });
+  }
+  return sections.filter((section) => section.articles.length > 0);
+}
+
+function ArticleList({ categorySlug, articles }: { categorySlug: string; articles: WebsiteResource[] }) {
+  return (
+    <ul className="max-w-3xl divide-y divide-[#3B5147]/12 border-y border-[#3B5147]/12">
+      {articles.map((article) => (
+        <li key={article.slug}>
+          <Link
+            to={`/resources/${categorySlug}/${article.slug}`}
+            className="group flex min-h-14 items-center justify-between gap-4 py-5 text-lg font-bold text-[#111814] transition hover:text-[#3B5147] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2"
+          >
+            <span>{article.title}</span>
+            <ArrowRight
+              className="h-5 w-5 shrink-0 text-[#3B5147] transition-transform group-hover:translate-x-0.5 motion-reduce:transform-none motion-reduce:transition-none"
+              aria-hidden="true"
+            />
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 type ResourceCategoryProps = {
   categorySlug?: string;
@@ -35,6 +82,7 @@ export default function ResourceCategory({
   const { data: category, isPending, isError } = usePublishedCategory(categorySlug);
   const { data: articles, isPending: articlesPending } =
     usePublishedCategoryArticles(categorySlug);
+  const { data: groups } = useCategoryGroups(categorySlug);
 
   if (!categorySlug) return <NotFound />;
   if (isPending) return <CategoryStatus message="Loading resources…" />;
@@ -47,6 +95,11 @@ export default function ResourceCategory({
 
   const path = `/resources/${category.slug}`;
   const list = articles ?? [];
+  const sections = sectionArticles(list, groups ?? []);
+  const forTherapists = list.length > 0 && list.filter((a) => a.cta === "join_network").length > list.length / 2;
+  const primaryCta = forTherapists
+    ? { label: "Work With ValorWell", to: "/clinicians" }
+    : { label: "Find Care", to: "/get-care" };
 
   return (
     <Layout>
@@ -94,22 +147,19 @@ export default function ResourceCategory({
                 the rest of the resource library.
               </p>
             ) : (
-              <ul className="max-w-3xl divide-y divide-[#3B5147]/12 border-y border-[#3B5147]/12">
-                {list.map((article) => (
-                  <li key={article.slug}>
-                    <Link
-                      to={`/resources/${category.slug}/${article.slug}`}
-                      className="group flex min-h-14 items-center justify-between gap-4 py-5 text-lg font-bold text-[#111814] transition hover:text-[#3B5147] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5147] focus-visible:ring-offset-2"
-                    >
-                      <span>{article.title}</span>
-                      <ArrowRight
-                        className="h-5 w-5 shrink-0 text-[#3B5147] transition-transform group-hover:translate-x-0.5 motion-reduce:transform-none motion-reduce:transition-none"
-                        aria-hidden="true"
-                      />
-                    </Link>
-                  </li>
+              <div className="space-y-12">
+                {sections.map((section) => (
+                  <div key={section.key} id={section.name ? section.key : undefined}>
+                    {section.name ? (
+                      <h3 className="mb-2 text-xl font-bold text-[#3B5147] md:text-2xl">{section.name}</h3>
+                    ) : null}
+                    {section.intro ? (
+                      <p className="mb-4 max-w-3xl leading-7 text-[#111814]/68">{section.intro}</p>
+                    ) : null}
+                    <ArticleList categorySlug={category.slug} articles={section.articles} />
+                  </div>
                 ))}
-              </ul>
+              </div>
             )}
           </div>
         </section>
@@ -117,10 +167,10 @@ export default function ResourceCategory({
         <section className="bg-[#F4F1E8] py-12 md:py-16">
           <div className="container-narrow flex flex-wrap gap-3">
             <Link
-              to="/get-care"
+              to={primaryCta.to}
               className="inline-flex min-h-12 items-center gap-2 rounded-md bg-[#3B5147] px-6 py-3 text-sm font-bold text-white"
             >
-              Find Care
+              {primaryCta.label}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
             <Link

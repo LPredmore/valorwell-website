@@ -117,7 +117,7 @@ export default function VACommunityCareMentalHealth() {
       ]}
       related={[
         { name: "Veteran Mental Health Care", href: "/veteran-mental-health-care", body: "See the broader ValorWell care approach for veterans." },
-        { name: "Clinical Documentation Resources", href: "/resources/documentation", body: "Understand treatment records, functional impact, and documentation boundaries." },
+        { name: "Veteran Mental Health Resources", href: "/resources/veteran-mental-health", body: "Supporting a Veteran who is struggling, and changing VA mental health providers." },
         { name: "VA Community Care Resources", href: "/resources/va-community-care", body: "Use the practical resource category for referrals, authorization, and records to keep." },
       ]}
       finalCTAs={[

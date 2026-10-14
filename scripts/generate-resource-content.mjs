@@ -29,8 +29,17 @@ endpoint.searchParams.set(
     "topic_aliases",
     "status",
     "published_at",
+    "public_updated_at",
     "resource_kind",
     "category_slug",
+    "sort_order",
+    "quick_answer",
+    "in_practice_markdown",
+    "reviewed_by",
+    "last_reviewed_on",
+    "cta",
+    "group_slug",
+    "id",
   ].join(","),
 );
 endpoint.searchParams.set("tenant_id", `eq.${TENANT_ID}`);
@@ -56,6 +65,34 @@ const rows = await response.json();
 if (!Array.isArray(rows)) {
   throw new Error("Billing Hub returned an invalid website_resources_public payload.");
 }
+
+async function fetchTable(table, select, order) {
+  const url = new URL(`/rest/v1/${table}`, supabaseUrl);
+  url.searchParams.set("select", select);
+  url.searchParams.set("tenant_id", `eq.${TENANT_ID}`);
+  if (order) url.searchParams.set("order", order);
+  const result = await fetch(url, {
+    headers: {
+      apikey: publishableKey,
+      Authorization: `Bearer ${publishableKey}`,
+      Accept: "application/json",
+    },
+  });
+  if (!result.ok) {
+    const body = await result.text();
+    throw new Error(`Could not read ${table} from Billing Hub (${result.status}): ${body.slice(0, 300)}`);
+  }
+  const data = await result.json();
+  if (!Array.isArray(data)) throw new Error(`Billing Hub returned an invalid ${table} payload.`);
+  return data;
+}
+
+const [groupRows, sourceRows, relationRows, redirectRows] = await Promise.all([
+  fetchTable("website_resource_groups", "category_slug,group_slug,name,display_order,intro", "category_slug.asc,display_order.asc"),
+  fetchTable("website_resource_sources", "resource_id,title,url,organization,display_order", "resource_id.asc,display_order.asc"),
+  fetchTable("website_resource_relations", "resource_id,related_resource_id,relation_type,display_order", "resource_id.asc,display_order.asc"),
+  fetchTable("website_resource_redirects", "from_path,to_path", "from_path.asc"),
+]);
 
 function requireString(row, field) {
   if (typeof row[field] !== "string" || !row[field].trim()) {
@@ -133,9 +170,34 @@ if (uniqueRoutePaths.size !== routePaths.length) {
   throw new Error("Published website resources contain duplicate public routes.");
 }
 
-const tsHeader = `// Generated from public.website_resources_public. Do not edit by hand.\n// scripts/generate-resource-content.mjs refreshes this file before production builds.\n\nexport type GeneratedWebsiteResource = {\n  slug: string;\n  title: string;\n  primary_question: string;\n  summary: string;\n  body_markdown: string;\n  faq: unknown[];\n  audience_tags: string[];\n  topic_aliases: string[];\n  source_urls?: string[];\n  coverage_status?: \"partial\" | \"complete\" | \"needs_review\";\n  status: \"published\";\n  live_url?: string | null;\n  last_researched_at?: string | null;\n  published_at: string | null;\n  resource_kind: "category" | "article";\n  category_slug: string | null;\n};\n\n`;
+const keyById = new Map(
+  rows
+    .filter((row) => row.resource_kind === "article")
+    .map((row) => [row.id, `${row.category_slug}/${row.slug}`]),
+);
+for (const row of rows) {
+  row.sources = sourceRows
+    .filter((source) => source.resource_id === row.id)
+    .map(({ title, url, organization }) => ({ title, url, organization }));
+  row.related = relationRows
+    .filter((relation) => relation.resource_id === row.id && relation.relation_type === "related")
+    .flatMap((relation) => (keyById.has(relation.related_resource_id) ? [keyById.get(relation.related_resource_id)] : []));
+}
 
-const resourceModule = `${tsHeader}export const generatedWebsiteResources: GeneratedWebsiteResource[] = ${JSON.stringify(rows, null, 2)};\n`;
+const canonicalResourcePaths = new Set(routePaths);
+const resourceRedirects = redirectRows.map((redirect) => ({ from: redirect.from_path, to: redirect.to_path }));
+for (const redirect of resourceRedirects) {
+  if (canonicalResourcePaths.has(redirect.from)) {
+    throw new Error(`Resource redirect ${redirect.from} is also a published page.`);
+  }
+  if (redirect.to !== "/resources" && !canonicalResourcePaths.has(redirect.to)) {
+    throw new Error(`Resource redirect ${redirect.from} points at ${redirect.to}, which is not published.`);
+  }
+}
+
+const tsHeader = `// Generated from public.website_resources_public. Do not edit by hand.\n// scripts/generate-resource-content.mjs refreshes this file before production builds.\n\nexport type GeneratedWebsiteResource = {\n  slug: string;\n  title: string;\n  primary_question: string;\n  summary: string;\n  body_markdown: string;\n  faq: unknown[];\n  audience_tags: string[];\n  topic_aliases: string[];\n  source_urls?: string[];\n  coverage_status?: \"partial\" | \"complete\" | \"needs_review\";\n  status: \"published\";\n  live_url?: string | null;\n  last_researched_at?: string | null;\n  published_at: string | null;\n  public_updated_at?: string | null;\n  resource_kind: "category" | "article";\n  category_slug: string | null;\n  sort_order?: number;\n  quick_answer?: string | null;\n  in_practice_markdown?: string | null;\n  reviewed_by?: string;\n  last_reviewed_on?: string | null;\n  cta?: "find_care" | "join_network" | "support_foundation";\n  group_slug?: string | null;\n  id?: string;\n  sources?: { title: string; url: string; organization: string | null }[];\n  related?: string[];\n};\n\nexport type GeneratedResourceGroup = {\n  category_slug: string;\n  group_slug: string;\n  name: string;\n  display_order: number;\n  intro: string | null;\n};\n\n`;
+
+const resourceModule = `${tsHeader}export const generatedWebsiteResources: GeneratedWebsiteResource[] = ${JSON.stringify(rows, null, 2)};\n\nexport const generatedResourceGroups: GeneratedResourceGroup[] = ${JSON.stringify(groupRows, null, 2)};\n`;
 const routeRows = rows.map((row) => ({
   path:
     row.resource_kind === "article"
@@ -148,7 +210,7 @@ const routeRows = rows.map((row) => ({
   indexable: true,
   sitemap: true,
 }));
-const routeModule = `// Generated from public.website_resources_public. Do not edit by hand.\n// scripts/generate-resource-content.mjs refreshes this file before production builds.\n\nexport const generatedResourceRoutes = ${JSON.stringify(routeRows, null, 2)};\n`;
+const routeModule = `// Generated from public.website_resources_public. Do not edit by hand.\n// scripts/generate-resource-content.mjs refreshes this file before production builds.\n\nexport const generatedResourceRoutes = ${JSON.stringify(routeRows, null, 2)};\n\nexport const generatedResourceRedirects = ${JSON.stringify(resourceRedirects, null, 2)};\n`;
 
 const resourceOutput = path.join(ROOT, "src", "generated", "websiteResources.ts");
 const routeOutput = path.join(ROOT, "route-contract", "generated-resource-routes.mjs");
@@ -156,4 +218,6 @@ fs.mkdirSync(path.dirname(resourceOutput), { recursive: true });
 fs.writeFileSync(resourceOutput, resourceModule, "utf8");
 fs.writeFileSync(routeOutput, routeModule, "utf8");
 
-console.log(`Generated ${rows.length} published website resources from Billing Hub public projection.`);
+console.log(
+  `Generated ${rows.length} published website resources, ${groupRows.length} topic groups, and ${resourceRedirects.length} resource redirects from Billing Hub.`,
+);

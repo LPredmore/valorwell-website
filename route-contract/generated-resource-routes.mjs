@@ -1344,3 +1344,5 @@ export const generatedResourceRoutes = [
     "sitemap": true
   }
 ];
+
+export const generatedResourceRedirects = [];

@@ -1,6 +1,7 @@
 import { routes as coreRoutes } from "./route-contract/core-routes.mjs";
 import { routes as resourceRoutes } from "./route-contract/resource-routes.mjs";
 import { routes as communityRoutes } from "./route-contract/community-routes.mjs";
+import { generatedResourceRedirects } from "./route-contract/generated-resource-routes.mjs";
 
 export const SITE_URL = "https://valorwell.org";
 
@@ -10,7 +11,7 @@ export const canonicalRoutes = [
   ...communityRoutes,
 ];
 
-export const redirects = [
+const staticRedirects = [
   {
     "from": "/videos",
     "to": "/network"
@@ -123,6 +124,22 @@ export const redirects = [
     "from": "/authority/family-systems",
     "to": "/family-systems"
   }
+];
+
+// Retired resource pages and empty topics redirect to the page the resources
+// sheet names. A hand-written redirect that pointed at a retired resource page
+// follows it to the new destination so no redirect lands on another redirect.
+const resourceRedirectTargets = new Map(
+  generatedResourceRedirects.map((redirect) => [redirect.from, redirect.to]),
+);
+const staticRedirectSources = new Set(staticRedirects.map((redirect) => redirect.from));
+
+export const redirects = [
+  ...staticRedirects.map((redirect) => ({
+    from: redirect.from,
+    to: resourceRedirectTargets.get(redirect.to) ?? redirect.to,
+  })),
+  ...generatedResourceRedirects.filter((redirect) => !staticRedirectSources.has(redirect.from)),
 ];
 
 export const retiredRoutes = ["/becomeapatient"];

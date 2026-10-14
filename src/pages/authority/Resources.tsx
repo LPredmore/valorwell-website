@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import {
   ArrowRight,
   BookOpen,
+  Briefcase,
   ClipboardCheck,
   HeartPulse,
   ShieldCheck,
@@ -28,6 +29,8 @@ const iconBySlug: Record<string, LucideIcon> = {
   documentation: ClipboardCheck,
   "veteran-mental-health": Stethoscope,
   "family-systems": Users,
+  "military-health-benefits": ShieldCheck,
+  "for-therapists": Briefcase,
 };
 
 

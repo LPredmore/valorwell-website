@@ -15,7 +15,7 @@ export default function MilitaryFamilyTherapy() {
       subhead="ValorWell helps families work through communication, stress, conflict, transition, trauma-related strain, and the real-life impact of military-connected mental health challenges when an appropriate care path is available."
       heroCTAs={[
         { label: "Find Care", to: "/get-care" },
-        { label: "Family Systems Resources", to: "/resources/family-systems", variant: "secondary" },
+        { label: "Family Resources", to: "/resources", variant: "secondary" },
       ]}
       sections={[
         {
@@ -86,12 +86,12 @@ export default function MilitaryFamilyTherapy() {
       ]}
       related={[
         { name: "Family Systems", href: "/family-systems", body: "Understand the educational systems-over-reactions framework." },
-        { name: "Family Systems Resources", href: "/resources/family-systems", body: "Practical communication, regulation, conflict-repair, and household frameworks." },
+        { name: "Veteran Mental Health Resources", href: "/resources/veteran-mental-health", body: "Supporting a Veteran who is struggling, and what to do when a provider isn't a fit." },
         { name: "Veteran Mental Health Care", href: "/veteran-mental-health-care", body: "See the broader ValorWell mental-health care approach for veterans." },
       ]}
       finalCTAs={[
         { label: "Ask About Family Support", to: "/get-care" },
-        { label: "Explore Family Systems Resources", to: "/resources/family-systems", variant: "secondary" },
+        { label: "Explore Family Resources", to: "/resources", variant: "secondary" },
       ]}
       finalNote={CRISIS_NOTE}
     />

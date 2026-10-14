@@ -53,9 +53,9 @@ const representativeBodyContent = new Map([
     "/resources",
     [
       "Practical guidance for navigating care, coverage, documentation, and family systems.",
-      "Clinical Documentation",
+      "CHAMPVA",
+      "VA Community Care",
       "Veteran Mental Health",
-      "Family Systems",
     ],
   ],
   [

@@ -26872,6 +26872,66 @@ export type Database = {
         }
         Relationships: []
       }
+      website_resource_groups: {
+        Row: {
+          category_slug: string
+          created_at: string
+          display_order: number
+          group_slug: string
+          intro: string | null
+          name: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          category_slug: string
+          created_at?: string
+          display_order?: number
+          group_slug: string
+          intro?: string | null
+          name: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Update: {
+          category_slug?: string
+          created_at?: string
+          display_order?: number
+          group_slug?: string
+          intro?: string | null
+          name?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      website_resource_redirects: {
+        Row: {
+          created_at: string
+          from_path: string
+          reason: string | null
+          tenant_id: string
+          to_path: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          from_path: string
+          reason?: string | null
+          tenant_id?: string
+          to_path: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          from_path?: string
+          reason?: string | null
+          tenant_id?: string
+          to_path?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       website_resource_relations: {
         Row: {
           created_at: string
@@ -27003,16 +27063,24 @@ export type Database = {
           content_schema_version: number
           coverage_status: string
           created_at: string
+          cta: string
           editorial_type: string
           faq: Json
           featured: boolean
+          group_slug: string | null
           id: string
+          import_content_hash: string | null
+          import_synced_at: string | null
+          in_practice_markdown: string | null
           last_researched_at: string | null
+          last_reviewed_on: string | null
           live_url: string | null
           primary_question: string
           public_updated_at: string | null
           published_at: string | null
+          quick_answer: string | null
           resource_kind: string
+          reviewed_by: string
           seo_description: string | null
           seo_title: string | null
           slug: string
@@ -27033,16 +27101,24 @@ export type Database = {
           content_schema_version?: number
           coverage_status?: string
           created_at?: string
+          cta?: string
           editorial_type?: string
           faq?: Json
           featured?: boolean
+          group_slug?: string | null
           id?: string
+          import_content_hash?: string | null
+          import_synced_at?: string | null
+          in_practice_markdown?: string | null
           last_researched_at?: string | null
+          last_reviewed_on?: string | null
           live_url?: string | null
           primary_question: string
           public_updated_at?: string | null
           published_at?: string | null
+          quick_answer?: string | null
           resource_kind?: string
+          reviewed_by?: string
           seo_description?: string | null
           seo_title?: string | null
           slug: string
@@ -27063,16 +27139,24 @@ export type Database = {
           content_schema_version?: number
           coverage_status?: string
           created_at?: string
+          cta?: string
           editorial_type?: string
           faq?: Json
           featured?: boolean
+          group_slug?: string | null
           id?: string
+          import_content_hash?: string | null
+          import_synced_at?: string | null
+          in_practice_markdown?: string | null
           last_researched_at?: string | null
+          last_reviewed_on?: string | null
           live_url?: string | null
           primary_question?: string
           public_updated_at?: string | null
           published_at?: string | null
+          quick_answer?: string | null
           resource_kind?: string
+          reviewed_by?: string
           seo_description?: string | null
           seo_title?: string | null
           slug?: string
@@ -28583,14 +28667,20 @@ export type Database = {
           body_markdown: string | null
           category_slug: string | null
           content_schema_version: number | null
+          cta: string | null
           editorial_type: string | null
           faq: Json | null
           featured: boolean | null
+          group_slug: string | null
           id: string | null
+          in_practice_markdown: string | null
+          last_reviewed_on: string | null
           primary_question: string | null
           public_updated_at: string | null
           published_at: string | null
+          quick_answer: string | null
           resource_kind: string | null
+          reviewed_by: string | null
           seo_description: string | null
           seo_title: string | null
           slug: string | null
@@ -28606,14 +28696,20 @@ export type Database = {
           body_markdown?: string | null
           category_slug?: string | null
           content_schema_version?: number | null
+          cta?: string | null
           editorial_type?: string | null
           faq?: Json | null
           featured?: boolean | null
+          group_slug?: string | null
           id?: string | null
+          in_practice_markdown?: string | null
+          last_reviewed_on?: string | null
           primary_question?: string | null
           public_updated_at?: string | null
           published_at?: string | null
+          quick_answer?: string | null
           resource_kind?: string | null
+          reviewed_by?: string | null
           seo_description?: string | null
           seo_title?: string | null
           slug?: string | null
@@ -28629,14 +28725,20 @@ export type Database = {
           body_markdown?: string | null
           category_slug?: string | null
           content_schema_version?: number | null
+          cta?: string | null
           editorial_type?: string | null
           faq?: Json | null
           featured?: boolean | null
+          group_slug?: string | null
           id?: string | null
+          in_practice_markdown?: string | null
+          last_reviewed_on?: string | null
           primary_question?: string | null
           public_updated_at?: string | null
           published_at?: string | null
+          quick_answer?: string | null
           resource_kind?: string | null
+          reviewed_by?: string | null
           seo_description?: string | null
           seo_title?: string | null
           slug?: string | null
@@ -30510,6 +30612,10 @@ export type Database = {
         Args: { p_newsletter_id: string; p_reason: string }
         Returns: Json
       }
+      crm_bulk_move_manual_pipeline_records: {
+        Args: { p_items: Json; p_to_stage_id: string }
+        Returns: number
+      }
       crm_bulk_update_client_status: {
         Args: {
           p_actor_profile_id: string
@@ -30782,6 +30888,79 @@ export type Database = {
         Args: { p_newsletter_id: string }
         Returns: Json
       }
+      crm_find_manual_pipeline_records: {
+        Args: {
+          p_after_id?: string
+          p_attention?: string
+          p_owner_filter?: string
+          p_page_size?: number
+          p_pipeline_id: string
+          p_search?: string
+          p_stage_id?: string
+          p_tenant_id: string
+        }
+        Returns: {
+          associated_organization_id: string | null
+          contact_id: string | null
+          created_at: string
+          field_values: Json
+          id: string
+          next_action: string | null
+          next_action_due_at: string | null
+          organization_id: string | null
+          owner_profile_id: string | null
+          pipeline_id: string
+          source_record_id: string | null
+          source_record_type: string | null
+          stage_id: string
+          tenant_id: string
+          updated_at: string
+          version: number
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "crm_pipeline_records"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      crm_find_manual_pipeline_records_sorted: {
+        Args: {
+          p_after_id?: string
+          p_attention?: string
+          p_owner_filter?: string
+          p_page_size?: number
+          p_pipeline_id: string
+          p_search?: string
+          p_sort_key?: string
+          p_stage_id?: string
+          p_tenant_id: string
+        }
+        Returns: {
+          associated_organization_id: string | null
+          contact_id: string | null
+          created_at: string
+          field_values: Json
+          id: string
+          next_action: string | null
+          next_action_due_at: string | null
+          organization_id: string | null
+          owner_profile_id: string | null
+          pipeline_id: string
+          source_record_id: string | null
+          source_record_type: string | null
+          stage_id: string
+          tenant_id: string
+          updated_at: string
+          version: number
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "crm_pipeline_records"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       crm_get_newsletter: { Args: { p_newsletter_id: string }; Returns: Json }
       crm_get_newsletter_runtime: { Args: never; Returns: Json }
       crm_has_role:
@@ -30830,6 +31009,16 @@ export type Database = {
           p_tenant_id: string
         }
         Returns: Json
+      }
+      crm_manual_pipeline_metrics: {
+        Args: { p_pipeline_id: string; p_tenant_id: string }
+        Returns: {
+          missing_action_count: number
+          overdue_count: number
+          record_count: number
+          stage_id: string
+          unassigned_count: number
+        }[]
       }
       crm_mark_enrollment_responded: {
         Args: {
@@ -32354,6 +32543,10 @@ export type Database = {
           p_worker_version?: string
         }
         Returns: boolean
+      }
+      import_website_resources: {
+        Args: { p_dry_run?: boolean; p_payload: Json }
+        Returns: Json
       }
       ingest_relationship_calendar_event: {
         Args: {

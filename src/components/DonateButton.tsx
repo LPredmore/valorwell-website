@@ -10,9 +10,10 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { trackDonationCheckoutStart } from "@/lib/tracking";
+import { getDonationAcquisition } from "@/lib/donationAttribution";
+import { createZeffyDonationFormUrl, ZEFFY_DONATION_FORM_URL } from "@/lib/zeffyDonationUrl";
 
-export const ZEFFY_DONATION_FORM_URL =
-  "https://www.zeffy.com/embed/donation-form/the-valorwell-bridge-fund?modal=true";
+export { ZEFFY_DONATION_FORM_URL } from "@/lib/zeffyDonationUrl";
 
 type Variant = "solid" | "outline" | "link";
 type Size = "sm" | "md" | "lg";
@@ -50,9 +51,12 @@ export function DonateButton({
 }: DonateButtonProps) {
   const [handoffId] = useState(() => crypto.randomUUID());
   const [open, setOpen] = useState(false);
+  const [formUrl, setFormUrl] = useState(ZEFFY_DONATION_FORM_URL);
 
   const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
+    // CTA placement remains analytics metadata, not the acquisition source.
+    setFormUrl(createZeffyDonationFormUrl(getDonationAcquisition()?.utm_source));
     trackDonationCheckoutStart(handoffId, {
       source,
       medium: utmMedium,
@@ -83,7 +87,7 @@ export function DonateButton({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <a
-          href={ZEFFY_DONATION_FORM_URL}
+          href={formUrl}
           data-donate-source={source}
           data-donate-medium={utmMedium}
           data-donate-campaign={utmCampaign}
@@ -105,7 +109,7 @@ export function DonateButton({
         </div>
         <iframe
           title="ValorWell Foundation Bridge Fund donation form"
-          src={ZEFFY_DONATION_FORM_URL}
+          src={formUrl}
           className="min-h-0 flex-1 border-0 bg-white"
           allow="payment *"
           referrerPolicy="strict-origin-when-cross-origin"

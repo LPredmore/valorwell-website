@@ -1,9 +1,10 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { DonateButton, ZEFFY_DONATION_FORM_URL } from "./DonateButton";
+import { captureDonationAcquisition, clearDonationAcquisitionForTests } from "@/lib/donationAttribution";
 
 describe("DonateButton", () => {
-  afterEach(cleanup);
+  afterEach(() => { cleanup(); clearDonationAcquisitionForTests(); });
 
   it("keeps a real donation link while enhancing it into an on-site modal", () => {
     render(
@@ -48,5 +49,16 @@ describe("DonateButton", () => {
       "the-valorwell-bridge-fund",
     );
     expect(link.getAttribute("data-donate-content")).toBe("campaign-card");
+  });
+
+  it("passes a documented acquisition source without replacing it with CTA placement", () => {
+    captureDonationAcquisition("?utm_source=google&gclid=private-click", "/", "");
+    render(<DonateButton source="impact-test">Donate with source</DonateButton>);
+    fireEvent.click(screen.getByRole("link", { name: "Donate with source" }));
+    const frame = screen.getByTitle("ValorWell Foundation Bridge Fund donation form");
+    const url = new URL(frame.getAttribute("src")!);
+    expect(url.searchParams.get("UTM_source")).toBe("google");
+    expect(url.searchParams.has("gclid")).toBe(false);
+    expect(url.toString()).not.toContain("impact-test");
   });
 });

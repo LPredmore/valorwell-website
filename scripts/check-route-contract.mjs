@@ -114,7 +114,7 @@ const progressiveEnhancementContent = new Map([
   [
     "/foundation",
     [
-      'href="https://www.zeffy.com/embed/donation-form/the-valorwell-bridge-fund?modal=true"',
+      'href="https://www.zeffy.com/embed/donation-form/the-valorwell-bridge-fund?modal=true',
       "Donate to the Foundation",
       'href="/impact"',
     ],
@@ -126,7 +126,7 @@ const progressiveEnhancementContent = new Map([
       "Donor → Foundation → therapist → veteran.",
       "Real Veterans. Real Impact.",
       "For years, I was just a name on a VA waiting list.",
-      'href="https://www.zeffy.com/embed/donation-form/the-valorwell-bridge-fund?modal=true"',
+      'href="https://www.zeffy.com/embed/donation-form/the-valorwell-bridge-fund?modal=true',
     ],
   ],
   [
@@ -143,7 +143,7 @@ const progressiveEnhancementContent = new Map([
   [
     "/donate",
     [
-      'href="https://www.zeffy.com/embed/donation-form/the-valorwell-bridge-fund?modal=true"',
+      'href="https://www.zeffy.com/embed/donation-form/the-valorwell-bridge-fund?modal=true',
       "Fund a Session",
     ],
   ],

@@ -23,9 +23,10 @@ const expectations = [
     canonical: "https://valorwell.org/resources",
     body: [
       "Practical guidance for navigating care, coverage, documentation, and family systems.",
-      "Clinical Documentation",
-      "Veteran Mental Health",
-      "Family Systems",
+      "CHAMPVA Resources",
+      "Veteran Mental Health Resources",
+      "VA Community Care Resources",
+      "Military Health Benefits Resources",
     ],
   },
   {

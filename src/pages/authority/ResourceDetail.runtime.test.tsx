@@ -35,6 +35,8 @@ const base = {
   published_at: null,
 };
 
+// Use a synthetic runtime topic that does not collide with an intentional
+// legacy redirect from the generated production resource route contract.
 const rows: (Row & Record<string, unknown>)[] = [
   {
     ...base,
@@ -84,7 +86,7 @@ const rows: (Row & Record<string, unknown>)[] = [
   },
   {
     ...base,
-    slug: "family-systems",
+    slug: "fixture-family-systems",
     title: "Family Systems Resources",
     summary: "Shared frameworks families can use repeatedly.",
     body_markdown: "## Category body\n\nCategory body text that must not appear as an article.",
@@ -114,7 +116,7 @@ const rows: (Row & Record<string, unknown>)[] = [
     source_urls: ["https://www.va.gov/example-source"],
     last_researched_at: "2026-09-16T00:00:00Z",
     resource_kind: "article",
-    category_slug: "family-systems",
+    category_slug: "fixture-family-systems",
   },
   {
     ...base,
@@ -125,7 +127,7 @@ const rows: (Row & Record<string, unknown>)[] = [
     source_urls: [],
     last_researched_at: null,
     resource_kind: "article",
-    category_slug: "family-systems",
+    category_slug: "fixture-family-systems",
   },
 ];
 
@@ -195,7 +197,7 @@ describe("runtime resource routing", () => {
   afterEach(cleanup);
 
   it("renders a category index listing its article titles", async () => {
-    renderAt("/resources/family-systems");
+    renderAt("/resources/fixture-family-systems");
 
     await waitFor(() =>
       expect(
@@ -210,7 +212,7 @@ describe("runtime resource routing", () => {
         }),
       ).toHaveAttribute(
         "href",
-        "/resources/family-systems/military-separation-limited-communication",
+        "/resources/fixture-family-systems/military-separation-limited-communication",
       ),
     );
 
@@ -229,7 +231,7 @@ describe("runtime resource routing", () => {
   });
 
   it("renders an article without public research metadata", async () => {
-    renderAt("/resources/family-systems/military-separation-limited-communication");
+    renderAt("/resources/fixture-family-systems/military-separation-limited-communication");
 
     await waitFor(() =>
       expect(
@@ -267,7 +269,7 @@ describe("runtime resource routing", () => {
   });
 
   it("renders a future published article slug with no hardcoded route", async () => {
-    renderAt("/resources/family-systems/a-future-article");
+    renderAt("/resources/fixture-family-systems/a-future-article");
 
     await waitFor(() =>
       expect(
@@ -277,7 +279,7 @@ describe("runtime resource routing", () => {
   });
 
   it("renders NotFound for unknown or draft slugs", async () => {
-    renderAt("/resources/family-systems/not-a-real-article");
+    renderAt("/resources/fixture-family-systems/not-a-real-article");
     await waitFor(() => expect(screen.getByText("Page not found")).toBeInTheDocument());
     cleanup();
 
@@ -327,7 +329,7 @@ describe("runtime resource routing", () => {
     const startHere = screen.getByRole("heading", { level: 3, name: "Start Here" });
     const telehealth = screen.getByRole("heading", { level: 3, name: "Telehealth Practice" });
     expect(startHere.compareDocumentPosition(telehealth) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(screen.getByText("Read these first.")).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText("Read these first.")).toBeInTheDocument());
     expect(screen.getByRole("link", { name: /Work With ValorWell/ })).toHaveAttribute("href", "/clinicians");
   });
 });

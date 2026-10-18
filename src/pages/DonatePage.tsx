@@ -52,18 +52,6 @@ export default function DonatePage() {
       />
 
       <div className="donate-theme bg-[#F4F1E8] text-[#111814]">
-        <style>{`
-          .donate-theme {
-            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-          }
-          .donate-theme h1,
-          .donate-theme h2,
-          .donate-theme h3,
-          .donate-theme h4 {
-            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-            letter-spacing: -0.025em;
-          }
-        `}</style>
 
         <section className="relative overflow-hidden border-b border-[#3B5147]/15 bg-[#F4F1E8]">
           <div className="pointer-events-none absolute inset-0" aria-hidden="true">

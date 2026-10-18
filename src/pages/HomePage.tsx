@@ -283,14 +283,6 @@ export default function HomePage() {
       <OrganizationSchema />
 
       <div className="home-theme bg-[#F4F1E8] text-[#111814]">
-        <style>{`
-          .home-theme,
-          .home-theme h1,
-          .home-theme h2,
-          .home-theme h3 {
-            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-          }
-        `}</style>
 
         <section className="border-b border-[#3B5147]/15 bg-[#F4F1E8]">
           <div className="container-wide grid items-center gap-10 py-12 md:py-16 lg:grid-cols-12 lg:gap-14 lg:py-20">

@@ -82,17 +82,6 @@ export default function AboutPage() {
       />
 
       <div className="about-theme bg-[#F4F1E8] text-[#111814]">
-        <style>{`
-          .about-theme {
-            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-          }
-          .about-theme h1,
-          .about-theme h2,
-          .about-theme h3 {
-            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-            letter-spacing: -0.025em;
-          }
-        `}</style>
 
         <section className="border-b border-[#3B5147]/15 bg-[#F4F1E8]">
           <div className="container-wide py-20 md:py-28 lg:py-32">

@@ -58,14 +58,6 @@ export default function HowItWorksPage() {
       />
 
       <div className="how-it-works-theme bg-[#F4F1E8] text-[#111814]">
-        <style>{`
-          .how-it-works-theme,
-          .how-it-works-theme h1,
-          .how-it-works-theme h2,
-          .how-it-works-theme h3 {
-            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-          }
-        `}</style>
 
         <section className="border-b border-[#3B5147]/15">
           <div className="container-wide py-16 md:py-24 lg:py-28">

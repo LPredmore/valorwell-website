@@ -95,17 +95,6 @@ export default function Contact() {
       />
 
       <div className="contact-theme bg-[#F4F1E8] text-[#111814]">
-        <style>{`
-          .contact-theme {
-            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-          }
-          .contact-theme h1,
-          .contact-theme h2,
-          .contact-theme h3 {
-            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-            letter-spacing: -0.025em;
-          }
-        `}</style>
 
         <section className="relative overflow-hidden border-b border-[#3B5147]/15">
           <div className="pointer-events-none absolute inset-0" aria-hidden="true">

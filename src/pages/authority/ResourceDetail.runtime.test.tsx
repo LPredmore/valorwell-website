@@ -35,7 +35,9 @@ const base = {
   published_at: null,
 };
 
-// Use a synthetic runtime topic that does not collide with an intentional\n// legacy redirect from the generated production resource route contract.\nconst rows: (Row & Record<string, unknown>)[] = [
+// Use a synthetic runtime topic that does not collide with an intentional
+// legacy redirect from the generated production resource route contract.
+const rows: (Row & Record<string, unknown>)[] = [
   {
     ...base,
     slug: "for-therapists",

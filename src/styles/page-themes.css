@@ -1,0 +1,120 @@
+/* src/pages/AboutPage.tsx */
+.about-theme {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+          }
+          .about-theme h1,
+          .about-theme h2,
+          .about-theme h3 {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+            letter-spacing: -0.025em;
+          }
+
+/* src/pages/authority/Resources.tsx */
+.resources-theme {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+          }
+          .resources-theme h1,
+          .resources-theme h2,
+          .resources-theme h3 {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+            letter-spacing: -0.025em;
+          }
+
+/* src/pages/BeyondTheYellowPage.tsx */
+.bty-theme {
+              font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+            }
+            .bty-theme h1,
+            .bty-theme h2,
+            .bty-theme h3,
+            .bty-theme h4 {
+              font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+              letter-spacing: -0.025em;
+            }
+
+/* src/pages/Contact.tsx */
+.contact-theme {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+          }
+          .contact-theme h1,
+          .contact-theme h2,
+          .contact-theme h3 {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+            letter-spacing: -0.025em;
+          }
+
+/* src/pages/DonatePage.tsx */
+.donate-theme {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+          }
+          .donate-theme h1,
+          .donate-theme h2,
+          .donate-theme h3,
+          .donate-theme h4 {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+            letter-spacing: -0.025em;
+          }
+
+/* src/pages/FoundationPage.tsx */
+.foundation-theme {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+          }
+          .foundation-theme h1,
+          .foundation-theme h2,
+          .foundation-theme h3,
+          .foundation-theme h4 {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+            letter-spacing: -0.03em;
+          }
+
+/* src/pages/HomePage.tsx */
+.home-theme,
+          .home-theme h1,
+          .home-theme h2,
+          .home-theme h3 {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+          }
+
+/* src/pages/HowItWorksPage.tsx */
+.how-it-works-theme,
+          .how-it-works-theme h1,
+          .how-it-works-theme h2,
+          .how-it-works-theme h3 {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+          }
+
+/* src/pages/ImpactPage.tsx */
+.impact-theme {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+          }
+          .impact-theme h1,
+          .impact-theme h2,
+          .impact-theme h3,
+          .impact-theme h4 {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+            letter-spacing: -0.025em;
+          }
+
+/* src/pages/MissionPage.tsx */
+.mission-theme {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+          }
+          .mission-theme h1,
+          .mission-theme h2,
+          .mission-theme h3,
+          .mission-theme h4 {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+            letter-spacing: -0.025em;
+          }
+
+/* src/pages/Partner.tsx */
+.partner-theme {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+          }
+          .partner-theme h1,
+          .partner-theme h2,
+          .partner-theme h3,
+          .partner-theme h4 {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+            letter-spacing: -0.025em;
+          }

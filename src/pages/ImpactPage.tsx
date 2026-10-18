@@ -66,18 +66,6 @@ export default function ImpactPage() {
       />
 
       <div className="impact-theme bg-[#F4F1E8] text-[#111814]">
-        <style>{`
-          .impact-theme {
-            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-          }
-          .impact-theme h1,
-          .impact-theme h2,
-          .impact-theme h3,
-          .impact-theme h4 {
-            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-            letter-spacing: -0.025em;
-          }
-        `}</style>
 
         <section className="relative overflow-hidden border-b border-[#3B5147]/15 bg-[#F4F1E8]">
           <div className="pointer-events-none absolute inset-0" aria-hidden="true">

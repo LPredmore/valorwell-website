@@ -59,18 +59,6 @@ export default function MissionPage() {
       />
 
       <div className="mission-theme bg-[#F4F1E8] text-[#111814]">
-        <style>{`
-          .mission-theme {
-            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-          }
-          .mission-theme h1,
-          .mission-theme h2,
-          .mission-theme h3,
-          .mission-theme h4 {
-            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-            letter-spacing: -0.025em;
-          }
-        `}</style>
 
         <section className="relative overflow-hidden border-b border-[#3B5147]/15 bg-[#F4F1E8]">
           <div className="pointer-events-none absolute inset-0" aria-hidden="true">

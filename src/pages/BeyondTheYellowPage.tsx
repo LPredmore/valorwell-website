@@ -136,18 +136,6 @@ export default function BeyondTheYellowPage() {
       <Header />
       <main className="bg-[#F4F1E8] text-[#111814]">
         <div className="bty-theme">
-          <style>{`
-            .bty-theme {
-              font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-            }
-            .bty-theme h1,
-            .bty-theme h2,
-            .bty-theme h3,
-            .bty-theme h4 {
-              font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-              letter-spacing: -0.025em;
-            }
-          `}</style>
 
           <section className="relative overflow-hidden border-b border-white/10 bg-[#111814] text-white">
             <div className="pointer-events-none absolute inset-0" aria-hidden="true">

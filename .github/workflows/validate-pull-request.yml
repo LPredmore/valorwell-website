@@ -31,3 +31,7 @@ jobs:
       - run: bun run lint
       - name: Prove real React server prerendering
         run: node scripts/run-prerender-proof.mjs
+      - name: Install Chromium for isolated browser acceptance
+        run: bunx playwright install --with-deps chromium
+      - name: Verify donation flow and hydration without external requests
+        run: bun run test:browser

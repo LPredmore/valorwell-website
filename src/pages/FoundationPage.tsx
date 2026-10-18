@@ -91,18 +91,6 @@ export default function FoundationPage() {
       <DonateActionSchema />
 
       <div className="foundation-theme bg-[#F4F1E8] text-[#111814]">
-        <style>{`
-          .foundation-theme {
-            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-          }
-          .foundation-theme h1,
-          .foundation-theme h2,
-          .foundation-theme h3,
-          .foundation-theme h4 {
-            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-            letter-spacing: -0.03em;
-          }
-        `}</style>
 
         <section className="relative overflow-hidden bg-[#101713] text-white">
           <div

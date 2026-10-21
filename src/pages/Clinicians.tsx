@@ -54,7 +54,10 @@ function Eyebrow({ children, light = false }: { children: ReactNode; light?: boo
 }
 
 export default function Clinicians() {
-  const [showApplication, setShowApplication] = useState(false);
+  // Keep the interest form in the initial HTML so Google Ads' guided
+  // form detection can see it without completing the interactive Fit Check.
+  // The Fit Check remains optional and its CTA scrolls to the form.
+  const [showApplication, setShowApplication] = useState(true);
 
   const scrollToFitCheck = () => {
     trackHomeEvent("clinician_fit_check_started", { page: "clinicians" });

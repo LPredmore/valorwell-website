@@ -8,6 +8,12 @@ A successful clinician-interest registration emits:
 - `vw_form_success`
 - `vw_form_submit_clinician`
 
+The form is now included in the prerendered HTML on `/clinicians` without
+clicking `Skip to Apply` or completing the Fit Check. Both the initial HTML
+and the hydrated browser form carry the stable identity below. This allows the
+Google Ads setup wizard to discover the form on page load; it does **not**
+change the separate backend-confirmed direct conversion action.
+
 The form has the stable HTML identity:
 
 ```text
@@ -44,6 +50,14 @@ them. Validation and backend errors do not fire the Ads event. The
 Google's automatic form-submission detection is a separate attempt-based signal.
 Avoid setting an auto-detected conversion for this same form as an additional
 **Primary** Ads goal, or Ads could count the same lead twice.
+
+The earlier Google Ads setup provided the full conversion destination
+`AW-16798905432/XWcdCMz27tscENjoq8o-`, which matches the website code.
+If the guided automatic form-detection wizard fails to acknowledge a submit,
+troubleshoot the **manual-code conversion action** using Tag Assistant rather
+than creating another automatic-form action for the same lead. Automatic
+`form_submit` measures submit attempts; the explicit `conversion` event fires
+only after the backend confirms success.
 
 After publishing, use Google Tag Assistant and a legitimate test submission to
 check one `conversion` event addressed to the target above, alongside

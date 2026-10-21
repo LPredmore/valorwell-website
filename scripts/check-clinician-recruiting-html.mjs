@@ -13,6 +13,9 @@ const requiredFragments = [
   "paid no-shows",
   "ValorWell-managed credentialing",
   "Choose when you work, how much you work, who you treat, and how you practice",
+  'id="valorwell-clinician-interest"',
+  'name="valorwell_clinician_interest"',
+  "Raise My Hand",
 ];
 
 const staleFragments = [

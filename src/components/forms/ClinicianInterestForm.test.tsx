@@ -16,6 +16,8 @@ vi.mock("@/integrations/supabase/client", () => ({
 }));
 
 vi.mock("@/lib/clinicianConversionTracking", () => ({
+  CLINICIAN_INTEREST_FORM_ID: "valorwell-clinician-interest",
+  CLINICIAN_INTEREST_FORM_NAME: "valorwell_clinician_interest",
   trackClinicianInterestRegistered: mocks.trackClinicianInterestRegistered,
 }));
 
@@ -48,8 +50,14 @@ describe("ClinicianInterestForm", () => {
     vi.clearAllMocks();
   });
 
-  it("collects only the initial interest fields", () => {
-    render(<ClinicianInterestForm />);
+  it("collects only the initial interest fields and exposes a stable form identity", () => {
+    const { container } = render(<ClinicianInterestForm />);
+    expect(container.querySelector("form")).toHaveAttribute(
+      "id", "valorwell-clinician-interest",
+    );
+    expect(container.querySelector("form")).toHaveAttribute(
+      "name", "valorwell_clinician_interest",
+    );
 
     expect(screen.getByLabelText("First name")).toBeInTheDocument();
     expect(screen.getByLabelText("Last name")).toBeInTheDocument();

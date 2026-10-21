@@ -7,7 +7,11 @@ import {
   billingHubSupabase,
   createWebsiteSubmissionKey,
 } from "@/integrations/supabase/client";
-import { trackClinicianInterestRegistered } from "@/lib/clinicianConversionTracking";
+import {
+  CLINICIAN_INTEREST_FORM_ID,
+  CLINICIAN_INTEREST_FORM_NAME,
+  trackClinicianInterestRegistered,
+} from "@/lib/clinicianConversionTracking";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -104,6 +108,8 @@ export function ClinicianInterestForm() {
 
   return (
     <form
+      id={CLINICIAN_INTEREST_FORM_ID}
+      name={CLINICIAN_INTEREST_FORM_NAME}
       onSubmit={handleSubmit(onSubmit)}
       className="rounded-3xl border border-white/15 bg-white/[0.06] p-6 md:p-9"
       noValidate

@@ -16,6 +16,8 @@ vi.mock("@/integrations/supabase/client", () => ({
 }));
 
 vi.mock("@/lib/clinicianConversionTracking", () => ({
+  CLINICIAN_INTEREST_FORM_ID: "valorwell-clinician-interest",
+  CLINICIAN_INTEREST_FORM_NAME: "valorwell_clinician_interest",
   trackClinicianInterestRegistered: mocks.trackClinicianInterestRegistered,
 }));
 

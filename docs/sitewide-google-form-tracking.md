@@ -96,9 +96,11 @@ setup depends on it.
 Alternatively, a conversion can still be imported from the Analytics property
 using `vw_form_success` (all successful public forms) or a form's stable event.
 
-Do not paste Google Ads event snippets into form components. Do not add another
-Google tag loader. Do not use page-load conversions as substitutes for a
-successful form submission.
+Direct Ads conversion-action hits for explicitly supplied conversion labels
+are sent from existing confirmed-success handlers (currently client signup and
+clinician interest); they are **not** separate global tag loaders or snippets
+pasted into page markup. Do not add a second copy of these events to the form.
+Do not use page-load conversions as substitutes for successful submissions.
 
 ## Verification
 

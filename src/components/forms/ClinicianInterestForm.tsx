@@ -73,7 +73,11 @@ export function ClinicianInterestForm() {
       return;
     }
 
-    trackClinicianInterestRegistered(submissionKey);
+    // The Edge Function deliberately answers honeypot requests with ok: true.
+    // Do not count those decoy submissions as real Google Ads leads.
+    if (!data.company?.trim()) {
+      trackClinicianInterestRegistered(submissionKey);
+    }
     setIsSubmitted(true);
   };
 

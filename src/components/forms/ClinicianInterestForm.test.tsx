@@ -104,6 +104,19 @@ describe("ClinicianInterestForm", () => {
     );
   });
 
+  it("does not report a successful honeypot response as an Ads lead", async () => {
+    const { container } = render(<ClinicianInterestForm />);
+    fillRequired();
+    const honeypot = container.querySelector<HTMLInputElement>("#clinician-company");
+    expect(honeypot).not.toBeNull();
+    fireEvent.change(honeypot!, { target: { value: "Bot company" } });
+    fireEvent.click(screen.getByRole("button", { name: "Raise My Hand" }));
+
+    await waitFor(() => expect(mocks.invoke).toHaveBeenCalledOnce());
+    expect(await screen.findByRole("status")).toBeInTheDocument();
+    expect(mocks.trackClinicianInterestRegistered).not.toHaveBeenCalled();
+  });
+
   it("shows a generic failure without exposing backend details or tracking a lead", async () => {
     mocks.invoke.mockResolvedValueOnce({
       data: null,

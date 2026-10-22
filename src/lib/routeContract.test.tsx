@@ -21,6 +21,12 @@ vi.mock("../integrations/supabase/client", () => ({
   },
 }));
 
+// The destination page pulls in SEO metadata and live data that this routing
+// test does not exercise, so it stands in for a plain marker.
+vi.mock("../pages/Clinicians", () => ({
+  default: () => <p>clinicians page</p>,
+}));
+
 function LocationProbe() {
   const location = useLocation();
   return <p data-testid="location">{location.pathname + location.search}</p>;

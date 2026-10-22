@@ -79,13 +79,19 @@ async function authenticated(db: SupabaseClient, input: Record<string, unknown>)
   const { data, error } = await db.from("provider_applicants")
     .select("id,email,first_name,last_name,status,closed_at,converted_staff_id")
     .eq("tenant_id", TENANT_ID).eq("id", payload.applicantId).maybeSingle();
-  if (error || !data || !eligible(data as Applicant) || normalize(data.email) !== payload.email) {
+  if (error || !data || !eligible(data as Applicant) || normalize(data.email) !== payload.email
+      || !(await interviewAccess(db, payload.applicantId))) {
     throw new Error("Scheduling invitation is no longer available.");
   }
   return data as Applicant;
 }
 function eligible(a: Applicant) {
   return Boolean(a.email && !a.closed_at && !a.converted_staff_id && !["declined", "withdrawn", "rejected", "hired"].includes(String(a.status).toLowerCase()));
+}
+async function interviewAccess(db: SupabaseClient, applicantId: string): Promise<boolean> {
+  const { data, error } = await db.rpc("crm_applicant_interview_can_access", { p_applicant_id: applicantId });
+  if (error) throw new Error("Scheduling access verification is unavailable.");
+  return data === true;
 }
 const nameOf = (a: Applicant) => [a.first_name, a.last_name].filter(Boolean).join(" ").trim() || "Applicant";
 const bookingPublic = (b: Booking | null) => b ? ({
@@ -308,7 +314,7 @@ async function validate(db: SupabaseClient, req: Request, input: Record<string, 
     .eq("tenant_id", TENANT_ID).ilike("email", email).order("created_at", { ascending: false }).limit(10);
   if (error) throw new Error("Invitation lookup is unavailable.");
   const applicant = (data ?? []).find(row => normalize(row.email) === email && eligible(row)) as Applicant | undefined;
-  if (!applicant) return response({ eligible: false });
+  if (!applicant || !(await interviewAccess(db, applicant.id))) return response({ eligible: false });
   const current = await activeBooking(db, applicant.id);
   return response({ eligible: true, name: nameOf(applicant), sessionToken: await issue(applicant), expiresInSeconds: 1800, booking: bookingPublic(current) });
 }

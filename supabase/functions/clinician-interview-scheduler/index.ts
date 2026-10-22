@@ -307,7 +307,7 @@ async function validate(db: SupabaseClient, req: Request, input: Record<string, 
     .select("id,email,first_name,last_name,status,closed_at,converted_staff_id,created_at")
     .eq("tenant_id", TENANT_ID).ilike("email", email).order("created_at", { ascending: false }).limit(10);
   if (error) throw new Error("Invitation lookup is unavailable.");
-  const applicant = (data ?? []).find(eligible) as Applicant | undefined;
+  const applicant = (data ?? []).find(row => normalize(row.email) === email && eligible(row)) as Applicant | undefined;
   if (!applicant) return response({ eligible: false });
   const current = await activeBooking(db, applicant.id);
   return response({ eligible: true, name: nameOf(applicant), sessionToken: await issue(applicant), expiresInSeconds: 1800, booking: bookingPublic(current) });
@@ -371,8 +371,8 @@ async function cancel(db: SupabaseClient, applicant: Applicant) {
   if (!current || current.status !== "confirmed" || !current.google_event_id) {
     return response({ cancelled: false, error: "This appointment cannot be cancelled online. Please contact info@valorwell.org." }, 409);
   }
-  if (DateTime.fromISO(current.starts_at) <= DateTime.now().plus({ hours: 72 })) {
-    return response({ cancelled: false, error: "Please contact info@valorwell.org to change an interview within 72 hours." }, 409);
+  if (DateTime.fromISO(current.starts_at) <= DateTime.now()) {
+    return response({ cancelled: false, error: "This interview has already started or passed. Please contact info@valorwell.org." }, 409);
   }
   const write = await writeAccess(db);
   const result = await fetch("https://www.googleapis.com/calendar/v3/calendars/" + encodeURIComponent(write.calendar)

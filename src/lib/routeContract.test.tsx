@@ -1,5 +1,5 @@
-import { render } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { cleanup, render } from "@testing-library/react";
 import { MemoryRouter, useLocation } from "react-router-dom";
 import { canonicalRoutes, redirects } from "../../site-route-contract.mjs";
 

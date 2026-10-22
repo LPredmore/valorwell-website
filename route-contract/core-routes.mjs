@@ -81,6 +81,15 @@ export const routes = [
     "sitemap": false
   },
   {
+    "path": "/clinicians/interview",
+    "title": "Schedule Your Clinician Interview | ValorWell",
+    "description": "Private one-hour clinician interview scheduler for applicants who have applied to ValorWell.",
+    "h1": "Schedule your clinician interview.",
+    "lead": "Existing applicants can verify their application email and select an available hour at least 72 hours in advance.",
+    "indexable": false,
+    "sitemap": false
+  },
+  {
     "path": "/network",
     "title": "Beyond The Yellow Featured Organizations | ValorWell",
     "description": "Explore organizations featured through Beyond The Yellow, read their feature pages, and watch the conversations behind their work.",

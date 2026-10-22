@@ -17,3 +17,7 @@ verify_jwt = false
 # Authenticated with its own RESOURCE_IMPORT_TOKEN secret, not a Supabase JWT.
 [functions.import-website-resources]
 verify_jwt = false
+
+# Applicant email gate and signed 30-minute scheduler sessions are verified in the function.
+[functions.clinician-interview-scheduler]
+verify_jwt = false

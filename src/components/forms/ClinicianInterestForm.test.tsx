@@ -136,9 +136,21 @@ describe("ClinicianInterestForm", () => {
     fireEvent.click(screen.getByRole("button", { name: "Raise My Hand" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
-      "We could not register your interest right now. Please try again.",
+      "Your application was not saved because our system is having trouble. Please try again in a few minutes.",
     );
     expect(screen.queryByText(/service_role/i)).not.toBeInTheDocument();
     expect(mocks.trackClinicianInterestRegistered).not.toHaveBeenCalled();
+  });
+
+  it("reuses the same submission key when the applicant retries after a failure", async () => {
+    mocks.invoke.mockResolvedValueOnce({ data: null, error: { message: "504" } });
+    render(<ClinicianInterestForm />);
+    fillRequired();
+    fireEvent.click(screen.getByRole("button", { name: "Raise My Hand" }));
+    await screen.findByRole("alert");
+    fireEvent.click(screen.getByRole("button", { name: "Raise My Hand" }));
+    await waitFor(() => expect(mocks.invoke).toHaveBeenCalledTimes(2));
+    const keys = mocks.invoke.mock.calls.map((c) => c[1].body.submissionKey);
+    expect(keys).toEqual(["clinician-interest-1", "clinician-interest-1"]);
   });
 });

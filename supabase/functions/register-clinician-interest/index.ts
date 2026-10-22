@@ -22,53 +22,58 @@ const BodySchema = z.object({
 
 const TENANT_ID = "00000000-0000-0000-0000-000000000001";
 
+import {
+  type DbError,
+  type IntakeResult,
+  type StoredSubmission,
+  isDatabaseUnavailable,
+  isUniqueViolation,
+  matchesSubmission,
+  outageAlertKey,
+} from "./logic.ts";
+
 const UNAVAILABLE_MESSAGE =
-  "Our system is having trouble right now and your application was not saved. Please try again in a few minutes.";
+  "Our system is having trouble right now, so we could not confirm your registration. Please try again in a few minutes.";
 
-// Errors that mean the database is unreachable/overloaded, not that the data is bad.
-function isDatabaseUnavailable(err: { code?: string; message?: string } | null): boolean {
-  if (!err) return false;
-  const code = err.code ?? "";
-  const msg = err.message ?? "";
-  return (
-    /^PGRST00[0-3]$/.test(code) ||
-    code === "57014" || code === "53300" || code === "08006" || code === "08001" ||
-    /timeout|timed out|connection|fetch failed|50[234]|schema cache/i.test(msg)
-  );
+type Stage = "insert" | "verify_lookup" | "unexpected";
+
+// Routine log line: submission key + request id only, never names or emails.
+function logEvent(level: "info" | "error", fields: {
+  requestId: string; submissionKey: string; stage: Stage; result: IntakeResult | "honeypot";
+  category?: string; code?: string | null; httpStatus?: number; recovery: "none" | "retry_pending" | "manual_attention";
+}) {
+  const line = { fn: "register-clinician-interest", at: new Date().toISOString(), ...fields };
+  if (level === "error") console.error(JSON.stringify(line));
+  else console.log(JSON.stringify(line));
 }
 
-function escapeHtml(v: string): string {
-  return v.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
-}
-
-// Alert staff so a failed application can be followed up by hand. Never throws.
-async function alertStaff(details: { submissionKey: string; firstName: string; lastName: string; email: string; reason: string }) {
+// Deduplicated outage alert: Resend's Idempotency-Key collapses every alert
+// within the same UTC hour into one email. No applicant details are included.
+async function alertOutage(fields: { requestId: string; submissionKey: string; code: string | null | undefined }) {
   const apiKey = Deno.env.get("RESEND_API_KEY");
-  if (!apiKey) {
-    console.error("register-clinician-interest alert skipped: RESEND_API_KEY missing", { submissionKey: details.submissionKey });
-    return;
-  }
+  if (!apiKey) return;
+  const key = outageAlertKey(new Date());
   try {
-    const res = await fetch("https://api.resend.com/emails", {
+    await fetch("https://api.resend.com/emails", {
       method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json", "Idempotency-Key": key },
       body: JSON.stringify({
         from: "ValorWell Alerts <noreply@valorwell.org>",
         to: ["info@valorwell.org"],
-        subject: "Clinician application could not be saved",
-        html: `<p>A clinician application failed to save and the applicant was asked to try again.</p>
-<ul><li>Name: ${escapeHtml(details.firstName)} ${escapeHtml(details.lastName)}</li>
-<li>Email: ${escapeHtml(details.email)}</li>
-<li>Submission key: ${escapeHtml(details.submissionKey)}</li>
-<li>Reason: ${escapeHtml(details.reason)}</li></ul>
-<p>If no matching website_submissions row appears later, follow up with this applicant directly.</p>`,
+        subject: "Clinician registrations are failing (database unavailable)",
+        html: `<p>At least one clinician interest registration could not be saved this hour because Billing Hub was unavailable. Applicants were told their registration was not confirmed and asked to retry.</p>
+<p>First failure this hour: submission key <code>${fields.submissionKey.replace(/[^\w-]/g, "")}</code>, request <code>${fields.requestId}</code>, code <code>${String(fields.code ?? "none").replace(/[^\w-]/g, "")}</code>.</p>
+<p>To count affected submissions, search the register-clinician-interest logs for <code>"result":"indeterminate"</code> and check each key against website_submissions.source_record_key after recovery. You will get at most one of these emails per hour.</p>`,
       }),
       signal: AbortSignal.timeout(8000),
     });
-    if (!res.ok) console.error("register-clinician-interest alert failed", { status: res.status, submissionKey: details.submissionKey });
-  } catch (e) {
-    console.error("register-clinician-interest alert error", { submissionKey: details.submissionKey, error: String(e) });
+  } catch (_e) {
+    // Alerting must never change the applicant's result.
   }
+}
+
+function respond(status: number, body: Record<string, unknown>) {
+  return new Response(JSON.stringify(body), { status, headers: jsonHeaders });
 }
 
 serve(async (req) => {
@@ -90,6 +95,7 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({
           ok: false,
+          result: "validation_failed",
           message: "Invalid submission.",
           errors: parsed.error.flatten().fieldErrors,
         }),
@@ -106,12 +112,12 @@ serve(async (req) => {
       submissionKey,
     } = parsed.data;
 
-    // Honeypot: silently succeed on bot submissions.
+    const requestId = crypto.randomUUID();
+
+    // Honeypot: look successful to bots; the website never tracks these.
     if (company && company.trim().length > 0) {
-      return new Response(
-        JSON.stringify({ ok: true, lifecycle: "invite_sent" }),
-        { status: 200, headers: jsonHeaders },
-      );
+      logEvent("info", { requestId, submissionKey: "honeypot", stage: "insert", result: "honeypot", recovery: "none" });
+      return respond(200, { ok: true, result: "persisted", lifecycle: "interest_recorded" });
     }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
@@ -128,9 +134,21 @@ serve(async (req) => {
     const sourceKey =
       submissionKey && submissionKey.length > 0
         ? submissionKey
-        : `clinician-interest-${normalizedEmail}-${Date.now()}`;
+        : `clinician-interest-${crypto.randomUUID()}`;
+    const expected = { firstName, lastName, email: normalizedEmail };
 
-    const { error: insertError } = await admin
+    const lookup = async (): Promise<{ row: StoredSubmission | null; error: DbError }> => {
+      const { data, error } = await admin
+        .from("website_submissions")
+        .select("id, submission_type, payload")
+        .eq("tenant_id", TENANT_ID)
+        .eq("source_system", "website")
+        .eq("source_record_key", sourceKey)
+        .maybeSingle();
+      return { row: (data as StoredSubmission | null) ?? null, error };
+    };
+
+    const { data: inserted, error: insertError } = await admin
       .from("website_submissions")
       .insert({
         tenant_id: TENANT_ID,
@@ -147,44 +165,49 @@ serve(async (req) => {
           email: normalizedEmail,
           source: "clinician_interest_form",
         },
-      });
+      })
+      .select("id")
+      .single();
 
-    if (insertError) {
-      // Treat duplicate submission_key as success (idempotent double-submit).
-      const msg = insertError.message ?? "";
-      if (insertError.code === "23505" || /duplicate key/i.test(msg)) {
-        return new Response(
-          JSON.stringify({ ok: true, lifecycle: "invite_sent" }),
-          { status: 200, headers: jsonHeaders },
-        );
-      }
-      const unavailable = isDatabaseUnavailable(insertError);
-      console.error("register-clinician-interest insert failed:", {
-        submissionKey: sourceKey,
-        kind: unavailable ? "database_unavailable" : "insert_rejected",
-        code: insertError.code,
-        message: insertError.message,
-      });
-      await alertStaff({ submissionKey: sourceKey, firstName, lastName, email: normalizedEmail, reason: `${insertError.code ?? ""} ${insertError.message ?? ""}`.trim() });
-      return new Response(
-        JSON.stringify({
-          ok: false,
-          retryable: unavailable,
-          message: unavailable ? UNAVAILABLE_MESSAGE : "We could not save your application. Please try again.",
-        }),
-        { status: unavailable ? 503 : 500, headers: jsonHeaders },
-      );
+    if (!insertError && inserted?.id) {
+      logEvent("info", { requestId, submissionKey: sourceKey, stage: "insert", result: "persisted", recovery: "none" });
+      return respond(200, { ok: true, result: "persisted", lifecycle: "interest_recorded", submissionId: inserted.id, requestId });
     }
 
-    return new Response(
-      JSON.stringify({ ok: true, lifecycle: "invite_sent" }),
-      { status: 200, headers: jsonHeaders },
-    );
+    // Unique violation, or a write whose outcome is unknown: resolve by the
+    // original key instead of assuming success.
+    if (isUniqueViolation(insertError) || isDatabaseUnavailable(insertError)) {
+      const { row, error: lookupError } = await lookup();
+      if (!lookupError && row) {
+        if (matchesSubmission(row, expected)) {
+          logEvent("info", { requestId, submissionKey: sourceKey, stage: "verify_lookup", result: "verified_duplicate", code: insertError?.code, recovery: "none" });
+          return respond(200, { ok: true, result: "verified_duplicate", lifecycle: "interest_recorded", submissionId: row.id, requestId });
+        }
+        logEvent("error", { requestId, submissionKey: sourceKey, stage: "verify_lookup", result: "key_conflict", code: insertError?.code, httpStatus: 409, recovery: "retry_pending" });
+        return respond(409, { ok: false, result: "key_conflict", retryable: true, newKeyRequired: true, requestId,
+          message: "We could not confirm your registration. Please submit the form again." });
+      }
+      if (isUniqueViolation(insertError) && !lookupError) {
+        // Uniqueness tripped on something other than our key; not a confirmed write.
+        logEvent("error", { requestId, submissionKey: sourceKey, stage: "verify_lookup", result: "indeterminate", category: "unique_other", code: insertError?.code, httpStatus: 500, recovery: "manual_attention" });
+        return respond(500, { ok: false, result: "indeterminate", retryable: true, requestId, message: UNAVAILABLE_MESSAGE });
+      }
+      if (!lookupError && !row && isDatabaseUnavailable(insertError)) {
+        // Database answered the lookup and has no row: the write did not land.
+        logEvent("error", { requestId, submissionKey: sourceKey, stage: "insert", result: "indeterminate", category: "database_unavailable", code: insertError?.code, httpStatus: 503, recovery: "retry_pending" });
+        await alertOutage({ requestId, submissionKey: sourceKey, code: insertError?.code });
+        return respond(503, { ok: false, result: "indeterminate", retryable: true, requestId, message: UNAVAILABLE_MESSAGE });
+      }
+      logEvent("error", { requestId, submissionKey: sourceKey, stage: "verify_lookup", result: "indeterminate", category: "database_unavailable", code: lookupError?.code ?? insertError?.code, httpStatus: 503, recovery: "retry_pending" });
+      await alertOutage({ requestId, submissionKey: sourceKey, code: lookupError?.code ?? insertError?.code });
+      return respond(503, { ok: false, result: "indeterminate", retryable: true, requestId, message: UNAVAILABLE_MESSAGE });
+    }
+
+    logEvent("error", { requestId, submissionKey: sourceKey, stage: "insert", result: "validation_failed", category: "insert_rejected", code: insertError?.code, httpStatus: 422, recovery: "manual_attention" });
+    return respond(422, { ok: false, result: "validation_failed", retryable: false, requestId,
+      message: "We could not save your registration. Please check your details or email info@valorwell.org." });
   } catch (err) {
-    console.error("register-clinician-interest failed:", { kind: "unexpected", error: String(err) });
-    return new Response(
-      JSON.stringify({ ok: false, retryable: true, message: UNAVAILABLE_MESSAGE }),
-      { status: 500, headers: jsonHeaders },
-    );
+    console.error(JSON.stringify({ fn: "register-clinician-interest", at: new Date().toISOString(), stage: "unexpected", result: "indeterminate", category: err instanceof Error ? err.name : "unknown", recovery: "retry_pending" }));
+    return respond(500, { ok: false, result: "indeterminate", retryable: true, message: UNAVAILABLE_MESSAGE });
   }
 });

@@ -40,7 +40,7 @@ describe("ClinicianInterestForm", () => {
   beforeEach(() => {
     mocks.keyNumber = 0;
     mocks.invoke.mockResolvedValue({
-      data: { ok: true, lifecycle: "invite_sent" },
+      data: { ok: true, result: "persisted", lifecycle: "interest_recorded" },
       error: null,
     });
   });
@@ -136,7 +136,7 @@ describe("ClinicianInterestForm", () => {
     fireEvent.click(screen.getByRole("button", { name: "Raise My Hand" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
-      "Your application was not saved because our system is having trouble. Please try again in a few minutes.",
+      "We could not confirm your registration because our system is having trouble. Please try again in a few minutes.",
     );
     expect(screen.queryByText(/service_role/i)).not.toBeInTheDocument();
     expect(mocks.trackClinicianInterestRegistered).not.toHaveBeenCalled();
@@ -152,5 +152,37 @@ describe("ClinicianInterestForm", () => {
     await waitFor(() => expect(mocks.invoke).toHaveBeenCalledTimes(2));
     const keys = mocks.invoke.mock.calls.map((c) => c[1].body.submissionKey);
     expect(keys).toEqual(["clinician-interest-1", "clinician-interest-1"]);
+  });
+
+  it("does not count an unconfirmed ok response as a lead", async () => {
+    mocks.invoke.mockResolvedValueOnce({ data: { ok: true }, error: null });
+    render(<ClinicianInterestForm />);
+    fillRequired();
+    fireEvent.click(screen.getByRole("button", { name: "Raise My Hand" }));
+    expect(await screen.findByRole("alert")).toBeInTheDocument();
+    expect(mocks.trackClinicianInterestRegistered).not.toHaveBeenCalled();
+  });
+
+  it("tracks a verified duplicate as a confirmed registration", async () => {
+    mocks.invoke.mockResolvedValueOnce({ data: { ok: true, result: "verified_duplicate" }, error: null });
+    render(<ClinicianInterestForm />);
+    fillRequired();
+    fireEvent.click(screen.getByRole("button", { name: "Raise My Hand" }));
+    expect(await screen.findByRole("status")).toBeInTheDocument();
+    expect(mocks.trackClinicianInterestRegistered).toHaveBeenCalledOnce();
+  });
+
+  it("starts a new key only when the server reports a key conflict", async () => {
+    mocks.invoke
+      .mockResolvedValueOnce({ data: { ok: false, result: "key_conflict", newKeyRequired: true, message: "Please submit again." }, error: null })
+      .mockResolvedValueOnce({ data: { ok: true, result: "persisted" }, error: null });
+    render(<ClinicianInterestForm />);
+    fillRequired();
+    fireEvent.click(screen.getByRole("button", { name: "Raise My Hand" }));
+    await screen.findByRole("alert");
+    fireEvent.click(screen.getByRole("button", { name: "Raise My Hand" }));
+    await waitFor(() => expect(mocks.invoke).toHaveBeenCalledTimes(2));
+    const keys = mocks.invoke.mock.calls.map((c) => c[1].body.submissionKey);
+    expect(keys).toEqual(["clinician-interest-1", "clinician-interest-2"]);
   });
 });

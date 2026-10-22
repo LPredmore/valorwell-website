@@ -35,9 +35,9 @@ type FormData = z.infer<typeof formSchema>;
 export function ClinicianInterestForm() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  // One key per applicant email, reused on retries so a retry after a timeout
-  // can never create a second application.
-  const submissionKeyRef = useRef<{ email: string; key: string } | null>(null);
+  // One key per logical submission. It survives timeouts and retries and is
+  // replaced only after a confirmed save or when the server asks for a new one.
+  const submissionKeyRef = useRef<string | null>(null);
 
   const {
     register,
@@ -56,11 +56,10 @@ export function ClinicianInterestForm() {
 
   const onSubmit = async (data: FormData) => {
     setSubmitError(null);
-    const normalizedEmail = data.email.trim().toLowerCase();
-    if (submissionKeyRef.current?.email !== normalizedEmail) {
-      submissionKeyRef.current = { email: normalizedEmail, key: createWebsiteSubmissionKey() };
+    if (!submissionKeyRef.current) {
+      submissionKeyRef.current = createWebsiteSubmissionKey();
     }
-    const submissionKey = submissionKeyRef.current.key;
+    const submissionKey = submissionKeyRef.current;
 
     const { data: response, error } = await billingHubSupabase.functions.invoke(
       "register-clinician-interest",
@@ -76,14 +75,21 @@ export function ClinicianInterestForm() {
       },
     );
 
-    if (error || response?.ok !== true) {
+    const confirmed =
+      !error &&
+      response?.ok === true &&
+      (response.result === "persisted" || response.result === "verified_duplicate");
+
+    if (!confirmed) {
+      if (response?.newKeyRequired) submissionKeyRef.current = null;
       setSubmitError(
         response?.message ??
-          "Your application was not saved because our system is having trouble. Please try again in a few minutes.",
+          "We could not confirm your registration because our system is having trouble. Please try again in a few minutes.",
       );
       return;
     }
 
+    submissionKeyRef.current = null;
     // The Edge Function deliberately answers honeypot requests with ok: true.
     // Do not count those decoy submissions as real Google Ads leads.
     if (!data.company?.trim()) {

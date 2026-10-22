@@ -1,10 +1,19 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 // @ts-expect-error plain .mjs build script
-import { fetchWithRetry } from "../../scripts/fetch-with-retry.mjs";
+import { fetchWithRetry, resetRetryBudgetForTests } from "../../scripts/fetch-with-retry.mjs";
 
 const opts = (fetchImpl: () => Promise<Response>) => ({ delays: [1, 1, 1, 1], fetchImpl, sleep: async () => {} });
 
 describe("fetchWithRetry", () => {
+  beforeEach(() => resetRetryBudgetForTests());
+  it("stops once the total retry budget is used", async () => {
+    let t = 0;
+    let n = 0;
+    await expect(
+      fetchWithRetry("x", {}, { delays: [1, 1, 1, 1], totalBudgetMs: 100, now: () => t, sleep: async () => { t += 60; }, fetchImpl: async () => { n++; return new Response("", { status: 503 }); } }),
+    ).rejects.toThrow(/budget/);
+    expect(n).toBe(2);
+  });
   it("retries a 502 and returns the later success", async () => {
     let n = 0;
     const res = await fetchWithRetry("x", {}, opts(async () => new Response("", { status: ++n < 3 ? 502 : 200 })));

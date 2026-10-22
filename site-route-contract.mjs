@@ -29,6 +29,10 @@ const staticRedirects = [
     "to": "/clinicians"
   },
   {
+    "from": "/careers",
+    "to": "/clinicians"
+  },
+  {
     "from": "/therapy",
     "to": "/get-care"
   },

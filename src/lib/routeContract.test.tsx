@@ -32,6 +32,8 @@ function LocationProbe() {
   return <p data-testid="location">{location.pathname + location.search}</p>;
 }
 
+afterEach(cleanup);
+
 describe("careers route", () => {
   it("redirects /careers to /clinicians", () => {
     expect(redirects.find((redirect) => redirect.from === "/careers")?.to).toBe(

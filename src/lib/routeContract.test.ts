@@ -1,5 +1,30 @@
-import { describe, expect, it } from "vitest";
+import { render } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
+import { MemoryRouter, useLocation } from "react-router-dom";
 import { canonicalRoutes, redirects } from "../../site-route-contract.mjs";
+
+vi.mock("../integrations/supabase/client", () => ({
+  supabase: {
+    auth: {
+      onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+      getSession: async () => ({ data: { session: null } }),
+      getUser: async () => ({ data: { user: null } }),
+      signInWithOAuth: async () => ({ data: {}, error: null }),
+      signOut: async () => ({ error: null }),
+    },
+    channel: () => ({ on: () => ({ subscribe: () => ({}) }), subscribe: () => ({}) }),
+    from: () => ({
+      select: () => ({ eq: () => ({ eq: () => ({ order: async () => ({ data: [], error: null }) }) }) }),
+    }),
+    functions: { invoke: async () => ({ data: null, error: null }) },
+    storage: { from: () => ({ list: async () => ({ data: [], error: null }) }) },
+  },
+}));
+
+function LocationProbe() {
+  const location = useLocation();
+  return <p data-testid="location">{location.pathname + location.search}</p>;
+}
 
 describe("careers route", () => {
   it("redirects /careers to /clinicians", () => {
@@ -9,16 +34,34 @@ describe("careers route", () => {
   });
 
   it("keeps /careers out of canonical routes so it is never prerendered or sitemapped", () => {
-    const careersRoute = canonicalRoutes.find((route) => route.path === "/careers");
-    expect(careersRoute).toBeUndefined();
+    expect(canonicalRoutes.find((route) => route.path === "/careers")).toBeUndefined();
   });
 
-  it("serves /careers through the client-side redirect routes", async () => {
+  it("sends a visitor who opens /careers to /clinicians", async () => {
     const { AppRoutes } = await import("../AppRoutes");
-    const source = await import("../AppRoutes?raw").catch(() => null);
-    // AppRoutes renders every contract redirect, so /careers must resolve to a
-    // Navigate to /clinicians rather than the NotFound page.
-    expect(typeof AppRoutes).toBe("function");
-    expect(source).toBeNull();
+
+    const { findByTestId } = render(
+      <MemoryRouter initialEntries={["/careers"]}>
+        <AppRoutes />
+        <LocationProbe />
+      </MemoryRouter>,
+    );
+
+    expect((await findByTestId("location")).textContent).toBe("/clinicians");
+  });
+
+  it("carries a query string through the careers redirect", async () => {
+    const { AppRoutes } = await import("../AppRoutes");
+
+    const { findByTestId } = render(
+      <MemoryRouter initialEntries={["/careers?utm_source=newsletter"]}>
+        <AppRoutes />
+        <LocationProbe />
+      </MemoryRouter>,
+    );
+
+    expect((await findByTestId("location")).textContent).toBe(
+      "/clinicians?utm_source=newsletter",
+    );
   });
 });

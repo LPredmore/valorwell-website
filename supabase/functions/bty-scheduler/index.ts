@@ -973,10 +973,21 @@ async function collectBusyEvents(
     return data ?? [];
   })();
 
-  const [calendarReads, meetings] = await Promise.all([
+  const clinicianReservationsPromise = admin.from("clinician_interview_bookings")
+    .select("starts_at,ends_at")
+    .eq("tenant_id", TENANT_ID)
+    .in("status", ["reserving", "confirmed", "attention"])
+    .lt("starts_at", timeMax)
+    .gt("ends_at", timeMin);
+
+  const [calendarReads, meetings, clinicianReservations] = await Promise.all([
     calendarReadsPromise,
     meetingsPromise,
+    clinicianReservationsPromise,
   ]);
+  if (clinicianReservations.error) {
+    throw new Error("Calendar availability is temporarily unavailable.");
+  }
 
   const busy: BusyEvent[] = [];
   for (const { events } of calendarReads) {
@@ -1001,6 +1012,19 @@ async function collectBusyEvents(
       isPreInterview: meeting.purpose === "bty_preinterview",
       source: "database",
       sourceId: meeting.external_event_id ?? meeting.id,
+    });
+  }
+
+  // Pending clinician reservations must also block BTY *overlaps*.
+  // They do not count toward the separate BTY per-day interview quota.
+  for (const appointment of clinicianReservations.data ?? []) {
+    const start = DateTime.fromISO(String(appointment.starts_at));
+    const end = DateTime.fromISO(String(appointment.ends_at));
+    if (!start.isValid || !end.isValid) continue;
+    busy.push({
+      start, end, allDay: false, physical: false,
+      isBtyRecording: false, isPreInterview: false,
+      source: "database",
     });
   }
 

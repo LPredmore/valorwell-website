@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -35,6 +35,9 @@ type FormData = z.infer<typeof formSchema>;
 export function ClinicianInterestForm() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  // One key per applicant email, reused on retries so a retry after a timeout
+  // can never create a second application.
+  const submissionKeyRef = useRef<{ email: string; key: string } | null>(null);
 
   const {
     register,
@@ -53,7 +56,11 @@ export function ClinicianInterestForm() {
 
   const onSubmit = async (data: FormData) => {
     setSubmitError(null);
-    const submissionKey = createWebsiteSubmissionKey();
+    const normalizedEmail = data.email.trim().toLowerCase();
+    if (submissionKeyRef.current?.email !== normalizedEmail) {
+      submissionKeyRef.current = { email: normalizedEmail, key: createWebsiteSubmissionKey() };
+    }
+    const submissionKey = submissionKeyRef.current.key;
 
     const { data: response, error } = await billingHubSupabase.functions.invoke(
       "register-clinician-interest",
@@ -72,7 +79,7 @@ export function ClinicianInterestForm() {
     if (error || response?.ok !== true) {
       setSubmitError(
         response?.message ??
-          "We could not register your interest right now. Please try again.",
+          "Your application was not saved because our system is having trouble. Please try again in a few minutes.",
       );
       return;
     }

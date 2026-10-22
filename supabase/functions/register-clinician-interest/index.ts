@@ -22,6 +22,55 @@ const BodySchema = z.object({
 
 const TENANT_ID = "00000000-0000-0000-0000-000000000001";
 
+const UNAVAILABLE_MESSAGE =
+  "Our system is having trouble right now and your application was not saved. Please try again in a few minutes.";
+
+// Errors that mean the database is unreachable/overloaded, not that the data is bad.
+function isDatabaseUnavailable(err: { code?: string; message?: string } | null): boolean {
+  if (!err) return false;
+  const code = err.code ?? "";
+  const msg = err.message ?? "";
+  return (
+    /^PGRST00[0-3]$/.test(code) ||
+    code === "57014" || code === "53300" || code === "08006" || code === "08001" ||
+    /timeout|timed out|connection|fetch failed|50[234]|schema cache/i.test(msg)
+  );
+}
+
+function escapeHtml(v: string): string {
+  return v.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
+}
+
+// Alert staff so a failed application can be followed up by hand. Never throws.
+async function alertStaff(details: { submissionKey: string; firstName: string; lastName: string; email: string; reason: string }) {
+  const apiKey = Deno.env.get("RESEND_API_KEY");
+  if (!apiKey) {
+    console.error("register-clinician-interest alert skipped: RESEND_API_KEY missing", { submissionKey: details.submissionKey });
+    return;
+  }
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        from: "ValorWell Alerts <noreply@valorwell.org>",
+        to: ["info@valorwell.org"],
+        subject: "Clinician application could not be saved",
+        html: `<p>A clinician application failed to save and the applicant was asked to try again.</p>
+<ul><li>Name: ${escapeHtml(details.firstName)} ${escapeHtml(details.lastName)}</li>
+<li>Email: ${escapeHtml(details.email)}</li>
+<li>Submission key: ${escapeHtml(details.submissionKey)}</li>
+<li>Reason: ${escapeHtml(details.reason)}</li></ul>
+<p>If no matching website_submissions row appears later, follow up with this applicant directly.</p>`,
+      }),
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) console.error("register-clinician-interest alert failed", { status: res.status, submissionKey: details.submissionKey });
+  } catch (e) {
+    console.error("register-clinician-interest alert error", { submissionKey: details.submissionKey, error: String(e) });
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -109,18 +158,21 @@ serve(async (req) => {
           { status: 200, headers: jsonHeaders },
         );
       }
+      const unavailable = isDatabaseUnavailable(insertError);
       console.error("register-clinician-interest insert failed:", {
+        submissionKey: sourceKey,
+        kind: unavailable ? "database_unavailable" : "insert_rejected",
         code: insertError.code,
         message: insertError.message,
-        details: insertError.details,
-        hint: insertError.hint,
       });
+      await alertStaff({ submissionKey: sourceKey, firstName, lastName, email: normalizedEmail, reason: `${insertError.code ?? ""} ${insertError.message ?? ""}`.trim() });
       return new Response(
         JSON.stringify({
           ok: false,
-          message: "We could not save your interest. Please try again.",
+          retryable: unavailable,
+          message: unavailable ? UNAVAILABLE_MESSAGE : "We could not save your application. Please try again.",
         }),
-        { status: 500, headers: jsonHeaders },
+        { status: unavailable ? 503 : 500, headers: jsonHeaders },
       );
     }
 
@@ -129,10 +181,9 @@ serve(async (req) => {
       { status: 200, headers: jsonHeaders },
     );
   } catch (err) {
-    console.error("register-clinician-interest failed:", err);
-    const message = err instanceof Error ? err.message : String(err);
+    console.error("register-clinician-interest failed:", { kind: "unexpected", error: String(err) });
     return new Response(
-      JSON.stringify({ ok: false, message }),
+      JSON.stringify({ ok: false, retryable: true, message: UNAVAILABLE_MESSAGE }),
       { status: 500, headers: jsonHeaders },
     );
   }

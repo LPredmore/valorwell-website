@@ -8,7 +8,14 @@ export async function fetchWithRetry(url, init, { delays = RETRY_DELAYS_MS, time
   let lastError;
   for (let attempt = 0; attempt <= delays.length; attempt += 1) {
     try {
-      const res = await fetchImpl(url, { ...init, signal: AbortSignal.timeout(timeoutMs) });
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(new Error(`timed out after ${timeoutMs}ms`)), timeoutMs);
+      let res;
+      try {
+        res = await fetchImpl(url, { ...init, signal: controller.signal });
+      } finally {
+        clearTimeout(timer);
+      }
       if (!RETRYABLE_STATUS.has(res.status) || attempt === delays.length) return res;
       lastError = new Error(`HTTP ${res.status}`);
     } catch (err) {

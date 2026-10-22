@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { loadEnv } from "vite";
+import { fetchWithRetry } from "./fetch-with-retry.mjs";
 
 const TENANT_ID = "00000000-0000-0000-0000-000000000001";
 const ROOT = process.cwd();
@@ -46,7 +47,7 @@ endpoint.searchParams.set("tenant_id", `eq.${TENANT_ID}`);
 endpoint.searchParams.set("status", "eq.published");
 endpoint.searchParams.set("order", "title.asc");
 
-const response = await fetch(endpoint, {
+const response = await fetchWithRetry(endpoint, {
   headers: {
     apikey: publishableKey,
     Authorization: `Bearer ${publishableKey}`,
@@ -71,7 +72,7 @@ async function fetchTable(table, select, order) {
   url.searchParams.set("select", select);
   url.searchParams.set("tenant_id", `eq.${TENANT_ID}`);
   if (order) url.searchParams.set("order", order);
-  const result = await fetch(url, {
+  const result = await fetchWithRetry(url, {
     headers: {
       apikey: publishableKey,
       Authorization: `Bearer ${publishableKey}`,

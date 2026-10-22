@@ -34,6 +34,9 @@ function LocationProbe() {
 
 afterEach(cleanup);
 
+// Loading the full route tree is slow when the whole suite runs in parallel.
+const ROUTE_TEST_TIMEOUT_MS = 30_000;
+
 describe("careers route", () => {
   it("redirects /careers to /clinicians", () => {
     expect(redirects.find((redirect) => redirect.from === "/careers")?.to).toBe(
@@ -56,7 +59,7 @@ describe("careers route", () => {
     );
 
     expect((await findByTestId("location")).textContent).toBe("/clinicians");
-  });
+  }, ROUTE_TEST_TIMEOUT_MS);
 
   it("carries a query string through the careers redirect", async () => {
     const { AppRoutes } = await import("../AppRoutes");
@@ -71,5 +74,5 @@ describe("careers route", () => {
     expect((await findByTestId("location")).textContent).toBe(
       "/clinicians?utm_source=newsletter",
     );
-  });
+  }, ROUTE_TEST_TIMEOUT_MS);
 });

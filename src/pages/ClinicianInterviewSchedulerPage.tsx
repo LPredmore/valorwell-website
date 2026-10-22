@@ -213,7 +213,7 @@ export default function ClinicianInterviewSchedulerPage() {
                     <button type="button" disabled={loading !== null} onClick={cancel} className="rounded-lg border border-[#3B5147]/30 px-4 py-2 font-semibold disabled:opacity-60">
                       Cancel and choose another time
                     </button>
-                    <p className="mt-2 text-sm text-[#111814]/60">Changes within 72 hours of your interview require assistance at info@valorwell.org.</p>
+                    <p className="mt-2 text-sm text-[#111814]/60">New interview bookings must be at least 72 hours in advance.</p>
                   </div>
                 </section>
               ) : (

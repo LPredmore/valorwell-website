@@ -1534,6 +1534,148 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_operations_thumbnail_expression_presets: {
+        Row: {
+          active: boolean
+          brow_style: string
+          camera_framing: string
+          code: string
+          created_at: string
+          emotion_family: string
+          energy_level: number
+          eye_direction: string
+          facial_expression: string
+          gesture_action: string
+          head_angle: string
+          hook_text_placement: string
+          id: string
+          mouth_style: string
+          name: string
+          person_positioning: string
+          pose_family: string
+          prompt_fragment: string
+          shoulder_angle: string
+          sort_order: number
+          tenant_id: string
+          tension_level: number
+          updated_at: string
+          valence: string
+        }
+        Insert: {
+          active?: boolean
+          brow_style: string
+          camera_framing: string
+          code: string
+          created_at?: string
+          emotion_family: string
+          energy_level: number
+          eye_direction: string
+          facial_expression: string
+          gesture_action: string
+          head_angle: string
+          hook_text_placement: string
+          id?: string
+          mouth_style: string
+          name: string
+          person_positioning: string
+          pose_family: string
+          prompt_fragment: string
+          shoulder_angle: string
+          sort_order?: number
+          tenant_id: string
+          tension_level: number
+          updated_at?: string
+          valence: string
+        }
+        Update: {
+          active?: boolean
+          brow_style?: string
+          camera_framing?: string
+          code?: string
+          created_at?: string
+          emotion_family?: string
+          energy_level?: number
+          eye_direction?: string
+          facial_expression?: string
+          gesture_action?: string
+          head_angle?: string
+          hook_text_placement?: string
+          id?: string
+          mouth_style?: string
+          name?: string
+          person_positioning?: string
+          pose_family?: string
+          prompt_fragment?: string
+          shoulder_angle?: string
+          sort_order?: number
+          tenant_id?: string
+          tension_level?: number
+          updated_at?: string
+          valence?: string
+        }
+        Relationships: []
+      }
+      ai_operations_thumbnail_expression_usage: {
+        Row: {
+          clip_id: string
+          emotion_family: string
+          generation_revision: number
+          id: number
+          preset_id: string
+          project_id: string
+          selected_at: string
+          selection_reason: string
+          speaker_name: string
+          tenant_id: string
+        }
+        Insert: {
+          clip_id: string
+          emotion_family: string
+          generation_revision: number
+          id?: never
+          preset_id: string
+          project_id: string
+          selected_at?: string
+          selection_reason: string
+          speaker_name: string
+          tenant_id: string
+        }
+        Update: {
+          clip_id?: string
+          emotion_family?: string
+          generation_revision?: number
+          id?: never
+          preset_id?: string
+          project_id?: string
+          selected_at?: string
+          selection_reason?: string
+          speaker_name?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_operations_thumbnail_expression_usage_clip_id_fkey"
+            columns: ["clip_id"]
+            isOneToOne: false
+            referencedRelation: "ai_operations_video_clips"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_operations_thumbnail_expression_usage_preset_id_fkey"
+            columns: ["preset_id"]
+            isOneToOne: false
+            referencedRelation: "ai_operations_thumbnail_expression_presets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_operations_thumbnail_expression_usage_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "ai_operations_video_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_operations_video_clips: {
         Row: {
           camera_framing: string | null
@@ -1583,6 +1725,12 @@ export type Database = {
           source_revision: number
           start_seconds: number
           status: string
+          thumbnail_expression_family: string | null
+          thumbnail_expression_locked: boolean
+          thumbnail_expression_preset_id: string | null
+          thumbnail_expression_selected_at: string | null
+          thumbnail_expression_selection_reason: string | null
+          thumbnail_expression_selection_version: number | null
           thumbnail_generation_revision: number
           thumbnail_input_fingerprint: string | null
           thumbnail_metadata_input_fingerprint: string | null
@@ -1650,6 +1798,12 @@ export type Database = {
           source_revision?: number
           start_seconds: number
           status?: string
+          thumbnail_expression_family?: string | null
+          thumbnail_expression_locked?: boolean
+          thumbnail_expression_preset_id?: string | null
+          thumbnail_expression_selected_at?: string | null
+          thumbnail_expression_selection_reason?: string | null
+          thumbnail_expression_selection_version?: number | null
           thumbnail_generation_revision?: number
           thumbnail_input_fingerprint?: string | null
           thumbnail_metadata_input_fingerprint?: string | null
@@ -1717,6 +1871,12 @@ export type Database = {
           source_revision?: number
           start_seconds?: number
           status?: string
+          thumbnail_expression_family?: string | null
+          thumbnail_expression_locked?: boolean
+          thumbnail_expression_preset_id?: string | null
+          thumbnail_expression_selected_at?: string | null
+          thumbnail_expression_selection_reason?: string | null
+          thumbnail_expression_selection_version?: number | null
           thumbnail_generation_revision?: number
           thumbnail_input_fingerprint?: string | null
           thumbnail_metadata_input_fingerprint?: string | null
@@ -1742,6 +1902,13 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "ai_operations_video_projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_operations_video_clips_thumbnail_expression_preset_id_fkey"
+            columns: ["thumbnail_expression_preset_id"]
+            isOneToOne: false
+            referencedRelation: "ai_operations_thumbnail_expression_presets"
             referencedColumns: ["id"]
           },
         ]
@@ -10386,6 +10553,59 @@ export type Database = {
           },
         ]
       }
+      clinician_interview_bookings: {
+        Row: {
+          applicant_id: string
+          booking_date: string
+          created_at: string
+          ends_at: string
+          google_event_id: string | null
+          google_ical_uid: string | null
+          google_meet_url: string | null
+          id: string
+          starts_at: string
+          status: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          applicant_id: string
+          booking_date: string
+          created_at?: string
+          ends_at: string
+          google_event_id?: string | null
+          google_ical_uid?: string | null
+          google_meet_url?: string | null
+          id?: string
+          starts_at: string
+          status?: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          applicant_id?: string
+          booking_date?: string
+          created_at?: string
+          ends_at?: string
+          google_event_id?: string | null
+          google_ical_uid?: string | null
+          google_meet_url?: string | null
+          id?: string
+          starts_at?: string
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clinician_interview_bookings_applicant_id_fkey"
+            columns: ["applicant_id"]
+            isOneToOne: false
+            referencedRelation: "provider_applicants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cliniclevel_license_types: {
         Row: {
           id: string
@@ -10630,6 +10850,126 @@ export type Database = {
           },
           {
             foreignKeyName: "crm_activity_events_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_applicant_interview_campaign_control: {
+        Row: {
+          activated_by: string | null
+          campaign_name: string
+          enabled: boolean
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          activated_by?: string | null
+          campaign_name?: string
+          enabled?: boolean
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          activated_by?: string | null
+          campaign_name?: string
+          enabled?: boolean
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_applicant_interview_campaign_control_activated_by_fkey"
+            columns: ["activated_by"]
+            isOneToOne: false
+            referencedRelation: "client_journey_exception_owner_options"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "crm_applicant_interview_campaign_control_activated_by_fkey"
+            columns: ["activated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_applicant_interview_campaign_control_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: true
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_applicant_interview_cutovers: {
+        Row: {
+          started_at: string
+          tenant_id: string
+        }
+        Insert: {
+          started_at?: string
+          tenant_id: string
+        }
+        Update: {
+          started_at?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_applicant_interview_cutovers_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: true
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_applicant_interview_enrollments: {
+        Row: {
+          applicant_id: string
+          campaign_name: string
+          completed_at: string | null
+          id: string
+          started_at: string
+          status: string
+          stopped_reason: string | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          applicant_id: string
+          campaign_name?: string
+          completed_at?: string | null
+          id?: string
+          started_at?: string
+          status?: string
+          stopped_reason?: string | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          applicant_id?: string
+          campaign_name?: string
+          completed_at?: string | null
+          id?: string
+          started_at?: string
+          status?: string
+          stopped_reason?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_applicant_interview_enrollments_applicant_id_fkey"
+            columns: ["applicant_id"]
+            isOneToOne: false
+            referencedRelation: "provider_applicants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_applicant_interview_enrollments_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
@@ -15277,6 +15617,7 @@ export type Database = {
           priority: Database["public"]["Enums"]["crm_task_priority_enum"]
           recurrence: string | null
           relationship_contact_id: string | null
+          relationship_opportunity_id: string | null
           relationship_organization_id: string | null
           staff_id: string | null
           start_at: string | null
@@ -15303,6 +15644,7 @@ export type Database = {
           priority?: Database["public"]["Enums"]["crm_task_priority_enum"]
           recurrence?: string | null
           relationship_contact_id?: string | null
+          relationship_opportunity_id?: string | null
           relationship_organization_id?: string | null
           staff_id?: string | null
           start_at?: string | null
@@ -15329,6 +15671,7 @@ export type Database = {
           priority?: Database["public"]["Enums"]["crm_task_priority_enum"]
           recurrence?: string | null
           relationship_contact_id?: string | null
+          relationship_opportunity_id?: string | null
           relationship_organization_id?: string | null
           staff_id?: string | null
           start_at?: string | null
@@ -15381,6 +15724,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "relationship_contacts"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_tasks_relationship_opportunity_tenant_fk"
+            columns: ["tenant_id", "relationship_opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "relationship_opportunities"
+            referencedColumns: ["tenant_id", "id"]
+          },
+          {
+            foreignKeyName: "crm_tasks_relationship_opportunity_tenant_fk"
+            columns: ["tenant_id", "relationship_opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "relationship_opportunity_pipeline_v"
+            referencedColumns: ["tenant_id", "id"]
           },
           {
             foreignKeyName: "crm_tasks_relationship_organization_id_fkey"
@@ -19187,6 +19544,7 @@ export type Database = {
       }
       provider_applicants: {
         Row: {
+          applicant_origin: string | null
           application_data: Json
           close_reason: string | null
           closed_at: string | null
@@ -19218,6 +19576,7 @@ export type Database = {
           version: number
         }
         Insert: {
+          applicant_origin?: string | null
           application_data?: Json
           close_reason?: string | null
           closed_at?: string | null
@@ -19249,6 +19608,7 @@ export type Database = {
           version?: number
         }
         Update: {
+          applicant_origin?: string | null
           application_data?: Json
           close_reason?: string | null
           closed_at?: string | null
@@ -22901,6 +23261,10 @@ export type Database = {
       }
       relationship_opportunities: {
         Row: {
+          attention_assessed_at: string | null
+          attention_assessed_through_at: string | null
+          attention_note: string | null
+          attention_status: string | null
           cause_area: string | null
           closed_at: string | null
           created_at: string
@@ -22925,6 +23289,10 @@ export type Database = {
           veteran_priority: boolean
         }
         Insert: {
+          attention_assessed_at?: string | null
+          attention_assessed_through_at?: string | null
+          attention_note?: string | null
+          attention_status?: string | null
           cause_area?: string | null
           closed_at?: string | null
           created_at?: string
@@ -22949,6 +23317,10 @@ export type Database = {
           veteran_priority?: boolean
         }
         Update: {
+          attention_assessed_at?: string | null
+          attention_assessed_through_at?: string | null
+          attention_note?: string | null
+          attention_status?: string | null
           cause_area?: string | null
           closed_at?: string | null
           created_at?: string
@@ -26949,6 +27321,111 @@ export type Database = {
         }
         Relationships: []
       }
+      valorwell_daily_watch_runs: {
+        Row: {
+          created_at: string
+          error_code: string | null
+          findings: Json
+          metrics: Json
+          model: string
+          notified: boolean
+          run_day: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          error_code?: string | null
+          findings?: Json
+          metrics?: Json
+          model?: string
+          notified?: boolean
+          run_day: string
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          error_code?: string | null
+          findings?: Json
+          metrics?: Json
+          model?: string
+          notified?: boolean
+          run_day?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      valorwell_monitor_runs: {
+        Row: {
+          alert_error: string | null
+          alert_sent: boolean
+          completed_at: string | null
+          created_at: string
+          error_code: string | null
+          findings: Json
+          id: string
+          metrics: Json
+          model: string
+          run_day: string
+          status: string
+          summary: string | null
+        }
+        Insert: {
+          alert_error?: string | null
+          alert_sent?: boolean
+          completed_at?: string | null
+          created_at?: string
+          error_code?: string | null
+          findings?: Json
+          id?: string
+          metrics?: Json
+          model?: string
+          run_day: string
+          status: string
+          summary?: string | null
+        }
+        Update: {
+          alert_error?: string | null
+          alert_sent?: boolean
+          completed_at?: string | null
+          created_at?: string
+          error_code?: string | null
+          findings?: Json
+          id?: string
+          metrics?: Json
+          model?: string
+          run_day?: string
+          status?: string
+          summary?: string | null
+        }
+        Relationships: []
+      }
+      valorwell_watchdog_alerts: {
+        Row: {
+          notified_at: string | null
+          reason_code: string
+          run_day: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          notified_at?: string | null
+          reason_code: string
+          run_day: string
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          notified_at?: string | null
+          reason_code?: string
+          run_day?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       website_intake_migration_runs: {
         Row: {
           completed_at: string | null
@@ -29944,6 +30421,23 @@ export type Database = {
         }
         Returns: Json
       }
+      approve_relationship_email_issue: {
+        Args: { p_issue_id: string; p_opportunity_id: string }
+        Returns: Json
+      }
+      assign_bty_short_expression: {
+        Args: {
+          p_clip_id: string
+          p_core_visual: string
+          p_hook_fingerprint: string
+          p_hook_placement: string
+          p_metadata_fingerprint: string
+          p_primary_speaker: string
+          p_tenant_id: string
+          p_workflow_revision: number
+        }
+        Returns: Json
+      }
       assign_client_clinician: {
         Args: {
           client_id: string
@@ -30113,6 +30607,20 @@ export type Database = {
           p_tenant_id: string
         }
         Returns: boolean
+      }
+      checkpoint_relationship_gmail_backfill: {
+        Args: {
+          p_ambiguous: number
+          p_has_more: boolean
+          p_issue_id: string
+          p_lease_token: string
+          p_matched: number
+          p_next_page_token: string
+          p_scanned: number
+          p_tenant_id: string
+          p_unavailable: number
+        }
+        Returns: Json
       }
       claim_appointment_provisioning_work: {
         Args: {
@@ -30367,6 +30875,14 @@ export type Database = {
           p_lease_seconds?: number
           p_limit?: number
           p_worker_id: string
+        }
+        Returns: Json
+      }
+      claim_relationship_gmail_backfill: {
+        Args: {
+          p_issue_id: string
+          p_lease_seconds?: number
+          p_tenant_id: string
         }
         Returns: Json
       }
@@ -30988,6 +31504,18 @@ export type Database = {
       crm_allowed_lifecycle_transitions: {
         Args: { p_client_id: string }
         Returns: Json
+      }
+      crm_applicant_interview_campaign_status: {
+        Args: { p_tenant_id: string }
+        Returns: Json
+      }
+      crm_applicant_interview_can_access: {
+        Args: { p_applicant_id: string }
+        Returns: boolean
+      }
+      crm_applicant_interview_can_send: {
+        Args: { p_applicant_id: string }
+        Returns: boolean
       }
       crm_apply_remove: {
         Args: {
@@ -31798,6 +32326,10 @@ export type Database = {
         Args: { p_tenant_id: string }
         Returns: Json
       }
+      crm_set_applicant_interview_campaign_enabled: {
+        Args: { p_enabled: boolean; p_tenant_id: string }
+        Returns: Json
+      }
       crm_set_at_risk: {
         Args: {
           p_at_risk: boolean
@@ -32584,6 +33116,10 @@ export type Database = {
         Returns: Json
       }
       get_public_client_statement: { Args: { p_token: string }; Returns: Json }
+      get_relationship_attention_overview: {
+        Args: { p_organization_id: string }
+        Returns: Json
+      }
       get_relationship_calendar_channel: {
         Args: { p_connection_id: string }
         Returns: Json
@@ -33031,6 +33567,10 @@ export type Database = {
         Args: { _tenant_id: string; _user_id: string }
         Returns: boolean
       }
+      link_relationship_email_review_task: {
+        Args: { p_group_key: string; p_task_id: string }
+        Returns: Json
+      }
       list_bty_scheduler_calendar_connections: {
         Args: never
         Returns: {
@@ -33040,6 +33580,14 @@ export type Database = {
         }[]
       }
       list_crm_control_plane_flags: { Args: never; Returns: Json }
+      list_pending_exact_bty_gmail_message_ids: {
+        Args: { p_limit?: number }
+        Returns: Json
+      }
+      list_relationship_attention_queue: {
+        Args: { p_limit?: number }
+        Returns: Json
+      }
       list_relationship_campaign_candidates: {
         Args: { p_filters?: Json }
         Returns: Json
@@ -33050,6 +33598,14 @@ export type Database = {
       }
       list_relationship_communications: {
         Args: { p_subject?: Json }
+        Returns: Json
+      }
+      list_relationship_email_review_group_issues: {
+        Args: { p_group_key: string; p_limit?: number }
+        Returns: Json
+      }
+      list_relationship_email_review_queue: {
+        Args: { p_limit?: number }
         Returns: Json
       }
       list_relationship_feature_flags: { Args: never; Returns: Json }
@@ -33104,6 +33660,15 @@ export type Database = {
         Returns: Json
       }
       newsletter_mailbox_key: { Args: { p_email: string }; Returns: string }
+      override_bty_short_expression: {
+        Args: {
+          p_clip_id: string
+          p_lock?: boolean
+          p_preset_code: string
+          p_tenant_id: string
+        }
+        Returns: Json
+      }
       payroll_admin_approve_line: {
         Args: {
           p_client_action_id?: string
@@ -33266,6 +33831,10 @@ export type Database = {
       preview_relationship_bty_reconciliation: { Args: never; Returns: Json }
       process_billing_clinical_outbox_v1: {
         Args: { p_limit?: number }
+        Returns: Json
+      }
+      process_relationship_email_review_task_cleanup: {
+        Args: { p_apply?: boolean; p_limit?: number }
         Returns: Json
       }
       process_relationship_unsubscribe: {
@@ -33603,6 +34172,15 @@ export type Database = {
           p_demand_id: string
           p_prior_version: number
           p_reason: string
+        }
+        Returns: Json
+      }
+      release_relationship_gmail_backfill: {
+        Args: {
+          p_error_code: string
+          p_issue_id: string
+          p_lease_token: string
+          p_tenant_id: string
         }
         Returns: Json
       }
@@ -34036,6 +34614,14 @@ export type Database = {
         Args: { p_enabled: boolean; p_flag_name: string; p_reason: string }
         Returns: Json
       }
+      set_relationship_opportunity_attention: {
+        Args: {
+          p_attention_status: string
+          p_note: string
+          p_opportunity_id: string
+        }
+        Returns: Json
+      }
       set_staff_care_pathway_readiness: {
         Args: {
           p_evidence?: Json
@@ -34441,6 +35027,10 @@ export type Database = {
           p_status: string
         }
         Returns: {
+          attention_assessed_at: string | null
+          attention_assessed_through_at: string | null
+          attention_note: string | null
+          attention_status: string | null
           cause_area: string | null
           closed_at: string | null
           created_at: string
@@ -34695,6 +35285,16 @@ export type Database = {
         }
         Returns: Json
       }
+      valorwell_daily_watch_ambiguity_snapshot_v1: {
+        Args: never
+        Returns: Json
+      }
+      valorwell_daily_watch_cron_token_valid_v1: {
+        Args: { p_token: string }
+        Returns: boolean
+      }
+      valorwell_daily_watch_snapshot_v1: { Args: never; Returns: Json }
+      valorwell_monitor_snapshot: { Args: never; Returns: Json }
       verify_relationship_referral: {
         Args: {
           p_disclosure: string
@@ -35128,6 +35728,7 @@ export type Database = {
         | "severe"
       provider_applicant_status_enum:
         | "new"
+        | "temp"
         | "contacted"
         | "screening"
         | "application"
@@ -35138,6 +35739,7 @@ export type Database = {
         | "withdrawn"
         | "no_response"
         | "inactive"
+        | "interview_scheduled"
       provider_availability_confirmation_state_enum:
         | "current"
         | "due"
@@ -35692,6 +36294,7 @@ export const Constants = {
       ],
       provider_applicant_status_enum: [
         "new",
+        "temp",
         "contacted",
         "screening",
         "application",
@@ -35702,6 +36305,7 @@ export const Constants = {
         "withdrawn",
         "no_response",
         "inactive",
+        "interview_scheduled",
       ],
       provider_availability_confirmation_state_enum: [
         "current",

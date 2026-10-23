@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 // Guardrails for the clinician qualification flow's hard boundaries:
@@ -6,18 +7,11 @@ import { describe, expect, it } from "vitest";
 // (including the paused "Invitation to Interview" campaign), and the initial
 // invite email must point at the qualification form — never the interview
 // scheduler.
-const registerSource = readFileSync(
-  new URL("../../supabase/functions/register-clinician-interest/index.ts", import.meta.url),
-  "utf8",
-);
-const applicationSource = readFileSync(
-  new URL("../../supabase/functions/therapist-application/index.ts", import.meta.url),
-  "utf8",
-);
-const inviteSource = readFileSync(
-  new URL("../../supabase/functions/_shared/therapistInvite.ts", import.meta.url),
-  "utf8",
-);
+const readFunction = (relative: string) =>
+  readFileSync(join(process.cwd(), "supabase", "functions", relative), "utf8");
+const registerSource = readFunction("register-clinician-interest/index.ts");
+const applicationSource = readFunction("therapist-application/index.ts");
+const inviteSource = readFunction("_shared/therapistInvite.ts");
 
 describe("clinician intake guardrails", () => {
   it("register-clinician-interest never writes provider_applicants or CRM campaign tables", () => {

@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, it } from "vitest";
-// @ts-expect-error plain .mjs build script
 import { fetchWithRetry, resetRetryBudgetForTests } from "../../scripts/fetch-with-retry.mjs";
 
 const opts = (fetchImpl: () => Promise<Response>) => ({ delays: [1, 1, 1, 1], fetchImpl, sleep: async () => {} });

@@ -16,6 +16,8 @@ const BodySchema = z.object({
   lastName: z.string().trim().min(1).max(100),
   email: z.string().trim().email().max(255),
   communicationConsent: z.literal(true),
+  phone: z.string().trim().max(18).optional().default(""),
+  smsConsent: z.boolean().optional().default(false),
   company: z.string().max(200).optional().default(""),
   submissionKey: z.string().max(200).optional().default(""),
 });
@@ -46,6 +48,14 @@ async function queueAndSendInvite(
   firstName: string,
 ) {
   try {
+    // Only a genuinely NEW, source-linked CRM applicant receives automated
+    // outreach. Existing Legacy/Indeed/staff identities remain manual review.
+    const {data:eligible,error:eligibilityError}=await admin.rpc(
+      "crm_can_send_new_therapist_interest",{p_submission_id:submissionId});
+    if(eligibilityError||eligible!==true){
+      if(eligibilityError) console.error(JSON.stringify({fn:"register-clinician-interest",stage:"crm_gate",code:eligibilityError.code}));
+      return;
+    }
     const { data: invite, error } = await admin
       .from("therapist_application_invites")
       .insert({ tenant_id: TENANT_ID, submission_id: submissionId, email })
@@ -158,6 +168,8 @@ serve(async (req) => {
       lastName,
       email,
       communicationConsent,
+      phone,
+      smsConsent,
       company,
       submissionKey,
     } = parsed.data;
@@ -181,6 +193,9 @@ serve(async (req) => {
     });
 
     const normalizedEmail = email.toLowerCase();
+    const phoneValid = !phone || /^[+]1[2-9][0-9]{9}$/.test(phone);
+    if(!phoneValid || (smsConsent && !phone))
+      return respond(400,{ok:false,result:"validation_failed",message:"Provide a valid US mobile number for optional texts."});
     const sourceKey =
       submissionKey && submissionKey.length > 0
         ? submissionKey
@@ -213,6 +228,8 @@ serve(async (req) => {
           first_name: firstName,
           last_name: lastName,
           email: normalizedEmail,
+          phone: phone || null,
+          sms_consent: smsConsent === true && Boolean(phone),
           source: "clinician_interest_form",
         },
       })

@@ -19,6 +19,7 @@ import DonatePage from "./pages/DonatePage";
 import BtyBillingHubPage from "./pages/BtyBillingHubPage";
 import BtySchedulerPage from "./pages/BtySchedulerPage";
 import ClinicianInterviewSchedulerPage from "./pages/ClinicianInterviewSchedulerPage";
+import TherapistApplicationPage from "./pages/TherapistApplicationPage";
 import Clinicians from "./pages/Clinicians";
 import GetCareWithSignup from "./pages/GetCareWithSignup";
 import Partner from "./pages/Partner";
@@ -69,6 +70,7 @@ const routeElements: Record<string, ReactNode> = {
   "/beyond-the-yellow": <BtyBillingHubPage />,
   "/beyond-the-yellow/schedule": <BtySchedulerPage />,
   "/clinicians/interview": <ClinicianInterviewSchedulerPage />,
+  "/therapistapplication": <TherapistApplicationPage />,
   "/network": <NetworkPage />,
   "/get-care": <GetCareWithSignup />,
   "/clinicians": <Clinicians />,

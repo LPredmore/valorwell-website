@@ -20,6 +20,7 @@ import BtyBillingHubPage from "./pages/BtyBillingHubPage";
 import BtySchedulerPage from "./pages/BtySchedulerPage";
 import ClinicianInterviewSchedulerPage from "./pages/ClinicianInterviewSchedulerPage";
 import Clinicians from "./pages/Clinicians";
+import TherapistApplication from "./pages/TherapistApplication";
 import GetCareWithSignup from "./pages/GetCareWithSignup";
 import Partner from "./pages/Partner";
 import Contact from "./pages/Contact";
@@ -72,6 +73,7 @@ const routeElements: Record<string, ReactNode> = {
   "/network": <NetworkPage />,
   "/get-care": <GetCareWithSignup />,
   "/clinicians": <Clinicians />,
+  "/therapistapplication": <TherapistApplication />,
   "/veteran-mental-health-care": <AuthorityVeteranMentalHealthCare />,
   "/va-community-care-mental-health": <AuthorityVACommunityCareMentalHealth />,
   "/military-family-therapy": <AuthorityMilitaryFamilyTherapy />,

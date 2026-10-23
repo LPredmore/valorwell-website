@@ -95,7 +95,6 @@ export default function TherapistApplicationPage() {
         }
       })
       .finally(() => setBusy(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const requestCode = async (event: FormEvent) => {

@@ -42,6 +42,19 @@ export async function sendTherapistInvite(
   invite: InviteRow,
   firstName: string | null,
 ): Promise<"sent" | "failed"> {
+  // This immediate interest-form email is part of the recruiter campaign.
+  // Respect the same production kill switch as scheduled follow-ups.
+  // Fail CLOSED if the switch cannot be read (e.g. database outage).
+  const { data: campaign, error: campaignError } = await admin
+    .from("therapist_application_followup_campaign_control")
+    .select("enabled")
+    .eq("tenant_id", "00000000-0000-0000-0000-000000000001")
+    .maybeSingle();
+  if (campaignError || campaign?.enabled !== true) {
+    // Do not mark pending invitations as failed when explicitly paused:
+    // manual resumption should be intentional and independently reviewed.
+    return "failed";
+  }
   const apiKey = Deno.env.get("RESEND_API_KEY");
   if (!apiKey) {
     console.error(JSON.stringify({ fn: "therapist-invite", inviteId: invite.id, result: "failed", reason: "missing_resend_key" }));

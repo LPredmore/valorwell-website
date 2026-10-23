@@ -15,6 +15,11 @@ import {
   validateStepTwo,
 } from "./logic.ts";
 import { sendTherapistInvite, type InviteRow } from "../_shared/therapistInvite.ts";
+import {
+  validateApplicantProfile,validateApplicantDisclosures,validateApplicantEmployment,
+  validateApplicantAttestation,type ApplicantDetails
+} from "../_shared/therapistProfessional.ts";
+import {parseResume} from "../_shared/therapistResume.ts";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -177,6 +182,9 @@ type ApplicationRow = {
   license_numbers: Record<string, string>;
   npi: string | null;
   npi_declared: boolean | null;
+  details: ApplicantDetails;
+  provider_applicant_id: string | null;
+  source_submission_id: string | null;
   status: "in_progress" | "submitted";
   completed_at: string | null;
 };
@@ -191,6 +199,7 @@ function serialize(row: ApplicationRow) {
     licenseNumbers: row.license_numbers ?? {},
     npi: row.npi,
     npiDeclared: row.npi_declared,
+    details: row.details ?? {},
     status: row.status,
     completedAt: row.completed_at,
   };
@@ -199,7 +208,7 @@ function serialize(row: ApplicationRow) {
 async function loadApplication(db: SupabaseClient, id: string): Promise<ApplicationRow> {
   const { data, error } = await db
     .from("therapist_applications")
-    .select("id,email,first_name,last_name,license_category,states,license_numbers,npi,npi_declared,status,completed_at")
+    .select("id,email,first_name,last_name,license_category,states,license_numbers,npi,npi_declared,details,provider_applicant_id,source_submission_id,status,completed_at")
     .eq("tenant_id", TENANT_ID)
     .eq("id", id)
     .maybeSingle();
@@ -210,7 +219,7 @@ async function loadApplication(db: SupabaseClient, id: string): Promise<Applicat
 async function getOrCreateApplication(db: SupabaseClient, email: string, identity: Identity): Promise<ApplicationRow> {
   const { data: existing, error: readError } = await db
     .from("therapist_applications")
-    .select("id,email,first_name,last_name,license_category,states,license_numbers,npi,npi_declared,status,completed_at")
+    .select("id,email,first_name,last_name,license_category,states,license_numbers,npi,npi_declared,details,provider_applicant_id,source_submission_id,status,completed_at")
     .eq("tenant_id", TENANT_ID)
     .eq("email", email)
     .maybeSingle();
@@ -227,14 +236,14 @@ async function getOrCreateApplication(db: SupabaseClient, email: string, identit
       first_name: identity.firstName,
       last_name: identity.lastName,
     })
-    .select("id,email,first_name,last_name,license_category,states,license_numbers,npi,npi_declared,status,completed_at")
+    .select("id,email,first_name,last_name,license_category,states,license_numbers,npi,npi_declared,details,provider_applicant_id,source_submission_id,status,completed_at")
     .single();
   if (insertError) {
     // Concurrent verify for the same email: read the row the other request made.
     if (insertError.code === "23505") {
       const { data: raced } = await db
         .from("therapist_applications")
-        .select("id,email,first_name,last_name,license_category,states,license_numbers,npi,npi_declared,status,completed_at")
+        .select("id,email,first_name,last_name,license_category,states,license_numbers,npi,npi_declared,details,provider_applicant_id,source_submission_id,status,completed_at")
         .eq("tenant_id", TENANT_ID)
         .eq("email", email)
         .maybeSingle();
@@ -392,6 +401,24 @@ async function save(db: SupabaseClient, session: { applicationId: string; email:
     if (!parsed.ok) return respond({ ok: false, error: parsed.error }, 400);
     patch.npi_declared = parsed.value.npiDeclared;
     patch.npi = parsed.value.npi;
+  } else if (step === 4) {
+    const parsed = validateApplicantProfile(input.profile);
+    if (!parsed.ok) return respond({ok:false,error:parsed.error},400);
+    patch.first_name = parsed.value.firstName;
+    patch.last_name = parsed.value.lastName;
+    patch.details = {...(application.details ?? {}),profile:parsed.value};
+  } else if (step === 5) {
+    const parsed = validateApplicantDisclosures(input.disclosures);
+    if (!parsed.ok) return respond({ok:false,error:parsed.error},400);
+    patch.details = {...(application.details ?? {}),disclosures:parsed.value};
+  } else if (step === 6) {
+    const parsed = validateApplicantEmployment(input.employment);
+    if (!parsed.ok) return respond({ok:false,error:parsed.error},400);
+    patch.details = {...(application.details ?? {}),employment:parsed.value};
+  } else if (step === 7) {
+    const parsed = validateApplicantAttestation(input.attestation);
+    if (!parsed.ok) return respond({ok:false,error:parsed.error},400);
+    patch.details = {...(application.details ?? {}),attestation:{...parsed.value,attestedAt:new Date().toISOString()}};
   } else {
     return respond({ ok: false, error: "Unknown application step." }, 400);
   }
@@ -401,7 +428,7 @@ async function save(db: SupabaseClient, session: { applicationId: string; email:
     .update(patch)
     .eq("id", application.id)
     .eq("status", "in_progress")
-    .select("id,email,first_name,last_name,license_category,states,license_numbers,npi,npi_declared,status,completed_at")
+    .select("id,email,first_name,last_name,license_category,states,license_numbers,npi,npi_declared,details,provider_applicant_id,source_submission_id,status,completed_at")
     .maybeSingle();
   if (error) throw new Error("Your answers could not be saved. Please try again.");
   return respond({ ok: true, application: serialize((updated ?? application) as ApplicationRow) });
@@ -427,15 +454,29 @@ async function complete(db: SupabaseClient, session: { applicationId: string; em
   const stepThree = validateStepThree({ hasNpi: application.npi_declared, npi: application.npi });
   if (!stepThree.ok) return respond({ ok: false, error: stepThree.error, step: 3 }, 400);
 
-  const { data: updated, error } = await db
-    .from("therapist_applications")
-    .update({ status: "submitted", completed_at: new Date().toISOString() })
-    .eq("id", application.id)
-    .eq("status", "in_progress")
-    .select("id,email,first_name,last_name,license_category,states,license_numbers,npi,npi_declared,status,completed_at")
-    .maybeSingle();
-  if (error) throw new Error("Your application could not be submitted. Please try again.");
-  return respond({ ok: true, application: serialize((updated ?? { ...application, status: "submitted" }) as ApplicationRow) });
+
+  const profile = validateApplicantProfile(application.details?.profile);
+  if (!profile.ok) return respond({ok:false,error:profile.error,step:4},400);
+  const disclosures=validateApplicantDisclosures(application.details?.disclosures);
+  if (!disclosures.ok) return respond({ok:false,error:disclosures.error,step:5},400);
+  const employment=validateApplicantEmployment(application.details?.employment);
+  if (!employment.ok) return respond({ok:false,error:employment.error,step:6},400);
+  const attestation=validateApplicantAttestation(application.details?.attestation);
+  if (!attestation.ok) return respond({ok:false,error:attestation.error,step:7},400);
+
+  // Single database transaction serializes identity linking, CRM upsert,
+  // website submission routing and final application status. Existing
+  // Legacy/Indeed applicants keep their owner, status and manual notes.
+  const {error} = await db.rpc("crm_finalize_therapist_professional_application",{
+    p_application_id:application.id
+  });
+  if (error) {
+    console.error(JSON.stringify({fn:"therapist-application",stage:"finalize",code:error.code}));
+    throw new Error("Your application could not be finalized. Please try again.");
+  }
+  const updated=await loadApplication(db,application.id);
+  return respond({ok:true,application:serialize(updated)});
+
 }
 
 // Cron-only retry sweep for invitation emails that failed their first send.
@@ -477,6 +518,18 @@ Deno.serve(async (req) => {
     if (action === "send_pending_invites") return await sendPendingInvites(db, req);
 
     const session = await authenticated(input);
+    if (action === "parse_resume") {
+      const application=await loadApplication(db,session.applicationId);
+      if (normalizeEmail(application.email)!==session.email || application.status==="submitted")
+        return respond({ok:false,error:"Your application is not available for edits."},403);
+      try {
+        const entries=await parseResume(input);
+        return respond({ok:true,entries});
+      } catch (err) {
+        const safe=err instanceof Error?err.message:"Could not parse the résumé.";
+        return respond({ok:false,error:safe},400);
+      }
+    }
     if (action === "session") {
       const application = await loadApplication(db, session.applicationId);
       return respond({ ok: true, application: serialize(application) });

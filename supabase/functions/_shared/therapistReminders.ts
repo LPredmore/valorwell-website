@@ -5,7 +5,7 @@
 import type {SupabaseClient} from "npm:@supabase/supabase-js@2";
 import {applicationReminderContent} from "./therapistReminderContent.ts";
 
-type Claimed = {id:string;tenant_id:string;invite_id:string;step:2|3;claim_token:string};
+type Claimed = {id:string;tenant_id:string;invite_id:string;step:2|3|4;claim_token:string};
 const safeError = (reason:string) => reason.replace(/[^a-zA-Z0-9_-]/g,"").slice(0,60);
 const normalizeEmail=(email:unknown)=>String(email??"").trim().toLowerCase();
 async function setOutcome(db:SupabaseClient,job:Claimed,status:"sent"|"failed"|"skipped",info?:string,providerId?:string) {

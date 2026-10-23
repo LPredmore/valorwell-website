@@ -25,7 +25,7 @@ export function inviteEmailHtml(firstName: string | null): string {
   return `<div style="font-family: Trebuchet MS, Verdana, sans-serif; color: #111814; line-height: 1.6; max-width: 560px;">
 <p>${greeting}</p>
 <p>Thank you for raising your hand to explore practicing with ValorWell. We received your interest and wanted to follow up while it's fresh.</p>
-<p>Your next small step is a short qualification form — it takes a couple of minutes and asks only about your licensure category, the states where you're licensed, your license numbers, and your NPI. Nothing else is needed yet.</p>
+<p>Your first step is a short license and NPI qualification form. You'll then be able to continue through the professional application, including relevant disclosures and optional work history. Your progress is saved along the way; a completed application is reviewed before interview invitations are offered.</p>
 <p style="margin: 28px 0;"><a href="${APPLICATION_URL}" style="background: #3B5147; color: #F4F1E8; padding: 12px 22px; border-radius: 6px; text-decoration: none; font-weight: bold;">Continue your application</a></p>
 <p style="font-size: 13px; color: #4a554f;">When you open the form, enter the same email address you used to register. We'll email you a one-time code to confirm it's you — no password needed.</p>
 <p>Questions? Just reply to this email and a real person will get back to you.</p>

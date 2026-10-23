@@ -1,5 +1,5 @@
 import {describe,expect,it} from "vitest";
-import {applicationReminderContent} from "../../supabase/functions/_shared/therapistReminders";
+import {applicationReminderContent} from "../../supabase/functions/_shared/therapistReminderContent";
 
 describe("therapist application reminder campaign",()=>{
   const link="https://valorwell.org/therapistapplication";

@@ -56,3 +56,8 @@ export function isConfirmedPersistence(result: IntakeResult): boolean {
 export function outageAlertKey(now: Date): string {
   return `clinician-intake-outage-${now.toISOString().slice(0, 13)}`;
 }
+
+/** The initial invitation goes out only for a brand-new, confirmed save. */
+export function shouldSendInvite(result: string, isHoneypot: boolean): boolean {
+  return !isHoneypot && result === "persisted";
+}

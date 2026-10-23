@@ -24,6 +24,8 @@ const formSchema = z.object({
     .trim()
     .email("Enter a valid email address.")
     .max(255),
+  phone: z.string().trim().max(30).optional().default(""),
+  smsConsent: z.boolean().optional().default(false),
   communicationConsent: z
     .boolean()
     .refine((value) => value, "Communication consent is required."),
@@ -50,12 +52,21 @@ export function ClinicianInterestForm() {
       lastName: "",
       email: "",
       communicationConsent: false,
+      phone: "",
+      smsConsent: false,
       company: "",
     },
   });
 
   const onSubmit = async (data: FormData) => {
     setSubmitError(null);
+    const digits=(data.phone??"").replace(/\D/g,"");
+    const usDigits=digits.length===11&&digits[0]==="1"?digits.slice(1):digits;
+    if((data.phone||data.smsConsent) && (usDigits.length!==10||!/^[2-9]/.test(usDigits))) {
+      setSubmitError("Enter a valid US mobile phone number, or leave both phone and SMS consent blank.");
+      return;
+    }
+    const phone=usDigits.length===10?"+1"+usDigits:"";
     if (!submissionKeyRef.current) {
       submissionKeyRef.current = createWebsiteSubmissionKey();
     }
@@ -69,6 +80,8 @@ export function ClinicianInterestForm() {
           lastName: data.lastName.trim(),
           email: data.email.trim().toLowerCase(),
           communicationConsent: data.communicationConsent,
+          phone,
+          smsConsent: Boolean(data.smsConsent)&&Boolean(phone),
           company: data.company?.trim() ?? "",
           submissionKey,
         },
@@ -180,6 +193,18 @@ export function ClinicianInterestForm() {
         {errors.email ? (
           <p className="mt-2 text-sm text-[#F2B7AA]">{errors.email.message}</p>
         ) : null}
+      </div>
+
+      <div className="mt-5">
+        <Label htmlFor="clinician-mobile" className="text-white">Mobile phone (optional)</Label>
+        <Input id="clinician-mobile" autoComplete="tel" type="tel" placeholder="(555) 555-1234"
+          className="mt-2 border-white/25 bg-white text-[#111814]" {...register("phone")}/>
+        <p className="mt-2 text-xs text-white/60">Adding a mobile number is optional. Email remains the primary contact method.</p>
+        <label className="mt-3 flex cursor-pointer items-start gap-3 text-sm leading-relaxed text-white/80">
+          <input type="checkbox" className="mt-1 h-4 w-4 shrink-0 accent-[#D7A92E]" {...register("smsConsent")}/>
+          <span>I agree to receive recruiting follow-up text messages from ValorWell at the mobile number I provided.
+            Consent is optional and is not required to apply. Message and data rates may apply. Reply STOP to opt out.</span>
+        </label>
       </div>
 
       <div className="absolute -left-[10000px] top-auto h-px w-px overflow-hidden" aria-hidden="true">

@@ -1,29 +1,42 @@
-export const APPLICATION_URL = "https://valorwell.org/therapistapplication";
-const escapes = (value:string) => value.replace(/&/g,"&amp;").replace(/</g,"&lt;")
- .replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
-export function applicationReminderContent(step:2|3,firstName:string|null) {
+export const APPLICATION_URL="https://valorwell.org/therapistapplication";
+const esc=(s:string)=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+ .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+export function applicationReminderContent(step:2|3|4,firstName:string|null) {
  const greeting=firstName?"Hi "+firstName.trim()+",":"Hi,";
- const subject=step===2
-  ?"A quick reminder about your ValorWell therapist application"
-  :"Final reminder: your ValorWell therapist application";
- const paragraphs=step===2?[
-   greeting,
-   "Thank you again for your interest in joining ValorWell. The next step is to complete your professional application so we can review your qualifications.",
-   "It starts with your licensure information and continues through a short professional profile. You can save your progress and return when convenient.",
-   "Continue your application: "+APPLICATION_URL,
-   "Use the same email address you provided when expressing interest. You'll receive a one-time verification code.",
-   "If you've already begun, there's nothing more you need to do in response to this email.",
-   "The ValorWell Team",
- ]:[
-   greeting,
-   "This is our final reminder about completing your ValorWell therapist application.",
-   "If you're still interested, we'd welcome the opportunity to review your qualifications. Completing the application is the next step before consideration for an interview.",
-   "Complete your application: "+APPLICATION_URL,
-   "Use the email address from your original interest registration. Your progress can be saved as you go.",
-   "We won't send additional reminders about this interest registration. You're welcome to return whenever the timing is right.",
-   "The ValorWell Team",
- ];
- const html=paragraphs.map(p=>"<p>"+escapes(p).replace(APPLICATION_URL,
- '<a href="'+APPLICATION_URL+'">'+APPLICATION_URL+"</a>")+"</p>").join("");
- return {subject,text:paragraphs.join("\n\n"),html};
+ const byStep={
+  2:{subject:"Checking in about your ValorWell therapist application",body:[
+    greeting,
+    "Thanks again for your interest in ValorWell. A couple of days ago, we emailed you a link to our professional application.",
+    "If you're interested in moving forward, we'd love for you to complete the application so we can learn a bit more about your licensure and experience.",
+    "Here is the application portal: "+APPLICATION_URL,
+    "Please use the same email address from your original interest registration. You can save your progress.",
+    "If you've already started, you can disregard this reminder.",
+    "Luke","ValorWell",
+  ]},
+  3:{subject:"Still interested in exploring ValorWell?",body:[
+    greeting,
+    "I wanted to check in once more about your interest in practicing with ValorWell.",
+    "I know schedules get busy. If the opportunity still sounds like a good fit, you can complete your professional application whenever you're ready.",
+    "Application portal: "+APPLICATION_URL,
+    "There's no need to reply if you've already begun, and you're welcome to reach out with any questions.",
+    "Luke","ValorWell",
+  ]},
+  4:{subject:"Final follow-up on your ValorWell therapist application",body:[
+    greeting,
+    "This is my last follow-up about your interest in joining ValorWell.",
+    "We haven't received a started application yet, so I'll close out our follow-up sequence for now. You're welcome to return if the timing becomes right.",
+    "If you'd still like us to consider your application, you can begin here: "+APPLICATION_URL,
+    "Thanks for your interest and for the work you do.",
+    "Luke","ValorWell",
+  ]}
+ } as const;
+ const entry=byStep[step];
+ if(!entry)throw new Error("Invalid follow-up step");
+ const paragraphs=[...entry.body];
+ return {
+  subject:entry.subject,
+  text:paragraphs.join("\n\n"),
+  html:paragraphs.map(p=>"<p>"+esc(p).replace(APPLICATION_URL,
+   '<a href="'+APPLICATION_URL+'">'+APPLICATION_URL+"</a>")+"</p>").join("")
+ };
 }

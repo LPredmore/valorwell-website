@@ -43,8 +43,8 @@ describe("step 2 validation (per-state license numbers)", () => {
 
   it("fails when any selected state is missing its number", () => {
     const result = validateStepTwo(["TX", "WI"], { TX: "123" });
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.error).toContain("WI");
+    if (result.ok) throw new Error("expected validation to fail");
+    expect(result.error).toContain("WI");
   });
 
   it("rejects non-object payloads", () => {

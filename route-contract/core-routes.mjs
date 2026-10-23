@@ -1,5 +1,14 @@
 export const routes = [
   {
+    "path": "/therapistapplication",
+    "title": "Therapist Application | ValorWell",
+    "description": "Secure continuation for clinicians who registered interest with ValorWell.",
+    "h1": "Your therapist application",
+    "lead": "Add your licensure, licensed states, state license numbers, and NPI if applicable.",
+    "indexable": false,
+    "sitemap": false
+  },
+  {
     "path": "/",
     "title": "ValorWell | Turning VA Coverage Into Mental Health Care",
     "description": "Born from one military family's struggle to use CHAMPVA, ValorWell builds care pathways and Foundation support when coverage still does not produce treatment.",

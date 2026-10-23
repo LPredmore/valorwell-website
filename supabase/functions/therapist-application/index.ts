@@ -20,6 +20,7 @@ import {
   validateApplicantAttestation,type ApplicantDetails
 } from "../_shared/therapistProfessional.ts";
 import {parseResume} from "../_shared/therapistResume.ts";
+import {processApplicationReminders} from "../_shared/therapistReminders.ts";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -503,7 +504,11 @@ async function sendPendingInvites(db: SupabaseClient, req: Request) {
     if (outcome === "sent") sent++;
     else failed++;
   }
-  return respond({ ok: true, checked: (invites ?? []).length, sent, failed });
+  // The initial interest email remains independent and immediate.
+  // The existing cron now also sends due campaign reminders with safe
+  // source/consent/application gates enforced by its service-role RPC.
+  const reminders=await processApplicationReminders(db);
+  return respond({ ok: true, initialInvites: {checked:(invites??[]).length,sent,failed}, reminders });
 }
 
 Deno.serve(async (req) => {

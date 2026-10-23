@@ -22,16 +22,15 @@ jobs:
         run: node scripts/check-positioning-guardrails.mjs
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-      - uses: oven-sh/setup-bun@v2
-      - run: bun install --frozen-lockfile
+          node-version: 24
+      - run: npm install --no-save --package-lock=false --no-audit --no-fund --registry=https://registry.npmjs.org
       - run: npm run typecheck
       - run: npm run test
-      - run: bun run build
-      - run: bun run lint
+      - run: npm run build
+      - run: npm run lint
       - name: Prove real React server prerendering
         run: node scripts/run-prerender-proof.mjs
       - name: Install Chromium for isolated browser acceptance
-        run: bunx playwright install --with-deps chromium
+        run: npx playwright install --with-deps chromium
       - name: Verify donation flow and hydration without external requests
-        run: bun run test:browser
+        run: npm run test:browser

@@ -75,6 +75,7 @@ export type TherapistApplication = {
   licenseNumbers: Record<string, string>;
   npi: string | null;
   npiDeclared: boolean | null;
+  details?: import("@/lib/therapistProfessional").ApplicantDetails;
   status: "in_progress" | "submitted";
   completedAt: string | null;
 };

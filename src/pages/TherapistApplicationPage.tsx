@@ -1,4 +1,6 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { ProfileQuestions, DisclosureQuestions, EmploymentQuestions, ReviewQuestions, EMPTY_PROFILE, EMPTY_DISCLOSURES, EMPTY_EMPLOYMENT, EMPTY_ATTESTATION } from "@/components/therapist/ProfessionalSteps";
+import { type ApplicantProfile, type ApplicantDisclosures, type ApplicantEmployment, type Attestation, type Employment, validateApplicantProfile, validateApplicantDisclosures, validateApplicantEmployment, validateApplicantAttestation } from "@/lib/therapistProfessional";
 import { CheckCircle2, ChevronLeft, ChevronRight, Loader2, LockKeyhole, Mail, Search, X } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { SEO } from "@/components/SEO";
@@ -26,6 +28,7 @@ type ApiResult = {
   error?: string;
   sessionToken?: string;
   application?: TherapistApplication;
+  entries?: Employment[];
   step?: number;
 };
 
@@ -42,7 +45,7 @@ async function invoke(body: Record<string, unknown>): Promise<ApiResult> {
   return (data ?? {}) as ApiResult;
 }
 
-const STEP_TITLES = ["Your license type", "Your license numbers", "Your NPI"];
+const STEP_TITLES = ["License type", "License numbers", "NPI", "Your details", "Disclosures", "Experience", "Review"];
 
 function stateName(code: string): string {
   return US_STATES.find((s) => s.code === code)?.name ?? code;
@@ -68,6 +71,11 @@ export default function TherapistApplicationPage() {
   // Step 3
   const [hasNpi, setHasNpi] = useState<boolean | null>(null);
   const [npi, setNpi] = useState("");
+  const [profile, setProfile] = useState<ApplicantProfile>(EMPTY_PROFILE);
+  const [disclosures, setDisclosures] = useState<ApplicantDisclosures>(EMPTY_DISCLOSURES);
+  const [employment, setEmployment] = useState<ApplicantEmployment>(EMPTY_EMPLOYMENT);
+  const [attestation, setAttestation] = useState<Attestation>(EMPTY_ATTESTATION);
+  const [parsingResume, setParsingResume] = useState(false);
 
   const hydrate = (saved: TherapistApplication) => {
     setApplication(saved);
@@ -76,6 +84,10 @@ export default function TherapistApplicationPage() {
     setLicenseNumbers(saved.licenseNumbers ?? {});
     setHasNpi(saved.npiDeclared);
     setNpi(saved.npi ?? "");
+    setProfile(saved.details?.profile ?? {...EMPTY_PROFILE,firstName:saved.firstName??"",lastName:saved.lastName??""});
+    setDisclosures(saved.details?.disclosures ?? EMPTY_DISCLOSURES);
+    setEmployment(saved.details?.employment ?? EMPTY_EMPLOYMENT);
+    setAttestation(saved.details?.attestation ?? EMPTY_ATTESTATION);
     if (saved.status === "submitted") setStage("done");
   };
 
@@ -160,7 +172,7 @@ export default function TherapistApplicationPage() {
         return;
       }
       body = { action: "save", sessionToken, step: 2, licenseNumbers };
-    } else {
+    } else if (step === 3) {
       if (hasNpi === null) {
         setError("Tell us whether you have an NPI number.");
         return;
@@ -170,6 +182,22 @@ export default function TherapistApplicationPage() {
         return;
       }
       body = { action: "save", sessionToken, step: 3, hasNpi, npi: npi.trim() };
+    } else if(step === 4) {
+      const checked=validateApplicantProfile(profile);
+      if (!checked.ok) {setError(checked.error);return;}
+      body={action:"save",sessionToken,step:4,profile:checked.value};
+    } else if(step === 5) {
+      const checked=validateApplicantDisclosures(disclosures);
+      if(!checked.ok){setError(checked.error);return;}
+      body={action:"save",sessionToken,step:5,disclosures:checked.value};
+    } else if(step === 6) {
+      const checked=validateApplicantEmployment(employment);
+      if(!checked.ok){setError(checked.error);return;}
+      body={action:"save",sessionToken,step:6,employment:checked.value};
+    } else {
+      const checked=validateApplicantAttestation(attestation);
+      if(!checked.ok){setError(checked.error);return;}
+      body={action:"save",sessionToken,step:7,attestation:checked.value};
     }
 
     setBusy(true);
@@ -196,6 +224,21 @@ export default function TherapistApplicationPage() {
     }
     setBusy(false);
     setStep(nextStep);
+  };
+
+  const parseUploadedResume = async (file:File) => {
+    if (!sessionToken) throw new Error("Verify your email to continue.");
+    if(file.size>2*1024*1024)throw new Error("Please upload a file smaller than 2 MB.");
+    setParsingResume(true);
+    try {
+      const bytes=new Uint8Array(await file.arrayBuffer());
+      let binary="";
+      for(let i=0;i<bytes.length;i+=8192)
+        binary+=String.fromCharCode(...bytes.subarray(i,Math.min(i+8192,bytes.length)));
+      const response=await invoke({action:"parse_resume",sessionToken,filename:file.name,base64:btoa(binary)});
+      if(!response.ok || !response.entries)throw new Error(response.error??"Please enter work history manually or skip.");
+      setEmployment({choice:"resume",entries:response.entries});
+    } finally {setParsingResume(false);}
   };
 
   const filteredStates = useMemo(() => {

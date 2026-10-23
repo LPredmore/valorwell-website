@@ -50,7 +50,7 @@ describe("ClinicianInterestForm", () => {
     vi.clearAllMocks();
   });
 
-  it("collects only the initial interest fields and exposes a stable form identity", () => {
+  it("collects low-friction interest and optional consented mobile data", () => {
     const { container } = render(<ClinicianInterestForm />);
     expect(container.querySelector("form")).toHaveAttribute(
       "id", "valorwell-clinician-interest",
@@ -66,10 +66,25 @@ describe("ClinicianInterestForm", () => {
       screen.getByLabelText(/I agree to receive clinician onboarding/i),
     ).toBeInTheDocument();
 
-    expect(screen.queryByLabelText(/phone/i)).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/Mobile phone/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/I agree to receive recruiting follow-up text/i)).toBeInTheDocument();
     expect(screen.queryByLabelText(/license type/i)).not.toBeInTheDocument();
     expect(screen.queryByLabelText(/licensed state/i)).not.toBeInTheDocument();
     expect(screen.queryByLabelText(/password/i)).not.toBeInTheDocument();
+  });
+
+  it("requires a valid number for optional SMS and normalizes opted-in US numbers",async()=>{
+    render(<ClinicianInterestForm/>);
+    fillRequired();
+    fireEvent.click(screen.getByLabelText(/I agree to receive recruiting follow-up text/i));
+    fireEvent.click(screen.getByRole("button",{name:"Raise My Hand"}));
+    expect(await screen.findByRole("alert")).toHaveTextContent(/valid US mobile phone number/i);
+    expect(mocks.invoke).not.toHaveBeenCalled();
+    fireEvent.change(screen.getByLabelText(/Mobile phone/i),{target:{value:"(816) 555-0123"}});
+    fireEvent.click(screen.getByRole("button",{name:"Raise My Hand"}));
+    await waitFor(()=>expect(mocks.invoke).toHaveBeenCalledOnce());
+    expect(mocks.invoke.mock.calls[0][1].body.phone).toBe("+18165550123");
+    expect(mocks.invoke.mock.calls[0][1].body.smsConsent).toBe(true);
   });
 
   it("validates required fields before invoking the function", async () => {
@@ -95,6 +110,8 @@ describe("ClinicianInterestForm", () => {
         lastName: "Taylor",
         email: "clinician@example.com",
         communicationConsent: true,
+        phone: "",
+        smsConsent: false,
         company: "",
         submissionKey: "clinician-interest-1",
       },

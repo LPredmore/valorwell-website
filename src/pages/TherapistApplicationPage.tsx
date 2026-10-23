@@ -184,19 +184,19 @@ export default function TherapistApplicationPage() {
       body = { action: "save", sessionToken, step: 3, hasNpi, npi: npi.trim() };
     } else if(step === 4) {
       const checked=validateApplicantProfile(profile);
-      if (!checked.ok) {setError(checked.error);return;}
+      if (!checked.ok) {setError('error' in checked?checked.error:'Review this section.');return;}
       body={action:"save",sessionToken,step:4,profile:checked.value};
     } else if(step === 5) {
       const checked=validateApplicantDisclosures(disclosures);
-      if(!checked.ok){setError(checked.error);return;}
+      if(!checked.ok){setError('error' in checked?checked.error:'Review this section.');return;}
       body={action:"save",sessionToken,step:5,disclosures:checked.value};
     } else if(step === 6) {
       const checked=validateApplicantEmployment(employment);
-      if(!checked.ok){setError(checked.error);return;}
+      if(!checked.ok){setError('error' in checked?checked.error:'Review this section.');return;}
       body={action:"save",sessionToken,step:6,employment:checked.value};
     } else {
       const checked=validateApplicantAttestation(attestation);
-      if(!checked.ok){setError(checked.error);return;}
+      if(!checked.ok){setError('error' in checked?checked.error:'Review this section.');return;}
       body={action:"save",sessionToken,step:7,attestation:checked.value};
     }
 

@@ -137,7 +137,7 @@ async function findIdentity(db: SupabaseClient, email: string): Promise<Identity
     .eq("tenant_id", TENANT_ID)
     .eq("source_system", "website")
     .eq("submission_type", "clinician_application")
-    .filter("lower(payload->>email)", "eq", email)
+    .eq("payload->>email", email)
     .order("submitted_at", { ascending: false })
     .limit(1);
   if (subError) throw new Error("Registration lookup is unavailable.");
@@ -212,7 +212,7 @@ async function getOrCreateApplication(db: SupabaseClient, email: string, identit
     .from("therapist_applications")
     .select("id,email,first_name,last_name,license_category,states,license_numbers,npi,npi_declared,status,completed_at")
     .eq("tenant_id", TENANT_ID)
-    .filter("lower(email)", "eq", email)
+    .eq("email", email)
     .maybeSingle();
   if (readError) throw new Error("Your application could not be loaded. Please try again.");
   if (existing) return existing as ApplicationRow;
@@ -236,7 +236,7 @@ async function getOrCreateApplication(db: SupabaseClient, email: string, identit
         .from("therapist_applications")
         .select("id,email,first_name,last_name,license_category,states,license_numbers,npi,npi_declared,status,completed_at")
         .eq("tenant_id", TENANT_ID)
-        .filter("lower(email)", "eq", email)
+        .eq("email", email)
         .maybeSingle();
       if (raced) return raced as ApplicationRow;
     }
@@ -288,7 +288,7 @@ async function requestCode(db: SupabaseClient, req: Request, input: Record<strin
     .from("therapist_application_codes")
     .select("id", { count: "exact", head: true })
     .eq("tenant_id", TENANT_ID)
-    .filter("lower(email)", "eq", email)
+    .eq("email", email)
     .gte("created_at", hourAgo);
   if (countError) throw new Error("Verification is temporarily unavailable. Please try again later.");
   if ((count ?? 0) >= CODES_PER_EMAIL_PER_HOUR) {
@@ -328,7 +328,7 @@ async function verifyCode(db: SupabaseClient, req: Request, input: Record<string
     .from("therapist_application_codes")
     .select("id, code_hash, expires_at, used_at, attempts")
     .eq("tenant_id", TENANT_ID)
-    .filter("lower(email)", "eq", email)
+    .eq("email", email)
     .order("created_at", { ascending: false })
     .limit(1);
   if (error) throw new Error("Verification is temporarily unavailable. Please try again later.");

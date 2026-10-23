@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import {
   LANGUAGES, PRE_INTERVIEW_DISCLOSURES, type ApplicantDisclosures,
   type ApplicantEmployment, type ApplicantProfile, type Attestation, type Employment,
-} from "../../supabase/functions/_shared/therapistProfessional";
+} from "@/lib/therapistProfessional";
 
 const inputClass = "mt-2";
 function Line({ label, value, onChange, required = false, placeholder = "", type = "text" }: {

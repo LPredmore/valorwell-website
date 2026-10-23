@@ -403,21 +403,21 @@ async function save(db: SupabaseClient, session: { applicationId: string; email:
     patch.npi = parsed.value.npi;
   } else if (step === 4) {
     const parsed = validateApplicantProfile(input.profile);
-    if (!parsed.ok) return respond({ok:false,error:parsed.error},400);
+    if (!parsed.ok) return respond({ok:false,error:('error' in parsed?parsed.error:'Invalid input.')},400);
     patch.first_name = parsed.value.firstName;
     patch.last_name = parsed.value.lastName;
     patch.details = {...(application.details ?? {}),profile:parsed.value};
   } else if (step === 5) {
     const parsed = validateApplicantDisclosures(input.disclosures);
-    if (!parsed.ok) return respond({ok:false,error:parsed.error},400);
+    if (!parsed.ok) return respond({ok:false,error:('error' in parsed?parsed.error:'Invalid input.')},400);
     patch.details = {...(application.details ?? {}),disclosures:parsed.value};
   } else if (step === 6) {
     const parsed = validateApplicantEmployment(input.employment);
-    if (!parsed.ok) return respond({ok:false,error:parsed.error},400);
+    if (!parsed.ok) return respond({ok:false,error:('error' in parsed?parsed.error:'Invalid input.')},400);
     patch.details = {...(application.details ?? {}),employment:parsed.value};
   } else if (step === 7) {
     const parsed = validateApplicantAttestation(input.attestation);
-    if (!parsed.ok) return respond({ok:false,error:parsed.error},400);
+    if (!parsed.ok) return respond({ok:false,error:('error' in parsed?parsed.error:'Invalid input.')},400);
     patch.details = {...(application.details ?? {}),attestation:{...parsed.value,attestedAt:new Date().toISOString()}};
   } else {
     return respond({ ok: false, error: "Unknown application step." }, 400);
@@ -456,13 +456,13 @@ async function complete(db: SupabaseClient, session: { applicationId: string; em
 
 
   const profile = validateApplicantProfile(application.details?.profile);
-  if (!profile.ok) return respond({ok:false,error:profile.error,step:4},400);
+  if (!profile.ok) return respond({ok:false,error:('error' in profile?profile.error:'Invalid profile.'),step:4},400);
   const disclosures=validateApplicantDisclosures(application.details?.disclosures);
-  if (!disclosures.ok) return respond({ok:false,error:disclosures.error,step:5},400);
+  if (!disclosures.ok) return respond({ok:false,error:('error' in disclosures?disclosures.error:'Invalid disclosures.'),step:5},400);
   const employment=validateApplicantEmployment(application.details?.employment);
-  if (!employment.ok) return respond({ok:false,error:employment.error,step:6},400);
+  if (!employment.ok) return respond({ok:false,error:('error' in employment?employment.error:'Invalid work history.'),step:6},400);
   const attestation=validateApplicantAttestation(application.details?.attestation);
-  if (!attestation.ok) return respond({ok:false,error:attestation.error,step:7},400);
+  if (!attestation.ok) return respond({ok:false,error:('error' in attestation?attestation.error:'Invalid attestation.'),step:7},400);
 
   // Single database transaction serializes identity linking, CRM upsert,
   // website submission routing and final application status. Existing

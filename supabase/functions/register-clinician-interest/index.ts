@@ -221,6 +221,9 @@ serve(async (req) => {
 
     if (!insertError && inserted?.id) {
       logEvent("info", { requestId, submissionKey: sourceKey, stage: "insert", result: "persisted", recovery: "none" });
+      if (shouldSendInvite("persisted", false)) {
+        await queueAndSendInvite(admin, inserted.id, normalizedEmail, firstName);
+      }
       return respond(200, { ok: true, result: "persisted", lifecycle: "interest_recorded", submissionId: inserted.id, requestId });
     }
 
@@ -231,6 +234,7 @@ serve(async (req) => {
       if (!lookupError && row) {
         if (matchesSubmission(row, expected)) {
           logEvent("info", { requestId, submissionKey: sourceKey, stage: "verify_lookup", result: "verified_duplicate", code: insertError?.code, recovery: "none" });
+          await retryFailedInvite(admin, row.id, firstName);
           return respond(200, { ok: true, result: "verified_duplicate", lifecycle: "interest_recorded", submissionId: row.id, requestId });
         }
         logEvent("error", { requestId, submissionKey: sourceKey, stage: "verify_lookup", result: "key_conflict", code: insertError?.code, httpStatus: 409, recovery: "retry_pending" });

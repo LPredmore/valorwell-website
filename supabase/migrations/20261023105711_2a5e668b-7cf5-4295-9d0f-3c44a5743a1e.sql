@@ -1,3 +1,0 @@
-CREATE POLICY "therapist_applications_no_client_access" ON public.therapist_applications FOR ALL TO anon, authenticated USING (false) WITH CHECK (false);
-CREATE POLICY "therapist_application_codes_no_client_access" ON public.therapist_application_codes FOR ALL TO anon, authenticated USING (false) WITH CHECK (false);
-CREATE POLICY "therapist_application_invites_no_client_access" ON public.therapist_application_invites FOR ALL TO anon, authenticated USING (false) WITH CHECK (false);

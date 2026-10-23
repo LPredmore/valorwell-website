@@ -90,6 +90,15 @@ export const routes = [
     "sitemap": false
   },
   {
+    "path": "/therapistapplication",
+    "title": "Therapist Application | ValorWell",
+    "description": "Private qualification form for clinicians who registered interest with ValorWell: license category, licensed states, license numbers, and NPI.",
+    "h1": "Continue your application.",
+    "lead": "Verify your email, then share your license category, licensed states, license numbers, and NPI in three short steps.",
+    "indexable": false,
+    "sitemap": false
+  },
+  {
     "path": "/network",
     "title": "Beyond The Yellow Featured Organizations | ValorWell",
     "description": "Explore organizations featured through Beyond The Yellow, read their feature pages, and watch the conversations behind their work.",

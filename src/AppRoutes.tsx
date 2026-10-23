@@ -70,6 +70,7 @@ const routeElements: Record<string, ReactNode> = {
   "/beyond-the-yellow": <BtyBillingHubPage />,
   "/beyond-the-yellow/schedule": <BtySchedulerPage />,
   "/clinicians/interview": <ClinicianInterviewSchedulerPage />,
+  "/therapistapplication": <TherapistApplicationPage />,
   "/network": <NetworkPage />,
   "/get-care": <GetCareWithSignup />,
   "/clinicians": <Clinicians />,

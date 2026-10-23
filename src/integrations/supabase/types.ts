@@ -26611,6 +26611,159 @@ export type Database = {
         }
         Relationships: []
       }
+      therapist_application_codes: {
+        Row: {
+          attempts: number
+          code_hash: string
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          tenant_id: string
+          used_at: string | null
+        }
+        Insert: {
+          attempts?: number
+          code_hash: string
+          created_at?: string
+          email: string
+          expires_at: string
+          id?: string
+          tenant_id: string
+          used_at?: string | null
+        }
+        Update: {
+          attempts?: number
+          code_hash?: string
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          tenant_id?: string
+          used_at?: string | null
+        }
+        Relationships: []
+      }
+      therapist_application_invites: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          last_error: string | null
+          resend_id: string | null
+          sent_at: string | null
+          status: string
+          submission_id: string
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          last_error?: string | null
+          resend_id?: string | null
+          sent_at?: string | null
+          status?: string
+          submission_id: string
+          tenant_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          last_error?: string | null
+          resend_id?: string | null
+          sent_at?: string | null
+          status?: string
+          submission_id?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "therapist_application_invites_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "relationship_interest_submission_conflicts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "therapist_application_invites_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "website_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      therapist_applications: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          email: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          license_category: string | null
+          license_numbers: Json
+          npi: string | null
+          provider_applicant_id: string | null
+          source_submission_id: string | null
+          states: string[]
+          status: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          email: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          license_category?: string | null
+          license_numbers?: Json
+          npi?: string | null
+          provider_applicant_id?: string | null
+          source_submission_id?: string | null
+          states?: string[]
+          status?: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          email?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          license_category?: string | null
+          license_numbers?: Json
+          npi?: string | null
+          provider_applicant_id?: string | null
+          source_submission_id?: string | null
+          states?: string[]
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "therapist_applications_source_submission_id_fkey"
+            columns: ["source_submission_id"]
+            isOneToOne: false
+            referencedRelation: "relationship_interest_submission_conflicts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "therapist_applications_source_submission_id_fkey"
+            columns: ["source_submission_id"]
+            isOneToOne: false
+            referencedRelation: "website_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       therapist_outreach_prospects: {
         Row: {
           created_at: string

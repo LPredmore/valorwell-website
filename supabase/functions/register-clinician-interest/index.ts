@@ -30,7 +30,57 @@ import {
   isUniqueViolation,
   matchesSubmission,
   outageAlertKey,
+  shouldSendInvite,
 } from "./logic.ts";
+import { sendTherapistInvite } from "../_shared/therapistInvite.ts";
+
+// Durable, idempotent invitation outbox: one row per submission guarantees at
+// most one initial invite email, however often the form is retried. A failed
+// send is retried here on a verified duplicate and by the cron sweep in the
+// therapist-application function. Email failures never change the applicant's
+// result.
+async function queueAndSendInvite(
+  admin: ReturnType<typeof createClient>,
+  submissionId: string,
+  email: string,
+  firstName: string,
+) {
+  try {
+    const { data: invite, error } = await admin
+      .from("therapist_application_invites")
+      .insert({ tenant_id: TENANT_ID, submission_id: submissionId, email })
+      .select("id, email, status")
+      .single();
+    if (error) {
+      if (error.code === "23505") return; // already queued for this submission
+      console.error(JSON.stringify({ fn: "register-clinician-interest", stage: "invite_queue", result: "failed", code: error.code }));
+      return;
+    }
+    await sendTherapistInvite(admin, invite, firstName);
+  } catch (_e) {
+    // Invite delivery must never change the registration result.
+  }
+}
+
+async function retryFailedInvite(
+  admin: ReturnType<typeof createClient>,
+  submissionId: string,
+  firstName: string,
+) {
+  try {
+    const { data: invite } = await admin
+      .from("therapist_application_invites")
+      .select("id, email, status")
+      .eq("tenant_id", TENANT_ID)
+      .eq("submission_id", submissionId)
+      .maybeSingle();
+    if (invite && invite.status === "failed") {
+      await sendTherapistInvite(admin, invite, firstName);
+    }
+  } catch (_e) {
+    // Best effort only.
+  }
+}
 
 const UNAVAILABLE_MESSAGE =
   "Our system is having trouble right now, so we could not confirm your registration. Please try again in a few minutes.";

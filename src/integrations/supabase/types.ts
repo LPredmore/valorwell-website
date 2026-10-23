@@ -26706,6 +26706,7 @@ export type Database = {
           license_category: string | null
           license_numbers: Json
           npi: string | null
+          npi_declared: boolean | null
           provider_applicant_id: string | null
           source_submission_id: string | null
           states: string[]
@@ -26723,6 +26724,7 @@ export type Database = {
           license_category?: string | null
           license_numbers?: Json
           npi?: string | null
+          npi_declared?: boolean | null
           provider_applicant_id?: string | null
           source_submission_id?: string | null
           states?: string[]
@@ -26740,6 +26742,7 @@ export type Database = {
           license_category?: string | null
           license_numbers?: Json
           npi?: string | null
+          npi_declared?: boolean | null
           provider_applicant_id?: string | null
           source_submission_id?: string | null
           states?: string[]

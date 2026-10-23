@@ -1,0 +1,1 @@
+ALTER TABLE public.therapist_applications ADD COLUMN npi_declared boolean;

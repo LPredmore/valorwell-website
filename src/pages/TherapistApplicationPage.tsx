@@ -261,7 +261,7 @@ export default function TherapistApplicationPage() {
     <Layout>
       <SEO
         title="Therapist Application"
-        description="Continue your ValorWell clinician application: verify your email, then share your license category, states, license numbers, and NPI."
+        description="Complete your secure ValorWell clinician application, professional qualifications and disclosures."
         canonical="/therapistapplication"
         noIndex
       />
@@ -269,21 +269,21 @@ export default function TherapistApplicationPage() {
         <div className="container mx-auto max-w-2xl px-4">
           <h1 className="text-3xl font-bold text-foreground md:text-4xl">Continue your application.</h1>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-            Three short steps: your license type, your license numbers, and your NPI. Your answers
-            are saved as you go, and you can come back anytime with your email.
+            Start with your license details, then complete your professional application at a comfortable pace.
+            Each stage saves securely, and you can return using the same email address.
           </p>
 
           {stage === "form" && (
-            <ol aria-label="Application progress" className="mt-8 flex items-center gap-2">
+            <ol aria-label="Application progress" className="mt-8 grid grid-cols-7 gap-1">
               {STEP_TITLES.map((title, index) => {
                 const number = index + 1;
                 const active = number === step;
                 const complete = number < step;
                 return (
-                  <li key={title} className="flex flex-1 items-center gap-2">
+                  <li key={title} className="flex min-w-0 flex-col items-center gap-1">
                     <span
                       aria-current={active ? "step" : undefined}
-                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
                         active
                           ? "bg-primary text-primary-foreground"
                           : complete
@@ -293,10 +293,10 @@ export default function TherapistApplicationPage() {
                     >
                       {complete ? <CheckCircle2 className="h-4 w-4" aria-hidden="true" /> : number}
                     </span>
-                    <span className={`hidden text-xs font-medium sm:block ${active ? "text-foreground" : "text-muted-foreground"}`}>
+                    <span className={`hidden text-center text-[10px] font-medium md:block ${active ? "text-foreground" : "text-muted-foreground"}`}>
                       {title}
                     </span>
-                    {number < STEP_TITLES.length && <span className="h-px flex-1 bg-border" aria-hidden="true" />}
+                    
                   </li>
                 );
               })}
@@ -526,8 +526,60 @@ export default function TherapistApplicationPage() {
                   <Button variant="outline" onClick={() => { setStep(2); setError(null); }} disabled={busy} className="min-h-12">
                     <ChevronLeft className="mr-1 h-4 w-4" aria-hidden="true" /> Back
                   </Button>
-                  <Button onClick={() => saveStep("done")} disabled={busy} className="min-h-12 flex-1">
-                    {busy ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />Submitting…</> : "Submit"}
+                  <Button onClick={() => saveStep(4)} disabled={busy} className="min-h-12 flex-1">
+                    {busy ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />Saving…</> : "Next: professional details"}
+                  </Button>
+                </div>
+              </div>
+            )}
+
+
+            {stage === "form" && step === 4 && (
+              <div>
+                <ProfileQuestions value={profile} onChange={setProfile}/>
+                {error && <p role="alert" className="mt-4 rounded-lg border border-destructive/40 p-3 text-sm">{error}</p>}
+                <div className="mt-6 flex gap-3">
+                  <Button variant="outline" onClick={()=>{setStep(3);setError(null)}} disabled={busy}>Back</Button>
+                  <Button className="flex-1" onClick={()=>saveStep(5)} disabled={busy}>
+                    {busy?"Saving…":"Next: professional disclosures"}
+                  </Button>
+                </div>
+              </div>
+            )}
+            {stage === "form" && step === 5 && (
+              <div>
+                <DisclosureQuestions value={disclosures} onChange={setDisclosures}/>
+                {error && <p role="alert" className="mt-4 rounded-lg border border-destructive/40 p-3 text-sm">{error}</p>}
+                <div className="mt-6 flex gap-3">
+                  <Button variant="outline" onClick={()=>{setStep(4);setError(null)}} disabled={busy}>Back</Button>
+                  <Button className="flex-1" onClick={()=>saveStep(6)} disabled={busy}>
+                    {busy?"Saving…":"Next: optional experience"}
+                  </Button>
+                </div>
+              </div>
+            )}
+            {stage === "form" && step === 6 && (
+              <div>
+                <EmploymentQuestions value={employment} onChange={setEmployment}
+                  onParse={parseUploadedResume} parsing={parsingResume}/>
+                {error && <p role="alert" className="mt-4 rounded-lg border border-destructive/40 p-3 text-sm">{error}</p>}
+                <div className="mt-6 flex gap-3">
+                  <Button variant="outline" onClick={()=>{setStep(5);setError(null)}} disabled={busy}>Back</Button>
+                  <Button className="flex-1" onClick={()=>saveStep(7)} disabled={busy||parsingResume}>
+                    {busy?"Saving…":"Review application"}
+                  </Button>
+                </div>
+              </div>
+            )}
+            {stage === "form" && step === 7 && (
+              <div>
+                <ReviewQuestions profile={profile} disclosures={disclosures} employment={employment}
+                  attestation={attestation} onChange={setAttestation} licensedStates={states.map(stateName)}/>
+                {error && <p role="alert" className="mt-4 rounded-lg border border-destructive/40 p-3 text-sm">{error}</p>}
+                <div className="mt-6 flex gap-3">
+                  <Button variant="outline" onClick={()=>{setStep(6);setError(null)}} disabled={busy}>Back</Button>
+                  <Button className="flex-1" onClick={()=>saveStep("done")} disabled={busy}>
+                    {busy?"Submitting…":"Submit professional application"}
                   </Button>
                 </div>
               </div>
@@ -536,7 +588,7 @@ export default function TherapistApplicationPage() {
             {stage === "done" && (
               <div className="text-center" role="status">
                 <CheckCircle2 className="mx-auto h-14 w-14 text-primary" aria-hidden="true" />
-                <h2 className="mt-6 text-2xl font-bold text-foreground">You&apos;re all set for now.</h2>
+                <h2 className="mt-6 text-2xl font-bold text-foreground">Your professional application is complete.</h2>
                 <p className="mx-auto mt-4 max-w-md text-base leading-relaxed text-muted-foreground">
                   We have what we need for this step. Our team will review your details and reach
                   out about what comes next. Questions in the meantime? Email{" "}
